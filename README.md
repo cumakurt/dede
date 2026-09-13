@@ -23,6 +23,7 @@ distributed exclusively under the GNU Affero General Public License v3.0
 ## Contents
 
 - [What Dede provides](#what-dede-provides)
+- [Report screenshots](#report-screenshots)
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [First scan](#first-scan)
@@ -63,6 +64,49 @@ distributed exclusively under the GNU Affero General Public License v3.0
 Dede is a static analysis tool. A finding is evidence for review, not proof that
 the target is exploitable. Incomplete or skipped analyzer coverage remains
 visible in the report and must not be interpreted as a clean bill of health.
+
+## Report screenshots
+
+### Self-contained HTML report
+
+<p align="center">
+  <img src="img/html.png" alt="Dede HTML report cover with project metadata and report navigation" width="100%">
+</p>
+
+The HTML report opens with project, repository, commit, analysis, and engine
+metadata. Its persistent navigation links the executive summary, finding views,
+security operations, remediation guidance, coverage, and methodology in one
+offline artifact.
+
+<p align="center">
+  <img src="img/html2.png" alt="Dede executive summary showing severity totals, security score, scan scope, and release guidance" width="100%">
+</p>
+
+The executive summary combines severity counts, the evidence-backed risk score,
+scan scope, analyzer completion, primary risks, and release guidance. These
+values are derived from the recorded scan; static analysis does not claim runtime
+exploitability.
+
+### Security operations and traceability
+
+<p align="center">
+  <img src="img/rem.png" alt="Dede security operations dashboard with lifecycle, attack surface, analyzer health, policy, performance, and traceability data" width="100%">
+</p>
+
+Security operations make incomplete coverage explicit while presenting finding
+lifecycle, reachability, exploitability, policy results, analyzer health, scan
+performance, and manifest traceability. A policy pass remains clearly separated
+from an application-security guarantee.
+
+### Archival PDF/A report
+
+<p align="center">
+  <img src="img/pdf.png" alt="Dede PDF/A report showing severity distribution and finding categories with document bookmarks" width="100%">
+</p>
+
+The locally generated PDF/A-3u report includes document bookmarks, severity and
+category distributions, detailed evidence, embedded machine-readable scan data,
+and a separate SHA-256 integrity file for archival workflows.
 
 ## Requirements
 
