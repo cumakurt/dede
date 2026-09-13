@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "generated": "2026-09-13",
+  "description": "Bundled advisory container. Organizations can add signed/offline advisory exports with sca.advisory_paths; Dede intentionally does not ship a stale CVE snapshot as authoritative data.",
+  "advisories": []
+}

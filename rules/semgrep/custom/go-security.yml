@@ -1,0 +1,38 @@
+rules:
+  - id: dede.go.security.exec-command
+    message: "Detected potentially unsafe command execution via shell -c (CWE-78)."
+    languages: [go]
+    severity: ERROR
+    metadata:
+      cwe: ["CWE-78"]
+      owasp: ["A03:2021"]
+      category: security
+    pattern-either:
+      - pattern: exec.Command($BIN, "sh", "-c", $CMD, ...)
+      - pattern: exec.Command("sh", "-c", $CMD, ...)
+      - pattern: exec.Command("bash", "-c", $CMD, ...)
+
+  - id: dede.go.security.insecure-tls-skip-verify
+    message: "TLS InsecureSkipVerify disables certificate validation (CWE-295)."
+    languages: [go]
+    severity: ERROR
+    metadata:
+      cwe: ["CWE-295"]
+      owasp: ["A02:2021"]
+      category: security
+    pattern: |
+      &tls.Config{..., InsecureSkipVerify: true, ...}
+
+  - id: dede.go.security.sql-sprintf
+    message: "SQL built with fmt.Sprintf may allow injection (CWE-89)."
+    languages: [go]
+    severity: WARNING
+    metadata:
+      cwe: ["CWE-89"]
+      owasp: ["A03:2021"]
+      category: security
+    patterns:
+      - pattern-either:
+          - pattern: $DB.Query(fmt.Sprintf(...), ...)
+          - pattern: $DB.Exec(fmt.Sprintf(...), ...)
+          - pattern: $DB.QueryRow(fmt.Sprintf(...), ...)

@@ -1,0 +1,955 @@
+rules:
+- id: scala.jwt-scala.security.jwt-scala-hardcode.jwt-scala-hardcode
+  patterns:
+  - pattern-inside: |
+      import pdi.jwt.$DEPS
+      ...
+  - pattern-either:
+    - pattern: $JWT.encode($X, "...", ...)
+    - pattern: $JWT.decode($X, "...", ...)
+    - pattern: $JWT.decodeRawAll($X, "...", ...)
+    - pattern: $JWT.decodeRaw($X, "...", ...)
+    - pattern: $JWT.decodeAll($X, "...", ...)
+    - pattern: $JWT.validate($X, "...", ...)
+    - pattern: $JWT.isValid($X, "...", ...)
+    - pattern: $JWT.decodeJson($X, "...", ...)
+    - pattern: $JWT.decodeJsonAll($X, "...", ...)
+    - patterns:
+      - pattern-either:
+        - pattern: $JWT.encode($X, $KEY, ...)
+        - pattern: $JWT.decode($X, $KEY, ...)
+        - pattern: $JWT.decodeRawAll($X, $KEY, ...)
+        - pattern: $JWT.decodeRaw($X, $KEY, ...)
+        - pattern: $JWT.decodeAll($X, $KEY, ...)
+        - pattern: $JWT.validate($X, $KEY, ...)
+        - pattern: $JWT.isValid($X, $KEY, ...)
+        - pattern: $JWT.decodeJson($X, $KEY, ...)
+        - pattern: $JWT.decodeJsonAll($X, $KEY, ...)
+        - pattern: $JWT.encode($X, this.$KEY, ...)
+        - pattern: $JWT.decode($X, this.$KEY, ...)
+        - pattern: $JWT.decodeRawAll($X, this.$KEY, ...)
+        - pattern: $JWT.decodeRaw($X, this.$KEY, ...)
+        - pattern: $JWT.decodeAll($X, this.$KEY, ...)
+        - pattern: $JWT.validate($X, this.$KEY, ...)
+        - pattern: $JWT.isValid($X, this.$KEY, ...)
+        - pattern: $JWT.decodeJson($X, this.$KEY, ...)
+        - pattern: $JWT.decodeJsonAll($X, this.$KEY, ...)
+      - pattern-either:
+        - pattern-inside: |
+            class $CL {
+              ...
+              $KEY = "..."
+              ...
+            }
+        - pattern-inside: |
+            object $CL {
+              ...
+              $KEY = "..."
+              ...
+            }
+  - metavariable-pattern:
+      metavariable: $JWT
+      patterns:
+      - pattern-either:
+        - pattern: Jwt
+        - pattern: JwtArgonaut
+        - pattern: JwtCirce
+        - pattern: JwtJson4s
+        - pattern: JwtJson
+        - pattern: JwtUpickle
+  message: 'Hardcoded JWT secret or private key is used. This is a Insufficiently
+    Protected Credentials weakness: https://cwe.mitre.org/data/definitions/522.html
+    Consider using an appropriate security mechanism to protect the credentials (e.g.
+    keeping secrets in environment variables)'
+  languages:
+  - scala
+  severity: WARNING
+  metadata:
+    references:
+    - https://jwt-scala.github.io/jwt-scala/
+    category: security
+    cwe:
+    - 'CWE-522: Insufficiently Protected Credentials'
+    owasp:
+    - A02:2017 - Broken Authentication
+    - A04:2021 - Insecure Design
+    - A06:2025 - Insecure Design
+    technology:
+    - scala
+    confidence: HIGH
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Cryptographic Issues
+    source: https://semgrep.dev/r/scala.jwt-scala.security.jwt-scala-hardcode.jwt-scala-hardcode
+    shortlink: https://sg.run/8zE7
+    semgrep.dev:
+      rule:
+        r_id: 19040
+        rv_id: 1263669
+        rule_id: WAUdK0
+        version_id: o5TbDA8
+        url: https://semgrep.dev/playground/r/o5TbDA8/scala.jwt-scala.security.jwt-scala-hardcode.jwt-scala-hardcode
+        origin: community
+- id: scala.lang.security.audit.documentbuilder-dtd-enabled.documentbuilder-dtd-enabled
+  patterns:
+  - pattern-either:
+    - pattern: |
+        $DF = DocumentBuilderFactory.newInstance(...)
+        ...
+        $DB = $DF.newDocumentBuilder(...)
+    - patterns:
+      - pattern: $DB = DocumentBuilderFactory.newInstance(...)
+      - pattern-not-inside: |
+          ...
+          $X = $DB.newDocumentBuilder(...)
+    - pattern: $DB = DocumentBuilderFactory.newInstance(...).newDocumentBuilder(...)
+  - pattern-not-inside: |
+      ...
+      $DB.setXIncludeAware(true)
+      ...
+      $DB.setNamespaceAware(true)
+      ...
+      $DB.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true)
+      ...
+      $DB.setFeature("http://xml.org/sax/features/external-general-entities", false)
+      ...
+      $DB.setFeature("http://xml.org/sax/features/external-parameter-entities", false)
+  - pattern-not-inside: |
+      ...
+      $DB.setXIncludeAware(true)
+      ...
+      $DB.setNamespaceAware(true)
+      ...
+      $DB.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true)
+      ...
+      $DB.setFeature("http://xml.org/sax/features/external-parameter-entities", false)
+      ...
+      $DB.setFeature("http://xml.org/sax/features/external-general-entities", false)
+  - pattern-not-inside: |
+      ...
+      $DB.setXIncludeAware(true)
+      ...
+      $DB.setNamespaceAware(true)
+      ...
+      $DB.setFeature("http://xml.org/sax/features/external-general-entities", false)
+      ...
+      $DB.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true)
+      ...
+      $DB.setFeature("http://xml.org/sax/features/external-parameter-entities", false)
+  - pattern-not-inside: |
+      ...
+      $DB.setXIncludeAware(true)
+      ...
+      $DB.setNamespaceAware(true)
+      ...
+      $DB.setFeature("http://xml.org/sax/features/external-general-entities", false)
+      ...
+      $DB.setFeature("http://xml.org/sax/features/external-parameter-entities", false)
+      ...
+      $DB.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true)
+  message: Document Builder being instantiated without calling the `setFeature` functions
+    that are generally used for disabling entity processing. User controlled data
+    in XML Document builder can result in XML Internal Entity Processing vulnerabilities
+    like the disclosure of confidential data, denial of service, Server Side Request
+    Forgery (SSRF), port scanning. Make sure to disable entity processing functionality.
+  languages:
+  - scala
+  severity: WARNING
+  metadata:
+    cwe:
+    - 'CWE-611: Improper Restriction of XML External Entity Reference'
+    owasp:
+    - A04:2017 - XML External Entities (XXE)
+    - A05:2021 - Security Misconfiguration
+    - A02:2025 - Security Misconfiguration
+    source-rule-url: https://cheatsheetseries.owasp.org//cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html
+    category: security
+    technology:
+    - scala
+    confidence: HIGH
+    references:
+    - https://owasp.org/Top10/A05_2021-Security_Misconfiguration
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: LOW
+    impact: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - XML Injection
+    source: https://semgrep.dev/r/scala.lang.security.audit.documentbuilder-dtd-enabled.documentbuilder-dtd-enabled
+    shortlink: https://sg.run/gRQn
+    semgrep.dev:
+      rule:
+        r_id: 19041
+        rv_id: 1263673
+        rule_id: 0oUwzP
+        version_id: X0TzyRq
+        url: https://semgrep.dev/playground/r/X0TzyRq/scala.lang.security.audit.documentbuilder-dtd-enabled.documentbuilder-dtd-enabled
+        origin: community
+- id: scala.lang.security.audit.xmlinputfactory-dtd-enabled.xmlinputfactory-dtd-enabled
+  patterns:
+  - pattern-not-inside: |
+      ...
+      $XMLFACTORY.setProperty("javax.xml.stream.isSupportingExternalEntities", false)
+  - pattern-either:
+    - pattern: $XMLFACTORY = XMLInputFactory.newFactory(...)
+    - pattern: $XMLFACTORY = XMLInputFactory.newInstance(...)
+    - pattern: $XMLFACTORY = new XMLInputFactory(...)
+  message: XMLInputFactory being instantiated without calling the setProperty functions
+    that are generally used for disabling entity processing. User controlled data
+    in XML Document builder can result in XML Internal Entity Processing vulnerabilities
+    like the disclosure of confidential data, denial of service, Server Side Request
+    Forgery (SSRF), port scanning. Make sure to disable entity processing functionality.
+  languages:
+  - scala
+  severity: WARNING
+  metadata:
+    cwe:
+    - 'CWE-611: Improper Restriction of XML External Entity Reference'
+    owasp:
+    - A04:2017 - XML External Entities (XXE)
+    - A05:2021 - Security Misconfiguration
+    - A02:2025 - Security Misconfiguration
+    source-rule-url: https://cheatsheetseries.owasp.org//cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html
+    category: security
+    technology:
+    - scala
+    confidence: HIGH
+    references:
+    - https://owasp.org/Top10/A05_2021-Security_Misconfiguration
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - audit
+    likelihood: LOW
+    impact: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - XML Injection
+    source: https://semgrep.dev/r/scala.lang.security.audit.xmlinputfactory-dtd-enabled.xmlinputfactory-dtd-enabled
+    shortlink: https://sg.run/3BEb
+    semgrep.dev:
+      rule:
+        r_id: 19043
+        rv_id: 1263683
+        rule_id: qNUQ7w
+        version_id: xyTjzkA
+        url: https://semgrep.dev/playground/r/xyTjzkA/scala.lang.security.audit.xmlinputfactory-dtd-enabled.xmlinputfactory-dtd-enabled
+        origin: community
+- id: scala.lang.security.audit.rsa-padding-set.rsa-padding-set
+  metadata:
+    cwe:
+    - 'CWE-780: Use of RSA Algorithm without OAEP'
+    owasp:
+    - A02:2021 - Cryptographic Failures
+    - A04:2025 - Cryptographic Failures
+    category: security
+    technology:
+    - scala
+    - cryptography
+    resources:
+    - https://blog.codacy.com/9-scala-security-issues/
+    confidence: HIGH
+    references:
+    - https://owasp.org/Top10/A02_2021-Cryptographic_Failures
+    subcategory:
+    - audit
+    likelihood: MEDIUM
+    impact: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Cryptographic Issues
+    source: https://semgrep.dev/r/scala.lang.security.audit.rsa-padding-set.rsa-padding-set
+    shortlink: https://sg.run/GO5p
+    semgrep.dev:
+      rule:
+        r_id: 15192
+        rv_id: 1263677
+        rule_id: 3qUj1Q
+        version_id: yeTxpoX
+        url: https://semgrep.dev/playground/r/yeTxpoX/scala.lang.security.audit.rsa-padding-set.rsa-padding-set
+        origin: community
+  message: Usage of RSA without OAEP (Optimal Asymmetric Encryption Padding) may weaken
+    encryption. This could lead to sensitive data exposure. Instead, use RSA with
+    `OAEPWithMD5AndMGF1Padding` instead.
+  severity: WARNING
+  languages:
+  - scala
+  patterns:
+  - pattern: |
+      $VAR = $CIPHER.getInstance($MODE)
+  - metavariable-regex:
+      metavariable: $MODE
+      regex: .*RSA/.*/NoPadding.*
+- id: scala.lang.security.audit.io-source-ssrf.io-source-ssrf
+  patterns:
+  - pattern-either:
+    - pattern: Source.fromURL($URL,...)
+    - pattern: Source.fromURI($URL,...)
+  - pattern-inside: |
+      import scala.io.$SOURCE
+      ...
+  - pattern-either:
+    - pattern-inside: |
+        def $FUNC(..., $URL: $T, ...) = $A {
+          ...
+        }
+    - pattern-inside: |
+        def $FUNC(..., $URL: $T, ...) = {
+          ...
+        }
+  message: A parameter being passed directly into `fromURL` most likely lead to SSRF.
+    This could allow an attacker to send data to their own server, potentially exposing
+    sensitive data sent with this request. They could also probe internal servers
+    or other resources that the server running this code can access. Do not allow
+    arbitrary hosts. Instead, create an allowlist for approved hosts, or hardcode
+    the correct host.
+  metadata:
+    cwe:
+    - 'CWE-918: Server-Side Request Forgery (SSRF)'
+    owasp:
+    - A10:2021 - Server-Side Request Forgery (SSRF)
+    - A01:2025 - Broken Access Control
+    references:
+    - https://cheatsheetseries.owasp.org/cheatsheets/Server_Side_Request_Forgery_Prevention_Cheat_Sheet.html
+    - https://www.scala-lang.org/api/current/scala/io/Source$.html#fromURL(url:java.net.URL)(implicitcodec:scala.io.Codec):scala.io.BufferedSource
+    category: security
+    technology:
+    - scala
+    confidence: MEDIUM
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - audit
+    likelihood: LOW
+    impact: HIGH
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Server-Side Request Forgery (SSRF)
+    source: https://semgrep.dev/r/scala.lang.security.audit.io-source-ssrf.io-source-ssrf
+    shortlink: https://sg.run/Qbz4
+    semgrep.dev:
+      rule:
+        r_id: 18486
+        rv_id: 1263675
+        rule_id: GdUDOZ
+        version_id: 1QTypG9
+        url: https://semgrep.dev/playground/r/1QTypG9/scala.lang.security.audit.io-source-ssrf.io-source-ssrf
+        origin: community
+  languages:
+  - scala
+  severity: WARNING
+- id: scala.lang.security.audit.tainted-sql-string.tainted-sql-string
+  languages:
+  - scala
+  severity: ERROR
+  mode: taint
+  message: User data flows into this manually-constructed SQL string. User data can
+    be safely inserted into SQL strings using prepared statements or an object-relational
+    mapper (ORM). Manually-constructed SQL strings is a possible indicator of SQL
+    injection, which could let an attacker steal or manipulate data from the database.
+    Instead, use prepared statements (`connection.PreparedStatement`) or a safe library.
+  metadata:
+    cwe:
+    - 'CWE-89: Improper Neutralization of Special Elements used in an SQL Command
+      (''SQL Injection'')'
+    owasp:
+    - A01:2017 - Injection
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    references:
+    - https://docs.oracle.com/javase/7/docs/api/java/sql/PreparedStatement.html
+    category: security
+    technology:
+    - scala
+    confidence: MEDIUM
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: HIGH
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - SQL Injection
+    source: https://semgrep.dev/r/scala.lang.security.audit.tainted-sql-string.tainted-sql-string
+    shortlink: https://sg.run/ALD6
+    semgrep.dev:
+      rule:
+        r_id: 20050
+        rv_id: 1263682
+        rule_id: WAUY8B
+        version_id: w8TRoO6
+        url: https://semgrep.dev/playground/r/w8TRoO6/scala.lang.security.audit.tainted-sql-string.tainted-sql-string
+        origin: community
+  pattern-sources:
+  - patterns:
+    - pattern: $PARAM
+    - pattern-either:
+      - pattern-inside: |
+          def $CTRL(..., $PARAM: $TYPE, ...) = {
+            ...
+          }
+      - pattern-inside: |
+          def $CTRL(..., $PARAM: $TYPE, ...) = $A {
+            ...
+          }
+      - pattern-inside: |
+          def $CTRL(..., $PARAM: $TYPE, ...) = $A(...) {
+            ...
+          }
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - patterns:
+        - pattern-either:
+          - pattern: |
+              "$SQLSTR" + ...
+          - pattern: |
+              "$SQLSTR".format(...)
+          - patterns:
+            - pattern-inside: |
+                $SB = new StringBuilder("$SQLSTR");
+                ...
+            - pattern: $SB.append(...)
+          - patterns:
+            - pattern-inside: |
+                $VAR = "$SQLSTR"
+                ...
+            - pattern: $VAR += ...
+        - metavariable-regex:
+            metavariable: $SQLSTR
+            regex: (?i)(select|delete|insert|create|update|alter|drop)\b
+      - patterns:
+        - pattern-either:
+          - pattern: s"..."
+          - pattern: f"..."
+        - pattern-regex: |
+            .*\b(?i)(select|delete|insert|create|update|alter|drop)\b.*
+    - pattern-not-inside: println(...)
+    - pattern-not-inside: throw new $EXCEPTION(...)
+  pattern-sanitizers:
+  - pattern-either:
+    - patterns:
+      - pattern-either:
+        - pattern: $LOGGER.$METHOD(...)
+        - pattern: $LOGGER(...)
+      - metavariable-regex:
+          metavariable: $LOGGER
+          regex: (i?)log.*
+    - patterns:
+      - pattern: $LOGGER.$METHOD(...)
+      - metavariable-regex:
+          metavariable: $METHOD
+          regex: (i?)(trace|info|warn|warning|warnToError|error|debug)
+- id: scala.lang.security.audit.sax-dtd-enabled.sax-dtd-enabled
+  patterns:
+  - pattern-either:
+    - pattern: $SR = new SAXReader(...)
+    - pattern: |
+        $SF = SAXParserFactory.newInstance(...)
+        ...
+        $SR = $SF.newSAXParser(...)
+    - patterns:
+      - pattern: $SR = SAXParserFactory.newInstance(...)
+      - pattern-not-inside: |
+          ...
+          $X = $SR.newSAXParser(...)
+    - pattern: $SR = SAXParserFactory.newInstance(...).newSAXParser(...)
+    - pattern: $SR = new SAXBuilder(...)
+  - pattern-not-inside: |
+      ...
+      $SR.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true)
+      ...
+      $SR.setFeature("http://xml.org/sax/features/external-general-entities", false)
+      ...
+      $SR.setFeature("http://xml.org/sax/features/external-parameter-entities", false)
+  - pattern-not-inside: |
+      ...
+      $SR.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true)
+      ...
+      $SR.setFeature("http://xml.org/sax/features/external-parameter-entities", false)
+      ...
+      $SR.setFeature("http://xml.org/sax/features/external-general-entities", false)
+  - pattern-not-inside: |
+      ...
+      $SR.setFeature("http://xml.org/sax/features/external-general-entities", false)
+      ...
+      $SR.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true)
+      ...
+      $SR.setFeature("http://xml.org/sax/features/external-parameter-entities", false)
+  - pattern-not-inside: |
+      ...
+      $SR.setFeature("http://xml.org/sax/features/external-general-entities", false)
+      ...
+      $SR.setFeature("http://xml.org/sax/features/external-parameter-entities", false)
+      ...
+      $SR.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true)
+  message: XML processor being instantiated without calling the `setFeature` functions
+    that are generally used for disabling entity processing. User controlled data
+    in XML Parsers can result in XML Internal Entity Processing vulnerabilities like
+    the disclosure of confidential data, denial of service, Server Side Request Forgery
+    (SSRF), port scanning. Make sure to disable entity processing functionality.
+  languages:
+  - scala
+  severity: WARNING
+  metadata:
+    cwe:
+    - 'CWE-611: Improper Restriction of XML External Entity Reference'
+    owasp:
+    - A04:2017 - XML External Entities (XXE)
+    - A05:2021 - Security Misconfiguration
+    - A02:2025 - Security Misconfiguration
+    source-rule-url: https://cheatsheetseries.owasp.org//cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html
+    category: security
+    technology:
+    - scala
+    confidence: HIGH
+    references:
+    - https://owasp.org/Top10/A05_2021-Security_Misconfiguration
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - audit
+    likelihood: MEDIUM
+    impact: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - XML Injection
+    source: https://semgrep.dev/r/scala.lang.security.audit.sax-dtd-enabled.sax-dtd-enabled
+    shortlink: https://sg.run/QbYP
+    semgrep.dev:
+      rule:
+        r_id: 19042
+        rv_id: 1263678
+        rule_id: KxUrkq
+        version_id: rxTAKWY
+        url: https://semgrep.dev/playground/r/rxTAKWY/scala.lang.security.audit.sax-dtd-enabled.sax-dtd-enabled
+        origin: community
+- id: kotlin.lang.security.no-null-cipher.no-null-cipher
+  pattern: NullCipher(...)
+  metadata:
+    cwe:
+    - 'CWE-327: Use of a Broken or Risky Cryptographic Algorithm'
+    owasp:
+    - A03:2017 - Sensitive Data Exposure
+    - A02:2021 - Cryptographic Failures
+    - A04:2025 - Cryptographic Failures
+    source-rule-url: https://find-sec-bugs.github.io/bugs.htm#NULL_CIPHER
+    asvs:
+      section: V6 Stored Cryptography Verification Requirements
+      control_id: 6.2.5 Insecure Algorithm
+      control_url: https://github.com/OWASP/ASVS/blob/master/4.0/en/0x14-V6-Cryptography.md#v62-algorithms
+      version: '4'
+    category: security
+    technology:
+    - kotlin
+    references:
+    - https://owasp.org/Top10/A02_2021-Cryptographic_Failures
+    subcategory:
+    - vuln
+    likelihood: LOW
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Cryptographic Issues
+    source: https://semgrep.dev/r/kotlin.lang.security.no-null-cipher.no-null-cipher
+    shortlink: https://sg.run/0ywb
+    semgrep.dev:
+      rule:
+        r_id: 14698
+        rv_id: 1263265
+        rule_id: 0oU2Yy
+        version_id: o5TbDPj
+        url: https://semgrep.dev/playground/r/o5TbDPj/kotlin.lang.security.no-null-cipher.no-null-cipher
+        origin: community
+  message: 'NullCipher was detected. This will not encrypt anything; the cipher text
+    will be the same as the plain text. Use a valid, secure cipher: Cipher.getInstance("AES/CBC/PKCS7PADDING").
+    See https://owasp.org/www-community/Using_the_Java_Cryptographic_Extensions for
+    more information.'
+  severity: WARNING
+  languages:
+  - kt
+  - scala
+- id: scala.scala-jwt.security.jwt-hardcode.scala-jwt-hardcoded-secret
+  languages:
+  - scala
+  message: 'Hardcoded JWT secret or private key is used. This is a Insufficiently
+    Protected Credentials weakness: https://cwe.mitre.org/data/definitions/522.html
+    Consider using an appropriate security mechanism to protect the credentials (e.g.
+    keeping secrets in environment variables)'
+  metadata:
+    category: security
+    cwe:
+    - 'CWE-522: Insufficiently Protected Credentials'
+    owasp:
+    - A02:2017 - Broken Authentication
+    - A04:2021 - Insecure Design
+    - A06:2025 - Insecure Design
+    source-rule-url: https://semgrep.dev/blog/2020/hardcoded-secrets-unverified-tokens-and-other-common-jwt-mistakes/
+    technology:
+    - jwt
+    confidence: HIGH
+    references:
+    - https://owasp.org/Top10/A04_2021-Insecure_Design
+    cwe2021-top25: true
+    subcategory:
+    - audit
+    likelihood: MEDIUM
+    impact: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Cryptographic Issues
+    source: https://semgrep.dev/r/scala.scala-jwt.security.jwt-hardcode.scala-jwt-hardcoded-secret
+    shortlink: https://sg.run/Z40o
+    semgrep.dev:
+      rule:
+        r_id: 15079
+        rv_id: 1263691
+        rule_id: OrU6W1
+        version_id: 7ZTE3kr
+        url: https://semgrep.dev/playground/r/7ZTE3kr/scala.scala-jwt.security.jwt-hardcode.scala-jwt-hardcoded-secret
+        origin: community
+  pattern-either:
+  - pattern: |
+      com.auth0.jwt.algorithms.Algorithm.HMAC256("...");
+  - pattern: |
+      $SECRET = "...";
+      ...
+      com.auth0.jwt.algorithms.Algorithm.HMAC256($SECRET);
+  - pattern: |
+      class $CLASS {
+        ...
+        $DECL $SECRET = "...";
+        ...
+        def $FUNC (...): $RETURNTYPE = {
+          ...
+          com.auth0.jwt.algorithms.Algorithm.HMAC256($SECRET);
+          ...
+        }
+        ...
+      }
+  - pattern: |
+      com.auth0.jwt.algorithms.Algorithm.HMAC384("...");
+  - pattern: |
+      $SECRET = "...";
+      ...
+      com.auth0.jwt.algorithms.Algorithm.HMAC384($SECRET);
+  - pattern: |
+      class $CLASS {
+        ...
+        $DECL $SECRET = "...";
+        ...
+        def $FUNC (...): $RETURNTYPE = {
+          ...
+          com.auth0.jwt.algorithms.Algorithm.HMAC384($SECRET);
+          ...
+        }
+        ...
+      }
+  - pattern: |
+      com.auth0.jwt.algorithms.Algorithm.HMAC512("...");
+  - pattern: |
+      $SECRET = "...";
+      ...
+      com.auth0.jwt.algorithms.Algorithm.HMAC512($SECRET);
+  - pattern: |
+      class $CLASS {
+        ...
+        $DECL $SECRET = "...";
+        ...
+        def $FUNC (...): $RETURNTYPE = {
+          ...
+          com.auth0.jwt.algorithms.Algorithm.HMAC512($SECRET);
+          ...
+        }
+        ...
+      }
+  severity: ERROR
+- id: scala.play.security.tainted-sql-from-http-request.tainted-sql-from-http-request
+  languages:
+  - scala
+  severity: ERROR
+  mode: taint
+  message: User data flows into this manually-constructed SQL string. User data can
+    be safely inserted into SQL strings using prepared statements or an object-relational
+    mapper (ORM). Manually-constructed SQL strings is a possible indicator of SQL
+    injection, which could let an attacker steal or manipulate data from the database.
+    Instead, use prepared statements (`connection.PreparedStatement`) or a safe library.
+  metadata:
+    cwe:
+    - 'CWE-89: Improper Neutralization of Special Elements used in an SQL Command
+      (''SQL Injection'')'
+    owasp:
+    - A01:2017 - Injection
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    references:
+    - https://docs.oracle.com/javase/7/docs/api/java/sql/PreparedStatement.html
+    category: security
+    technology:
+    - scala
+    - play
+    confidence: HIGH
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: HIGH
+    impact: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - SQL Injection
+    source: https://semgrep.dev/r/scala.play.security.tainted-sql-from-http-request.tainted-sql-from-http-request
+    shortlink: https://sg.run/BeW9
+    semgrep.dev:
+      rule:
+        r_id: 20051
+        rv_id: 1263688
+        rule_id: 0oUpon
+        version_id: ZRTKAoG
+        url: https://semgrep.dev/playground/r/ZRTKAoG/scala.play.security.tainted-sql-from-http-request.tainted-sql-from-http-request
+        origin: community
+  pattern-sources:
+  - patterns:
+    - pattern-either:
+      - patterns:
+        - pattern: $REQ
+        - pattern-either:
+          - pattern-inside: "Action {\n  $REQ: Request[$T] => \n    ...\n}\n"
+          - pattern-inside: "Action(...) {\n  $REQ: Request[$T] => \n    ...\n}\n"
+          - pattern-inside: "Action.async {\n  $REQ: Request[$T] => \n    ...\n}\n"
+          - pattern-inside: "Action.async(...) {\n  $REQ: Request[$T] => \n    ...\n}\n"
+      - patterns:
+        - pattern: $PARAM
+        - pattern-either:
+          - pattern-inside: |
+              def $CTRL(..., $PARAM: $TYPE, ...) = Action {
+                ...
+              }
+          - pattern-inside: |
+              def $CTRL(..., $PARAM: $TYPE, ...) = Action(...) {
+                ...
+              }
+          - pattern-inside: |
+              def $CTRL(..., $PARAM: $TYPE, ...) = Action.async {
+                ...
+              }
+          - pattern-inside: |
+              def $CTRL(..., $PARAM: $TYPE, ...) = Action.async(...) {
+                ...
+              }
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - patterns:
+        - pattern-either:
+          - pattern: |
+              "$SQLSTR" + ...
+          - pattern: |
+              "$SQLSTR".format(...)
+          - patterns:
+            - pattern-inside: |
+                $SB = new StringBuilder("$SQLSTR");
+                ...
+            - pattern: $SB.append(...)
+          - patterns:
+            - pattern-inside: |
+                $VAR = "$SQLSTR"
+                ...
+            - pattern: $VAR += ...
+        - metavariable-regex:
+            metavariable: $SQLSTR
+            regex: (?i)(select|delete|insert|create|update|alter|drop)\b
+      - patterns:
+        - pattern: s"..."
+        - pattern-regex: |
+            .*\b(?i)(select|delete|insert|create|update|alter|drop)\b.*
+    - pattern-not-inside: println(...)
+- id: scala.play.security.tainted-html-response.tainted-html-response
+  mode: taint
+  metadata:
+    category: security
+    cwe:
+    - 'CWE-79: Improper Neutralization of Input During Web Page Generation (''Cross-site
+      Scripting'')'
+    owasp:
+    - A07:2017 - Cross-Site Scripting (XSS)
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    technology:
+    - scala
+    - play
+    confidence: MEDIUM
+    references:
+    - https://owasp.org/Top10/A03_2021-Injection
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: HIGH
+    impact: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Cross-Site-Scripting (XSS)
+    source: https://semgrep.dev/r/scala.play.security.tainted-html-response.tainted-html-response
+    shortlink: https://sg.run/BG96
+    semgrep.dev:
+      rule:
+        r_id: 18795
+        rv_id: 1263686
+        rule_id: 0oUwn2
+        version_id: vdT06yj
+        url: https://semgrep.dev/playground/r/vdT06yj/scala.play.security.tainted-html-response.tainted-html-response
+        origin: community
+  message: Detected a request with potential user-input going into an `Ok()` response.
+    This bypasses any view or template environments, including HTML escaping, which
+    may expose this application to cross-site scripting (XSS) vulnerabilities. Consider
+    using a view technology such as Twirl which automatically escapes HTML views.
+  pattern-sources:
+  - patterns:
+    - pattern-either:
+      - patterns:
+        - pattern: $REQ
+        - pattern-either:
+          - pattern-inside: "Action {\n  $REQ: Request[$T] => \n    ...\n}\n"
+          - pattern-inside: "Action(...) {\n  $REQ: Request[$T] => \n    ...\n}\n"
+          - pattern-inside: "Action.async {\n  $REQ: Request[$T] => \n    ...\n}\n"
+          - pattern-inside: "Action.async(...) {\n  $REQ: Request[$T] => \n    ...\n}\n"
+      - patterns:
+        - pattern: $PARAM
+        - pattern-either:
+          - pattern-inside: |
+              def $CTRL(..., $PARAM: $TYPE, ...) = Action {
+                ...
+              }
+          - pattern-inside: |
+              def $CTRL(..., $PARAM: $TYPE, ...) = Action(...) {
+                ...
+              }
+          - pattern-inside: |
+              def $CTRL(..., $PARAM: $TYPE, ...) = Action.async {
+                ...
+              }
+          - pattern-inside: |
+              def $CTRL(..., $PARAM: $TYPE, ...) = Action.async(...) {
+                ...
+              }
+  pattern-sanitizers:
+  - pattern-either:
+    - pattern: org.apache.commons.lang3.StringEscapeUtils.escapeHtml4(...)
+    - pattern: org.owasp.encoder.Encode.forHtml(...)
+  pattern-sinks:
+  - pattern-either:
+    - pattern: Html.apply(...)
+    - pattern: Ok(...).as(HTML)
+    - pattern: Ok(...).as(ContentTypes.HTML)
+    - patterns:
+      - pattern: Ok(...).as($CTYPE)
+      - metavariable-regex:
+          metavariable: $CTYPE
+          regex: '"[tT][eE][xX][tT]/[hH][tT][mM][lL]"'
+    - patterns:
+      - pattern: Ok(...).as($CTYPE)
+      - pattern-not: Ok(...).as("...")
+      - pattern-either:
+        - pattern-inside: |
+            def $FUNC(..., $URL: $T, ...) = $A {
+              ...
+            }
+        - pattern-inside: |
+            def $FUNC(..., $URL: $T, ...) = {
+              ...
+            }
+  severity: WARNING
+  languages:
+  - scala
+- id: scala.play.security.tainted-slick-sqli.tainted-slick-sqli
+  mode: taint
+  metadata:
+    references:
+    - https://scala-slick.org/doc/3.3.3/sql.html#splicing-literal-values
+    - https://scala-slick.org/doc/3.2.0/sql-to-slick.html#non-optimal-sql-code
+    category: security
+    cwe:
+    - 'CWE-89: Improper Neutralization of Special Elements used in an SQL Command
+      (''SQL Injection'')'
+    owasp:
+    - A01:2017 - Injection
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    technology:
+    - scala
+    - slick
+    - play
+    confidence: HIGH
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: HIGH
+    impact: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - SQL Injection
+    source: https://semgrep.dev/r/scala.play.security.tainted-slick-sqli.tainted-slick-sqli
+    shortlink: https://sg.run/k9K2
+    semgrep.dev:
+      rule:
+        r_id: 18328
+        rv_id: 1263687
+        rule_id: GdUDWO
+        version_id: d6TyxJe
+        url: https://semgrep.dev/playground/r/d6TyxJe/scala.play.security.tainted-slick-sqli.tainted-slick-sqli
+        origin: community
+  message: Detected a tainted SQL statement. This could lead to SQL injection if variables
+    in the SQL statement are not properly sanitized. Avoid using using user input
+    for generating SQL strings.
+  pattern-sources:
+  - patterns:
+    - pattern-either:
+      - patterns:
+        - pattern: $REQ
+        - pattern-either:
+          - pattern-inside: "Action {\n  $REQ: Request[$T] => \n    ...\n}\n"
+          - pattern-inside: "Action(...) {\n  $REQ: Request[$T] => \n    ...\n}\n"
+          - pattern-inside: "Action.async {\n  $REQ: Request[$T] => \n    ...\n}\n"
+          - pattern-inside: "Action.async(...) {\n  $REQ: Request[$T] => \n    ...\n}\n"
+      - patterns:
+        - pattern: $PARAM
+        - pattern-either:
+          - pattern-inside: |
+              def $CTRL(..., $PARAM: $TYPE, ...) = Action {
+                ...
+              }
+          - pattern-inside: |
+              def $CTRL(..., $PARAM: $TYPE, ...) = Action(...) {
+                ...
+              }
+          - pattern-inside: |
+              def $CTRL(..., $PARAM: $TYPE, ...) = Action.async {
+                ...
+              }
+          - pattern-inside: |
+              def $CTRL(..., $PARAM: $TYPE, ...) = Action.async(...) {
+                ...
+              }
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - pattern: $MODEL.overrideSql(...)
+      - pattern: sql"..."
+    - pattern-inside: |
+        import slick.$DEPS
+        ...
+  severity: ERROR
+  languages:
+  - scala

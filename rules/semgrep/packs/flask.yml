@@ -1,0 +1,1304 @@
+rules:
+- id: python.flask.security.injection.os-system-injection.os-system-injection
+  languages:
+  - python
+  severity: ERROR
+  message: User data detected in os.system. This could be vulnerable to a command
+    injection and should be avoided. If this must be done, use the 'subprocess' module
+    instead and pass the arguments as a list.
+  metadata:
+    cwe:
+    - 'CWE-78: Improper Neutralization of Special Elements used in an OS Command (''OS
+      Command Injection'')'
+    owasp:
+    - A01:2017 - Injection
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    references:
+    - https://owasp.org/www-community/attacks/Command_Injection
+    category: security
+    technology:
+    - flask
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - audit
+    likelihood: MEDIUM
+    impact: HIGH
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Command Injection
+    source: https://semgrep.dev/r/python.flask.security.injection.os-system-injection.os-system-injection
+    shortlink: https://sg.run/4xzz
+    semgrep.dev:
+      rule:
+        r_id: 9544
+        rv_id: 1263429
+        rule_id: BYUN99
+        version_id: 1QTypw7
+        url: https://semgrep.dev/playground/r/1QTypw7/python.flask.security.injection.os-system-injection.os-system-injection
+        origin: community
+  pattern-either:
+  - patterns:
+    - pattern: os.system(...)
+    - pattern-either:
+      - pattern-inside: |
+          @$APP.route($ROUTE, ...)
+          def $FUNC(..., $ROUTEVAR, ...):
+            ...
+            os.system(..., <... $ROUTEVAR ...>, ...)
+      - pattern-inside: |
+          @$APP.route($ROUTE, ...)
+          def $FUNC(..., $ROUTEVAR, ...):
+            ...
+            $INTERM = <... $ROUTEVAR ...>
+            ...
+            os.system(..., <... $INTERM ...>, ...)
+  - pattern: os.system(..., <... flask.request.$W.get(...) ...>, ...)
+  - pattern: os.system(..., <... flask.request.$W[...] ...>, ...)
+  - pattern: os.system(..., <... flask.request.$W(...) ...>, ...)
+  - pattern: os.system(..., <... flask.request.$W ...>, ...)
+  - patterns:
+    - pattern-inside: |
+        $INTERM = <... flask.request.$W.get(...) ...>
+        ...
+        os.system(<... $INTERM ...>)
+    - pattern: os.system(...)
+  - patterns:
+    - pattern-inside: |
+        $INTERM = <... flask.request.$W[...] ...>
+        ...
+        os.system(<... $INTERM ...>)
+    - pattern: os.system(...)
+  - patterns:
+    - pattern-inside: |
+        $INTERM = <... flask.request.$W(...) ...>
+        ...
+        os.system(<... $INTERM ...>)
+    - pattern: os.system(...)
+  - patterns:
+    - pattern-inside: |
+        $INTERM = <... flask.request.$W ...>
+        ...
+        os.system(<... $INTERM ...>)
+    - pattern: os.system(...)
+- id: python.flask.security.injection.path-traversal-open.path-traversal-open
+  languages:
+  - python
+  severity: ERROR
+  message: Found request data in a call to 'open'. Ensure the request data is validated
+    or sanitized, otherwise it could result in path traversal attacks.
+  metadata:
+    cwe:
+    - 'CWE-22: Improper Limitation of a Pathname to a Restricted Directory (''Path
+      Traversal'')'
+    owasp:
+    - A05:2017 - Broken Access Control
+    - A01:2021 - Broken Access Control
+    - A01:2025 - Broken Access Control
+    references:
+    - https://owasp.org/www-community/attacks/Path_Traversal
+    category: security
+    technology:
+    - flask
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - audit
+    likelihood: MEDIUM
+    impact: HIGH
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Path Traversal
+    source: https://semgrep.dev/r/python.flask.security.injection.path-traversal-open.path-traversal-open
+    shortlink: https://sg.run/PJRW
+    semgrep.dev:
+      rule:
+        r_id: 9545
+        rv_id: 1263430
+        rule_id: DbUpOQ
+        version_id: 9lT4b94
+        url: https://semgrep.dev/playground/r/9lT4b94/python.flask.security.injection.path-traversal-open.path-traversal-open
+        origin: community
+  pattern-either:
+  - patterns:
+    - pattern: open(...)
+    - pattern-either:
+      - pattern-inside: |
+          @$APP.route($ROUTE, ...)
+          def $FUNC(..., $ROUTEVAR, ...):
+            ...
+            open(..., <... $ROUTEVAR ...>, ...)
+      - pattern-inside: |
+          @$APP.route($ROUTE, ...)
+          def $FUNC(..., $ROUTEVAR, ...):
+            ...
+            with open(..., <... $ROUTEVAR ...>, ...) as $FD:
+              ...
+      - pattern-inside: |
+          @$APP.route($ROUTE, ...)
+          def $FUNC(..., $ROUTEVAR, ...):
+            ...
+            $INTERM = <... $ROUTEVAR ...>
+            ...
+            open(..., <... $INTERM ...>, ...)
+  - pattern: open(..., <... flask.request.$W.get(...) ...>, ...)
+  - pattern: open(..., <... flask.request.$W[...] ...>, ...)
+  - pattern: open(..., <... flask.request.$W(...) ...>, ...)
+  - pattern: open(..., <... flask.request.$W ...>, ...)
+  - patterns:
+    - pattern-inside: |
+        $INTERM = <... flask.request.$W.get(...) ...>
+        ...
+        open(<... $INTERM ...>, ...)
+    - pattern: open(...)
+  - patterns:
+    - pattern-inside: |
+        $INTERM = <... flask.request.$W[...] ...>
+        ...
+        open(<... $INTERM ...>, ...)
+    - pattern: open(...)
+  - patterns:
+    - pattern-inside: |
+        $INTERM = <... flask.request.$W(...) ...>
+        ...
+        open(<... $INTERM ...>, ...)
+    - pattern: open(...)
+  - patterns:
+    - pattern-inside: |
+        $INTERM = <... flask.request.$W ...>
+        ...
+        open(<... $INTERM ...>, ...)
+    - pattern: open(...)
+  - patterns:
+    - pattern-inside: |
+        $INTERM = <... flask.request.$W.get(...) ...>
+        ...
+        with open(<... $INTERM ...>, ...) as $F:
+          ...
+    - pattern: open(...)
+  - patterns:
+    - pattern-inside: |
+        $INTERM = <... flask.request.$W[...] ...>
+        ...
+        with open(<... $INTERM ...>, ...) as $F:
+          ...
+    - pattern: open(...)
+  - patterns:
+    - pattern-inside: |
+        $INTERM = <... flask.request.$W(...) ...>
+        ...
+        with open(<... $INTERM ...>, ...) as $F:
+          ...
+    - pattern: open(...)
+  - patterns:
+    - pattern-inside: |
+        $INTERM = <... flask.request.$W ...>
+        ...
+        with open(<... $INTERM ...>, ...) as $F:
+          ...
+    - pattern: open(...)
+- id: python.flask.security.injection.ssrf-requests.ssrf-requests
+  languages:
+  - python
+  severity: ERROR
+  message: Data from request object is passed to a new server-side request. This could
+    lead to a server-side request forgery (SSRF). To mitigate, ensure that schemes
+    and hosts are validated against an allowlist, do not forward the response to the
+    user, and ensure proper authentication and transport-layer security in the proxied
+    request.
+  metadata:
+    cwe:
+    - 'CWE-918: Server-Side Request Forgery (SSRF)'
+    owasp:
+    - A10:2021 - Server-Side Request Forgery (SSRF)
+    - A01:2025 - Broken Access Control
+    references:
+    - https://owasp.org/www-community/attacks/Server_Side_Request_Forgery
+    category: security
+    technology:
+    - flask
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: HIGH
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Server-Side Request Forgery (SSRF)
+    source: https://semgrep.dev/r/python.flask.security.injection.ssrf-requests.ssrf-requests
+    shortlink: https://sg.run/J9LW
+    semgrep.dev:
+      rule:
+        r_id: 9546
+        rv_id: 1263432
+        rule_id: WAUoRx
+        version_id: rxTAKJn
+        url: https://semgrep.dev/playground/r/rxTAKJn/python.flask.security.injection.ssrf-requests.ssrf-requests
+        origin: community
+  pattern-either:
+  - patterns:
+    - pattern: requests.$FUNC(...)
+    - pattern-either:
+      - pattern-inside: |
+          @$APP.$ROUTE_METHOD($ROUTE, ...)
+          def $ROUTE_FUNC(..., $ROUTEVAR, ...):
+            ...
+            requests.$FUNC(..., <... $ROUTEVAR ...>, ...)
+      - pattern-inside: |
+          @$APP.$ROUTE_METHOD($ROUTE, ...)
+          def $ROUTE_FUNC(..., $ROUTEVAR, ...):
+            ...
+            $INTERM = <... $ROUTEVAR ...>
+            ...
+            requests.$FUNC(..., <... $INTERM ...>, ...)
+    - metavariable-regex:
+        metavariable: $ROUTE_METHOD
+        regex: ^(route|get|post|put|delete|patch)$
+  - pattern: requests.$FUNC(..., <... flask.request.$W.get(...) ...>, ...)
+  - pattern: requests.$FUNC(..., <... flask.request.$W[...] ...>, ...)
+  - pattern: requests.$FUNC(..., <... flask.request.$W(...) ...>, ...)
+  - pattern: requests.$FUNC(..., <... flask.request.$W ...>, ...)
+  - patterns:
+    - pattern-inside: |
+        $INTERM = <... flask.request.$W.get(...) ...>
+        ...
+        requests.$FUNC(<... $INTERM ...>, ...)
+    - pattern: requests.$FUNC(...)
+  - patterns:
+    - pattern-inside: |
+        $INTERM = <... flask.request.$W[...] ...>
+        ...
+        requests.$FUNC(<... $INTERM ...>, ...)
+    - pattern: requests.$FUNC(...)
+  - patterns:
+    - pattern-inside: |
+        $INTERM = <... flask.request.$W(...) ...>
+        ...
+        requests.$FUNC(<... $INTERM ...>, ...)
+    - pattern: requests.$FUNC(...)
+  - patterns:
+    - pattern-inside: |
+        $INTERM = <... flask.request.$W ...>
+        ...
+        requests.$FUNC(<... $INTERM ...>, ...)
+    - pattern: requests.$FUNC(...)
+- id: python.flask.security.injection.user-eval.eval-injection
+  languages:
+  - python
+  severity: ERROR
+  message: Detected user data flowing into eval. This is code injection and should
+    be avoided.
+  metadata:
+    cwe:
+    - 'CWE-95: Improper Neutralization of Directives in Dynamically Evaluated Code
+      (''Eval Injection'')'
+    owasp:
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    references:
+    - https://nedbatchelder.com/blog/201206/eval_really_is_dangerous.html
+    category: security
+    technology:
+    - flask
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Code Injection
+    source: https://semgrep.dev/r/python.flask.security.injection.user-eval.eval-injection
+    shortlink: https://sg.run/5QpX
+    semgrep.dev:
+      rule:
+        r_id: 9547
+        rv_id: 1263436
+        rule_id: 0oU54W
+        version_id: w8TRoB0
+        url: https://semgrep.dev/playground/r/w8TRoB0/python.flask.security.injection.user-eval.eval-injection
+        origin: community
+  pattern-either:
+  - patterns:
+    - pattern: eval(...)
+    - pattern-either:
+      - pattern-inside: |
+          @$APP.route($ROUTE, ...)
+          def $FUNC(..., $ROUTEVAR, ...):
+            ...
+            eval(..., <... $ROUTEVAR ...>, ...)
+      - pattern-inside: |
+          @$APP.route($ROUTE, ...)
+          def $FUNC(..., $ROUTEVAR, ...):
+            ...
+            $INTERM = <... $ROUTEVAR ...>
+            ...
+            eval(..., <... $INTERM ...>, ...)
+  - pattern: eval(..., <... flask.request.$W.get(...) ...>, ...)
+  - pattern: eval(..., <... flask.request.$W[...] ...>, ...)
+  - pattern: eval(..., <... flask.request.$W(...) ...>, ...)
+  - pattern: eval(..., <... flask.request.$W ...>, ...)
+  - patterns:
+    - pattern-inside: |
+        $INTERM = <... flask.request.$W.get(...) ...>
+        ...
+        eval(..., <... $INTERM ...>, ...)
+    - pattern: eval(...)
+  - patterns:
+    - pattern-inside: |
+        $INTERM = <... flask.request.$W[...] ...>
+        ...
+        eval(..., <... $INTERM ...>, ...)
+    - pattern: eval(...)
+  - patterns:
+    - pattern-inside: |
+        $INTERM = <... flask.request.$W(...) ...>
+        ...
+        eval(..., <... $INTERM ...>, ...)
+    - pattern: eval(...)
+  - patterns:
+    - pattern-inside: |
+        $INTERM = <... flask.request.$W ...>
+        ...
+        eval(..., <... $INTERM ...>, ...)
+    - pattern: eval(...)
+- id: python.flask.security.injection.user-exec.exec-injection
+  languages:
+  - python
+  severity: ERROR
+  message: Detected user data flowing into exec. This is code injection and should
+    be avoided.
+  metadata:
+    cwe:
+    - 'CWE-95: Improper Neutralization of Directives in Dynamically Evaluated Code
+      (''Eval Injection'')'
+    owasp:
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    references:
+    - https://nedbatchelder.com/blog/201206/exec_really_is_dangerous.html
+    category: security
+    technology:
+    - flask
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: HIGH
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Code Injection
+    source: https://semgrep.dev/r/python.flask.security.injection.user-exec.exec-injection
+    shortlink: https://sg.run/Ge42
+    semgrep.dev:
+      rule:
+        r_id: 9548
+        rv_id: 1263437
+        rule_id: KxUbl2
+        version_id: xyTjzD9
+        url: https://semgrep.dev/playground/r/xyTjzD9/python.flask.security.injection.user-exec.exec-injection
+        origin: community
+  pattern-either:
+  - patterns:
+    - pattern: exec(...)
+    - pattern-either:
+      - pattern-inside: |
+          @$APP.route($ROUTE, ...)
+          def $FUNC(..., $ROUTEVAR, ...):
+            ...
+            exec(..., <... $ROUTEVAR ...>, ...)
+      - pattern-inside: |
+          @$APP.route($ROUTE, ...)
+          def $FUNC(..., $ROUTEVAR, ...):
+            ...
+            $INTERM = <... $ROUTEVAR ...>
+            ...
+            exec(..., <... $INTERM ...>, ...)
+  - pattern: exec(..., <... flask.request.$W.get(...) ...>, ...)
+  - pattern: exec(..., <... flask.request.$W[...] ...>, ...)
+  - pattern: exec(..., <... flask.request.$W(...) ...>, ...)
+  - pattern: exec(..., <... flask.request.$W ...>, ...)
+  - patterns:
+    - pattern-inside: |
+        $INTERM = <... flask.request.$W.get(...) ...>
+        ...
+        exec(..., <... $INTERM ...>, ...)
+    - pattern: exec(...)
+  - patterns:
+    - pattern-inside: |
+        $INTERM = <... flask.request.$W[...] ...>
+        ...
+        exec(..., <... $INTERM ...>, ...)
+    - pattern: exec(...)
+  - patterns:
+    - pattern-inside: |
+        $INTERM = <... flask.request.$W(...) ...>
+        ...
+        exec(..., <... $INTERM ...>, ...)
+    - pattern: exec(...)
+  - patterns:
+    - pattern-inside: |
+        $INTERM = <... flask.request.$W ...>
+        ...
+        exec(..., <... $INTERM ...>, ...)
+    - pattern: exec(...)
+- id: python.flask.security.audit.app-run-param-config.avoid_app_run_with_bad_host
+  message: Running flask app with host 0.0.0.0 could expose the server publicly.
+  metadata:
+    cwe:
+    - 'CWE-668: Exposure of Resource to Wrong Sphere'
+    owasp:
+    - A01:2021 - Broken Access Control
+    - A01:2025 - Broken Access Control
+    category: security
+    technology:
+    - flask
+    references:
+    - https://owasp.org/Top10/A01_2021-Broken_Access_Control
+    subcategory:
+    - vuln
+    likelihood: HIGH
+    impact: MEDIUM
+    confidence: HIGH
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Other
+    source: https://semgrep.dev/r/python.flask.security.audit.app-run-param-config.avoid_app_run_with_bad_host
+    shortlink: https://sg.run/eLby
+    semgrep.dev:
+      rule:
+        r_id: 9532
+        rv_id: 1263414
+        rule_id: L1Uy1n
+        version_id: BjTkZOY
+        url: https://semgrep.dev/playground/r/BjTkZOY/python.flask.security.audit.app-run-param-config.avoid_app_run_with_bad_host
+        origin: community
+  languages:
+  - python
+  severity: WARNING
+  pattern-either:
+  - pattern: app.run(..., host="0.0.0.0", ...)
+  - pattern: app.run(..., "0.0.0.0", ...)
+- id: python.flask.security.audit.app-run-security-config.avoid_using_app_run_directly
+  patterns:
+  - pattern-not-inside: |
+      if __name__ == '__main__':
+        ...
+  - pattern-not-inside: |
+      def $X(...):
+        ...
+  - pattern: app.run(...)
+  message: top-level app.run(...) is ignored by flask. Consider putting app.run(...)
+    behind a guard, like inside a function
+  metadata:
+    cwe:
+    - 'CWE-668: Exposure of Resource to Wrong Sphere'
+    owasp:
+    - A01:2021 - Broken Access Control
+    - A01:2025 - Broken Access Control
+    category: security
+    technology:
+    - flask
+    references:
+    - https://owasp.org/Top10/A01_2021-Broken_Access_Control
+    subcategory:
+    - vuln
+    likelihood: LOW
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Other
+    source: https://semgrep.dev/r/python.flask.security.audit.app-run-security-config.avoid_using_app_run_directly
+    shortlink: https://sg.run/vz5b
+    semgrep.dev:
+      rule:
+        r_id: 9533
+        rv_id: 1263415
+        rule_id: 8GUjdX
+        version_id: DkTRb4z
+        url: https://semgrep.dev/playground/r/DkTRb4z/python.flask.security.audit.app-run-security-config.avoid_using_app_run_directly
+        origin: community
+  languages:
+  - python
+  severity: WARNING
+- id: python.flask.security.injection.nan-injection.nan-injection
+  message: Found user input going directly into typecast for bool(), float(), or complex().
+    This allows an attacker to inject Python's not-a-number (NaN) into the typecast.
+    This results in undefind behavior, particularly when doing comparisons. Either
+    cast to a different type, or add a guard checking for all capitalizations of the
+    string 'nan'.
+  languages:
+  - python
+  severity: ERROR
+  mode: taint
+  pattern-sources:
+  - pattern-either:
+    - pattern: flask.request.$SOMETHING.get(...)
+    - pattern: flask.request.$SOMETHING[...]
+    - patterns:
+      - pattern-inside: |
+          @$APP.route(...)
+          def $FUNC(..., $ROUTEVAR, ...):
+            ...
+      - pattern: $ROUTEVAR
+  pattern-sinks:
+  - pattern-either:
+    - pattern: float(...)
+    - pattern: bool(...)
+    - pattern: complex(...)
+  pattern-sanitizers:
+  - not_conflicting: true
+    pattern: $ANYTHING(...)
+  metadata:
+    references:
+    - https://discuss.python.org/t/nan-breaks-min-max-and-sorting-functions-a-solution/2868
+    - https://blog.bitdiscovery.com/2021/12/python-nan-injection/
+    category: security
+    cwe:
+    - 'CWE-704: Incorrect Type Conversion or Cast'
+    technology:
+    - flask
+    subcategory:
+    - vuln
+    impact: MEDIUM
+    likelihood: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Improper Validation
+    source: https://semgrep.dev/r/python.flask.security.injection.nan-injection.nan-injection
+    shortlink: https://sg.run/e598
+    semgrep.dev:
+      rule:
+        r_id: 18276
+        rv_id: 946222
+        rule_id: WAUdj7
+        version_id: qkT4j85
+        url: https://semgrep.dev/playground/r/qkT4j85/python.flask.security.injection.nan-injection.nan-injection
+        origin: community
+- id: python.flask.security.audit.debug-enabled.debug-enabled
+  patterns:
+  - pattern-inside: |
+      import flask
+      ...
+  - pattern: $APP.run(..., debug=True, ...)
+  message: Detected Flask app with debug=True. Do not deploy to production with this
+    flag enabled as it will leak sensitive information. Instead, consider using Flask
+    configuration variables or setting 'debug' using system environment variables.
+  metadata:
+    cwe:
+    - 'CWE-489: Active Debug Code'
+    owasp: A06:2017 - Security Misconfiguration
+    references:
+    - https://labs.detectify.com/2015/10/02/how-patreon-got-hacked-publicly-exposed-werkzeug-debugger/
+    category: security
+    technology:
+    - flask
+    subcategory:
+    - vuln
+    likelihood: HIGH
+    impact: MEDIUM
+    confidence: HIGH
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Active Debug Code
+    source: https://semgrep.dev/r/python.flask.security.audit.debug-enabled.debug-enabled
+    shortlink: https://sg.run/dKrd
+    semgrep.dev:
+      rule:
+        r_id: 9534
+        rv_id: 946206
+        rule_id: gxU1bd
+        version_id: 8KTKjwR
+        url: https://semgrep.dev/playground/r/8KTKjwR/python.flask.security.audit.debug-enabled.debug-enabled
+        origin: community
+  severity: WARNING
+  languages:
+  - python
+- id: python.flask.security.injection.csv-writer-injection.csv-writer-injection
+  languages:
+  - python
+  message: Detected user input into a generated CSV file using the built-in `csv`
+    module. If user data is used to generate the data in this file, it is possible
+    that an attacker could inject a formula when the CSV is imported into a spreadsheet
+    application that runs an attacker script, which could steal data from the importing
+    user or, at worst, install malware on the user's computer. `defusedcsv` is a drop-in
+    replacement with the same API that will attempt to mitigate formula injection
+    attempts. You can use `defusedcsv` instead of `csv` to safely generate CSVs.
+  metadata:
+    category: security
+    confidence: MEDIUM
+    cwe:
+    - 'CWE-1236: Improper Neutralization of Formula Elements in a CSV File'
+    owasp:
+    - A01:2017 - Injection
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    references:
+    - https://github.com/raphaelm/defusedcsv
+    - https://owasp.org/www-community/attacks/CSV_Injection
+    - https://web.archive.org/web/20220516052229/https://www.contextis.com/us/blog/comma-separated-vulnerabilities
+    technology:
+    - python
+    - flask
+    subcategory:
+    - vuln
+    impact: MEDIUM
+    likelihood: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Improper Validation
+    source: https://semgrep.dev/r/python.flask.security.injection.csv-writer-injection.csv-writer-injection
+    shortlink: https://sg.run/JzqQ
+    semgrep.dev:
+      rule:
+        r_id: 31146
+        rv_id: 1263428
+        rule_id: L1UR2K
+        version_id: jQTn50Y
+        url: https://semgrep.dev/playground/r/jQTn50Y/python.flask.security.injection.csv-writer-injection.csv-writer-injection
+        origin: community
+  mode: taint
+  pattern-sinks:
+  - patterns:
+    - pattern-inside: |
+        $WRITER = csv.writer(...)
+
+        ...
+
+        $WRITER.$WRITE(...)
+    - pattern: $WRITER.$WRITE(...)
+    - metavariable-regex:
+        metavariable: $WRITE
+        regex: ^(writerow|writerows|writeheader)$
+  pattern-sources:
+  - patterns:
+    - pattern-either:
+      - patterns:
+        - pattern-either:
+          - pattern: flask.request.form.get(...)
+          - pattern: flask.request.form[...]
+          - pattern: flask.request.args.get(...)
+          - pattern: flask.request.args[...]
+          - pattern: flask.request.values.get(...)
+          - pattern: flask.request.values[...]
+          - pattern: flask.request.cookies.get(...)
+          - pattern: flask.request.cookies[...]
+          - pattern: flask.request.stream
+          - pattern: flask.request.headers.get(...)
+          - pattern: flask.request.headers[...]
+          - pattern: flask.request.data
+          - pattern: flask.request.full_path
+          - pattern: flask.request.url
+          - pattern: flask.request.json
+          - pattern: flask.request.get_json()
+          - pattern: flask.request.view_args.get(...)
+          - pattern: flask.request.view_args[...]
+      - patterns:
+        - pattern-inside: |
+            @$APP.route($ROUTE, ...)
+            def $FUNC(..., $ROUTEVAR, ...):
+              ...
+        - focus-metavariable: $ROUTEVAR
+  severity: ERROR
+- id: python.flask.security.hashids-with-flask-secret.hashids-with-flask-secret
+  languages:
+  - python
+  message: The Flask secret key is used as salt in HashIDs. The HashID mechanism is
+    not secure. By observing sufficient HashIDs, the salt used to construct them can
+    be recovered. This means the Flask secret key can be obtained by attackers, through
+    the HashIDs.
+  metadata:
+    category: security
+    subcategory:
+    - vuln
+    cwe:
+    - 'CWE-327: Use of a Broken or Risky Cryptographic Algorithm'
+    owasp:
+    - "A02:2021 \u2013 Cryptographic Failures"
+    references:
+    - https://flask.palletsprojects.com/en/2.2.x/config/#SECRET_KEY
+    - http://carnage.github.io/2015/08/cryptanalysis-of-hashids
+    technology:
+    - flask
+    likelihood: LOW
+    impact: HIGH
+    confidence: HIGH
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Cryptographic Issues
+    source: https://semgrep.dev/r/python.flask.security.hashids-with-flask-secret.hashids-with-flask-secret
+    shortlink: https://sg.run/N0Rx
+    semgrep.dev:
+      rule:
+        r_id: 72427
+        rv_id: 946220
+        rule_id: KxUX3z
+        version_id: 0bT15Px
+        url: https://semgrep.dev/playground/r/0bT15Px/python.flask.security.hashids-with-flask-secret.hashids-with-flask-secret
+        origin: community
+  pattern-either:
+  - pattern: hashids.Hashids(..., salt=flask.current_app.config['SECRET_KEY'], ...)
+  - pattern: hashids.Hashids(flask.current_app.config['SECRET_KEY'], ...)
+  - patterns:
+    - pattern-inside: |
+        $APP = flask.Flask(...)
+        ...
+    - pattern-either:
+      - pattern: hashids.Hashids(..., salt=$APP.config['SECRET_KEY'], ...)
+      - pattern: hashids.Hashids($APP.config['SECRET_KEY'], ...)
+  severity: ERROR
+- id: python.flask.security.injection.tainted-sql-string.tainted-sql-string
+  message: Detected user input used to manually construct a SQL string. This is usually
+    bad practice because manual construction could accidentally result in a SQL injection.
+    An attacker could use a SQL injection to steal or modify contents of the database.
+    Instead, use a parameterized query which is available by default in most database
+    engines. Alternatively, consider using an object-relational mapper (ORM) such
+    as SQLAlchemy which will protect your queries.
+  metadata:
+    cwe:
+    - 'CWE-704: Incorrect Type Conversion or Cast'
+    owasp:
+    - A01:2017 - Injection
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    references:
+    - https://docs.sqlalchemy.org/en/14/core/tutorial.html#using-textual-sql
+    - https://www.tutorialspoint.com/sqlalchemy/sqlalchemy_quick_guide.htm
+    - https://docs.sqlalchemy.org/en/14/core/tutorial.html#using-more-specific-text-with-table-expression-literal-column-and-expression-column
+    category: security
+    technology:
+    - sqlalchemy
+    - flask
+    subcategory:
+    - vuln
+    impact: MEDIUM
+    likelihood: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Improper Validation
+    source: https://semgrep.dev/r/python.flask.security.injection.tainted-sql-string.tainted-sql-string
+    shortlink: https://sg.run/JxZj
+    semgrep.dev:
+      rule:
+        r_id: 14702
+        rv_id: 1409402
+        rule_id: YGUDKQ
+        version_id: A8TEvb4
+        url: https://semgrep.dev/playground/r/A8TEvb4/python.flask.security.injection.tainted-sql-string.tainted-sql-string
+        origin: community
+  severity: ERROR
+  languages:
+  - python
+  mode: taint
+  pattern-sources:
+  - patterns:
+    - pattern-either:
+      - pattern: flask.request.$ANYTHING
+      - patterns:
+        - pattern-inside: |
+            @$APP.route(...)
+            def $FUNC(..., $ROUTEVAR, ...):
+              ...
+        - pattern: $ROUTEVAR
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - pattern: |
+          "$SQLSTR" + ...
+      - pattern: |
+          "$SQLSTR" % ...
+      - pattern: |
+          "$SQLSTR".format(...)
+      - pattern: |
+          f"$SQLSTR{...}..."
+    - metavariable-regex:
+        metavariable: $SQLSTR
+        regex: \s*(?i)(select|delete|insert|create|update|alter|drop)\b.*
+- id: python.flask.security.audit.directly-returned-format-string.directly-returned-format-string
+  message: Detected Flask route directly returning a formatted string. This is subject
+    to cross-site scripting if user input can reach the string. Consider using the
+    template engine instead and rendering pages with 'render_template()'.
+  metadata:
+    cwe:
+    - 'CWE-79: Improper Neutralization of Input During Web Page Generation (''Cross-site
+      Scripting'')'
+    owasp:
+    - A07:2017 - Cross-Site Scripting (XSS)
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    category: security
+    technology:
+    - flask
+    references:
+    - https://owasp.org/Top10/A03_2021-Injection
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: HIGH
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Cross-Site-Scripting (XSS)
+    source: https://semgrep.dev/r/python.flask.security.audit.directly-returned-format-string.directly-returned-format-string
+    shortlink: https://sg.run/Zv6o
+    semgrep.dev:
+      rule:
+        r_id: 9535
+        rv_id: 1263416
+        rule_id: QrUz49
+        version_id: WrTqKAz
+        url: https://semgrep.dev/playground/r/WrTqKAz/python.flask.security.audit.directly-returned-format-string.directly-returned-format-string
+        origin: community
+  languages:
+  - python
+  severity: WARNING
+  mode: taint
+  pattern-sources:
+  - pattern-either:
+    - patterns:
+      - pattern-inside: |
+          @$APP.route(...)
+          def $FUNC(..., $PARAM, ...):
+            ...
+      - pattern: $PARAM
+    - pattern: |
+        request.$FUNC.get(...)
+    - pattern: |
+        request.$FUNC(...)
+    - pattern: request.$FUNC[...]
+  pattern-sinks:
+  - patterns:
+    - pattern-not-inside: return "..."
+    - pattern-either:
+      - pattern: return "...".format(...)
+      - pattern: return "..." % ...
+      - pattern: return "..." + ...
+      - pattern: return ... + "..."
+      - pattern: return f"...{...}..."
+      - patterns:
+        - pattern: return $X
+        - pattern-either:
+          - pattern-inside: |
+              $X = "...".format(...)
+              ...
+          - pattern-inside: |
+              $X = "..." % ...
+              ...
+          - pattern-inside: |
+              $X = "..." + ...
+              ...
+          - pattern-inside: |
+              $X = ... + "..."
+              ...
+          - pattern-inside: |
+              $X = f"...{...}..."
+              ...
+        - pattern-not-inside: |
+            $X = "..."
+            ...
+- id: python.flask.security.injection.raw-html-concat.raw-html-format
+  languages:
+  - python
+  severity: WARNING
+  message: Detected user input flowing into a manually constructed HTML string. You
+    may be accidentally bypassing secure methods of rendering HTML by manually constructing
+    HTML and this could create a cross-site scripting vulnerability, which could let
+    attackers steal sensitive user data. To be sure this is safe, check that the HTML
+    is rendered safely. Otherwise, use templates (`flask.render_template`) which will
+    safely render HTML instead.
+  metadata:
+    cwe:
+    - 'CWE-79: Improper Neutralization of Input During Web Page Generation (''Cross-site
+      Scripting'')'
+    owasp:
+    - A07:2017 - Cross-Site Scripting (XSS)
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    category: security
+    technology:
+    - flask
+    references:
+    - https://flask.palletsprojects.com/en/2.0.x/security/#cross-site-scripting-xss
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Cross-Site-Scripting (XSS)
+    source: https://semgrep.dev/r/python.flask.security.injection.raw-html-concat.raw-html-format
+    shortlink: https://sg.run/Pb7e
+    semgrep.dev:
+      rule:
+        r_id: 14389
+        rv_id: 1409401
+        rule_id: GdUrJv
+        version_id: RGTEN1l
+        url: https://semgrep.dev/playground/r/RGTEN1l/python.flask.security.injection.raw-html-concat.raw-html-format
+        origin: community
+  mode: taint
+  pattern-sanitizers:
+  - pattern: jinja2.escape(...)
+  - pattern: flask.escape(...)
+  - patterns:
+    - pattern: flask.render_template($TPL, ...)
+    - metavariable-regex:
+        metavariable: $TPL
+        regex: .*\.html
+  pattern-sources:
+  - patterns:
+    - pattern-either:
+      - pattern: flask.request.$ANYTHING
+      - patterns:
+        - pattern-inside: |
+            @$APP.route(...)
+            def $FUNC(..., $ROUTEVAR, ...):
+              ...
+        - pattern: $ROUTEVAR
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - patterns:
+        - pattern-either:
+          - pattern: '"$HTMLSTR" % ...'
+          - pattern: '"$HTMLSTR".format(...)'
+          - pattern: '"$HTMLSTR" + ...'
+          - pattern: f"$HTMLSTR{...}..."
+      - patterns:
+        - pattern-inside: |
+            $HTML = "$HTMLSTR"
+            ...
+        - pattern-either:
+          - pattern: $HTML % ...
+          - pattern: $HTML.format(...)
+          - pattern: $HTML + ...
+    - metavariable-pattern:
+        metavariable: $HTMLSTR
+        language: generic
+        pattern: <$TAG ...
+- id: python.flask.security.injection.tainted-url-host.tainted-url-host
+  languages:
+  - python
+  message: User data flows into the host portion of this manually-constructed URL.
+    This could allow an attacker to send data to their own server, potentially exposing
+    sensitive data such as cookies or authorization information sent with this request.
+    They could also probe internal servers or other resources that the server running
+    this code can access. (This is called server-side request forgery, or SSRF.) Do
+    not allow arbitrary hosts. Instead, create an allowlist for approved hosts, or
+    hardcode the correct host.
+  metadata:
+    cwe:
+    - 'CWE-918: Server-Side Request Forgery (SSRF)'
+    owasp:
+    - A10:2021 - Server-Side Request Forgery (SSRF)
+    - A01:2025 - Broken Access Control
+    references:
+    - https://cheatsheetseries.owasp.org/cheatsheets/Server_Side_Request_Forgery_Prevention_Cheat_Sheet.html
+    category: security
+    technology:
+    - flask
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    impact: MEDIUM
+    likelihood: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Server-Side Request Forgery (SSRF)
+    source: https://semgrep.dev/r/python.flask.security.injection.tainted-url-host.tainted-url-host
+    shortlink: https://sg.run/RXpK
+    semgrep.dev:
+      rule:
+        r_id: 14649
+        rv_id: 1409403
+        rule_id: ReU3Wb
+        version_id: BjTy42w
+        url: https://semgrep.dev/playground/r/BjTy42w/python.flask.security.injection.tainted-url-host.tainted-url-host
+        origin: community
+  mode: taint
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - patterns:
+        - pattern: '"$URLSTR" % ...'
+        - metavariable-pattern:
+            metavariable: $URLSTR
+            language: generic
+            patterns:
+            - pattern-either:
+              - pattern: $SCHEME://%s
+              - pattern: $SCHEME://%r
+      - patterns:
+        - pattern: '"$URLSTR".format(...)'
+        - metavariable-pattern:
+            metavariable: $URLSTR
+            language: generic
+            pattern: $SCHEME:// { ... }
+      - patterns:
+        - pattern: '"$URLSTR" + ...'
+        - metavariable-regex:
+            metavariable: $URLSTR
+            regex: .*://$
+      - patterns:
+        - pattern: f"$URLSTR{...}..."
+        - metavariable-regex:
+            metavariable: $URLSTR
+            regex: .*://$
+      - patterns:
+        - pattern-inside: |
+            $URL = "$URLSTR"
+            ...
+        - pattern: $URL += ...
+        - metavariable-regex:
+            metavariable: $URLSTR
+            regex: .*://$
+  pattern-sources:
+  - patterns:
+    - pattern-either:
+      - pattern: flask.request.$ANYTHING
+      - patterns:
+        - pattern-inside: |
+            @$APP.route(...)
+            def $FUNC(..., $ROUTEVAR, ...):
+              ...
+        - pattern: $ROUTEVAR
+  severity: WARNING
+- id: python.flask.security.injection.subprocess-injection.subprocess-injection
+  languages:
+  - python
+  mode: taint
+  options:
+    symbolic_propagation: true
+  pattern-sources:
+  - pattern-either:
+    - patterns:
+      - pattern-either:
+        - pattern: flask.request.form.get(...)
+        - pattern: flask.request.form[...]
+        - pattern: flask.request.args.get(...)
+        - pattern: flask.request.args[...]
+        - pattern: flask.request.values.get(...)
+        - pattern: flask.request.values[...]
+        - pattern: flask.request.cookies.get(...)
+        - pattern: flask.request.cookies[...]
+        - pattern: flask.request.stream
+        - pattern: flask.request.headers.get(...)
+        - pattern: flask.request.headers[...]
+        - pattern: flask.request.data
+        - pattern: flask.request.full_path
+        - pattern: flask.request.url
+        - pattern: flask.request.json
+        - pattern: flask.request.get_json()
+        - pattern: flask.request.view_args.get(...)
+        - pattern: flask.request.view_args[...]
+    - patterns:
+      - pattern-inside: |
+          @$APP.route($ROUTE, ...)
+          def $FUNC(..., $ROUTEVAR, ...):
+            ...
+      - focus-metavariable: $ROUTEVAR
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - patterns:
+        - pattern: subprocess.$FUNC(...)
+        - pattern-not: subprocess.$FUNC("...", ...)
+        - pattern-not: subprocess.$FUNC(["...", ...], ...)
+        - pattern-not-inside: |
+            $CMD = ["...", ...]
+            ...
+            subprocess.$FUNC($CMD, ...)
+      - patterns:
+        - pattern: subprocess.$FUNC(["$SHELL", "-c", ...], ...)
+        - metavariable-regex:
+            metavariable: $SHELL
+            regex: ^(sh|bash|ksh|csh|tcsh|zsh)$
+      - patterns:
+        - pattern: subprocess.$FUNC(["$INTERPRETER", ...], ...)
+        - metavariable-regex:
+            metavariable: $INTERPRETER
+            regex: ^(python|python\d)$
+  pattern-sanitizers:
+  - patterns:
+    - pattern: $DICT[$KEY]
+    - focus-metavariable: $KEY
+  severity: ERROR
+  message: Detected user input entering a `subprocess` call unsafely. This could result
+    in a command injection vulnerability. An attacker could use this vulnerability
+    to execute arbitrary commands on the host, which allows them to download malware,
+    scan sensitive data, or run any command they wish on the server. Do not let users
+    choose the command to run. In general, prefer to use Python API versions of system
+    commands. If you must use subprocess, use a dictionary to allowlist a set of commands.
+  metadata:
+    category: security
+    technology:
+    - flask
+    owasp:
+    - A01:2017 - Injection
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    cwe:
+    - 'CWE-78: Improper Neutralization of Special Elements used in an OS Command (''OS
+      Command Injection'')'
+    references:
+    - https://semgrep.dev/docs/cheat-sheets/python-command-injection/
+    confidence: HIGH
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: HIGH
+    impact: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Command Injection
+    source: https://semgrep.dev/r/python.flask.security.injection.subprocess-injection.subprocess-injection
+    shortlink: https://sg.run/5gW3
+    semgrep.dev:
+      rule:
+        r_id: 31147
+        rv_id: 1263433
+        rule_id: 8GU3qp
+        version_id: bZT53gQ
+        url: https://semgrep.dev/playground/r/bZT53gQ/python.flask.security.injection.subprocess-injection.subprocess-injection
+        origin: community
+- id: python.django.security.injection.command.subprocess-injection.subprocess-injection
+  languages:
+  - python
+  mode: taint
+  options:
+    symbolic_propagation: true
+  pattern-sources:
+  - patterns:
+    - pattern-inside: |
+        def $FUNC(..., $REQUEST, ...):
+          ...
+    - focus-metavariable: $REQUEST
+    - metavariable-pattern:
+        metavariable: $REQUEST
+        patterns:
+        - pattern: request
+        - pattern-not-inside: request.build_absolute_uri
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - patterns:
+        - pattern: subprocess.$FUNC(...)
+        - pattern-not: subprocess.$FUNC("...", ...)
+        - pattern-not: subprocess.$FUNC(["...", ...], ...)
+        - pattern-not-inside: |
+            $CMD = ["...", ...]
+            ...
+            subprocess.$FUNC($CMD, ...)
+      - patterns:
+        - pattern: subprocess.$FUNC(["$SHELL", "-c", ...], ...)
+        - metavariable-regex:
+            metavariable: $SHELL
+            regex: ^(sh|bash|ksh|csh|tcsh|zsh)$
+      - patterns:
+        - pattern: subprocess.$FUNC(["$INTERPRETER", ...], ...)
+        - metavariable-regex:
+            metavariable: $INTERPRETER
+            regex: ^(python|python\d)$
+  pattern-sanitizers:
+  - patterns:
+    - pattern: $DICT[$KEY]
+    - focus-metavariable: $KEY
+  severity: ERROR
+  message: Detected user input entering a `subprocess` call unsafely. This could result
+    in a command injection vulnerability. An attacker could use this vulnerability
+    to execute arbitrary commands on the host, which allows them to download malware,
+    scan sensitive data, or run any command they wish on the server. Do not let users
+    choose the command to run. In general, prefer to use Python API versions of system
+    commands. If you must use subprocess, use a dictionary to allowlist a set of commands.
+  metadata:
+    category: security
+    technology:
+    - flask
+    owasp:
+    - A01:2017 - Injection
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    cwe:
+    - 'CWE-78: Improper Neutralization of Special Elements used in an OS Command (''OS
+      Command Injection'')'
+    references:
+    - https://semgrep.dev/docs/cheat-sheets/python-command-injection/
+    confidence: HIGH
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: HIGH
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Command Injection
+    source: https://semgrep.dev/r/python.django.security.injection.command.subprocess-injection.subprocess-injection
+    shortlink: https://sg.run/49BE
+    semgrep.dev:
+      rule:
+        r_id: 31144
+        rv_id: 1263388
+        rule_id: EwUepx
+        version_id: 7ZTE3qK
+        url: https://semgrep.dev/playground/r/7ZTE3qK/python.django.security.injection.command.subprocess-injection.subprocess-injection
+        origin: community
+- id: python.flask.security.audit.flask-url-for-external-true.flask-url-for-external-true
+  message: Function `flask.url_for` with `_external=True` argument will generate URLs
+    using the `Host` header of the HTTP request, which may lead to security risks
+    such as Host header injection
+  metadata:
+    cwe:
+    - 'CWE-673: External Influence of Sphere Definition'
+    owasp:
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    category: security
+    technology:
+    - flask
+    references:
+    - https://flask.palletsprojects.com/en/latest/api/#flask.url_for
+    - https://portswigger.net/kb/issues/00500300_host-header-injection
+    subcategory:
+    - audit
+    likelihood: MEDIUM
+    impact: LOW
+    confidence: HIGH
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Other
+    source: https://semgrep.dev/r/python.flask.security.audit.flask-url-for-external-true.flask-url-for-external-true
+    shortlink: https://sg.run/gEGeR
+    semgrep.dev:
+      rule:
+        r_id: 191541
+        rv_id: 1263418
+        rule_id: JDU5oql
+        version_id: K3TKk6n
+        url: https://semgrep.dev/playground/r/K3TKk6n/python.flask.security.audit.flask-url-for-external-true.flask-url-for-external-true
+        origin: community
+  languages:
+  - python
+  severity: WARNING
+  patterns:
+  - pattern-not: flask.url_for(..., _external=False, ...)
+  - pattern-not: url_for(..., _external=False, ...)
+  - pattern-either:
+    - pattern: flask.url_for(..., _external=$VAR, ...)
+    - pattern: url_for(..., _external=$VAR, ...)

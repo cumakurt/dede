@@ -1,0 +1,91 @@
+rules:
+  - id: dede.java.web.sql-injection
+    languages: [java]
+    mode: taint
+    severity: ERROR
+    message: Request input reaches JDBC SQL statement text.
+    metadata:
+      category: security
+      cwe: [CWE-89]
+      confidence: HIGH
+      analysis: taint
+      recommendation: Use constant prepared statements and bind values with the appropriate setter methods.
+      references: [https://cwe.mitre.org/data/definitions/89.html]
+    pattern-sources:
+      - pattern-either:
+          - pattern: $REQ.getParameter(...)
+          - pattern: $REQ.getHeader(...)
+          - pattern: $REQ.getQueryString()
+          - pattern: $REQ.getInputStream()
+        exact: true
+    pattern-sinks:
+      - patterns:
+          - pattern-either:
+              - pattern: $STMT.executeQuery($QUERY, ...)
+              - pattern: $STMT.executeUpdate($QUERY, ...)
+              - pattern: $CONN.prepareStatement($QUERY, ...)
+          - focus-metavariable: $QUERY
+
+  - id: dede.java.web.command-injection
+    languages: [java]
+    mode: taint
+    severity: ERROR
+    message: Request input controls a process command.
+    metadata:
+      category: security
+      cwe: [CWE-78]
+      confidence: HIGH
+      analysis: taint
+      recommendation: Use a fixed executable and validate arguments; do not pass user-controlled shell command text.
+      references: [https://cwe.mitre.org/data/definitions/78.html]
+    pattern-sources:
+      - pattern-either:
+          - pattern: $REQ.getParameter(...)
+          - pattern: $REQ.getHeader(...)
+          - pattern: $REQ.getQueryString()
+          - pattern: $REQ.getInputStream()
+        exact: true
+    pattern-sinks:
+      - patterns:
+          - pattern: Runtime.getRuntime().exec($COMMAND, ...)
+          - focus-metavariable: $COMMAND
+
+  - id: dede.java.web.unsafe-deserialization
+    languages: [java]
+    mode: taint
+    severity: ERROR
+    message: A request-controlled input stream reaches native Java object deserialization.
+    metadata:
+      category: security
+      cwe: [CWE-502]
+      confidence: MEDIUM
+      analysis: taint
+      recommendation: Prefer data-only formats and schema validation; audit any required object input filters.
+      references: [https://cwe.mitre.org/data/definitions/502.html]
+    pattern-sources:
+      - pattern-either:
+          - pattern: $REQ.getParameter(...)
+          - pattern: $REQ.getHeader(...)
+          - pattern: $REQ.getQueryString()
+          - pattern: $REQ.getInputStream()
+        exact: true
+    pattern-sinks:
+      - patterns:
+          - pattern: $STREAM.readObject()
+          - focus-metavariable: $STREAM
+
+  - id: dede.java.web.xxe-enabled
+    languages: [java]
+    severity: WARNING
+    message: XML parser configuration explicitly permits DTDs or external entities.
+    metadata:
+      category: security
+      cwe: [CWE-611]
+      confidence: MEDIUM
+      recommendation: Disable DTDs, external entities and external resource access before parsing untrusted XML.
+      references: [https://cwe.mitre.org/data/definitions/611.html]
+    pattern-either:
+      - pattern: $FACTORY.setFeature("http://apache.org/xml/features/disallow-doctype-decl", false)
+      - pattern: $FACTORY.setFeature("http://xml.org/sax/features/external-general-entities", true)
+      - pattern: $FACTORY.setFeature("http://xml.org/sax/features/external-parameter-entities", true)
+      - pattern: $FACTORY.setProperty(javax.xml.stream.XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, true)

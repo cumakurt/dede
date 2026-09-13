@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="author" content="{{ developer_name }}"/>
+<meta name="description" content="Evidence-backed offline application security analysis report for {{ project_name }}"/>
+<meta name="keywords" content="SAST, application security, static analysis, Dede"/>
+<meta name="generator" content="{{ engine_label }}"/>
+<title>Dede Security Report — {{ project_name }}</title>
+<style>
+{% include "_theme.css.j2" %}
+</style>
+</head>
+<body>
+<div class="wrap">
+  {% include "_cover.html.j2" %}
+  {% include "_report_toc.html.j2" %}
+  {% include "_executive_summary.html.j2" %}
+  {% include "_findings_overview.html.j2" %}
+  {% include "_security_operations.html.j2" %}
+  {% include "_quality.html.j2" %}
+  {% include "_security_score.html.j2" %}
+  {% include "_top_risks.html.j2" %}
+  {% include "_detailed_findings.html.j2" %}
+  {% include "_secrets.html.j2" %}
+  {% include "_hotspots.html.j2" %}
+  {% include "_remediation.html.j2" %}
+  {% include "_coverage.html.j2" %}
+  {% include "_methodology.html.j2" %}
+</div>
+</body>
+</html>

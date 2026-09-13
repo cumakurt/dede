@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "name": "dede/vapor",
+  "version": "1.0.0",
+  "models": {
+    "swift": {
+      "sources": [
+        {
+          "call": "req.query.get",
+          "kind": "http.query"
+        },
+        {
+          "call": "req.parameters.get",
+          "kind": "http.path"
+        }
+      ],
+      "sinks": [
+        {
+          "call": "db.raw",
+          "kind": "sql-execution",
+          "cwe": "CWE-89",
+          "severity": "HIGH"
+        }
+      ],
+      "sanitizers": []
+    }
+  },
+  "integrity": {
+    "sha256": "10ecd573f83dd5eb97f6d1ba2094792a8621e7e207db8a34f9a5dfa7b0ff6228"
+  }
+}

@@ -1,0 +1,2 @@
+# FAKE test requirements — not used at runtime
+flask==3.0.0

@@ -1,0 +1,71 @@
+{% from "_macros.html.j2" import page_chrome, source_tag with context %}
+{{ page_chrome('04 / Top Security Risks') }}
+<section class="section" id="top-risks">
+  <p class="section-kicker">04 / Top Security Risks</p>
+  <h2>What engineering should fix first</h2>
+
+  {% if top_risk_views %}
+  <table class="data">
+    <colgroup>
+      <col style="width:12%"/>
+      <col style="width:10%"/>
+      <col style="width:34%"/>
+      <col style="width:10%"/>
+      <col style="width:18%"/>
+      <col style="width:8%"/>
+      <col style="width:8%"/>
+    </colgroup>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Severity</th>
+        <th>Finding</th>
+        <th>CWE</th>
+        <th>Location</th>
+        <th>Confidence</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for view in top_risk_views %}
+      <tr>
+        <td class="mono">{{ view.finding.id }}</td>
+        <td><span class="badge {{ view.finding.severity.value }}">{{ view.finding.severity.value }}</span></td>
+        <td class="break-text">{{ source_tag(view.title_origin) }} {{ view.title }}</td>
+        <td>{{ view.cwe_display }}</td>
+        <td class="mono break-text">{{ view.finding.file }}:{{ view.finding.start_line }}</td>
+        <td>{{ view.finding.confidence.value }}</td>
+        <td>
+          {% if view.needs_review %}
+          <span class="badge needs-review">{{ view.status }}</span>
+          {% else %}
+          <span class="badge status">{{ view.status }}</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="muted">No security risks to prioritize.</p>
+  {% endif %}
+
+  <div class="two-col" style="margin-top:0.85rem;">
+    <div class="col callout neutral">
+      <strong>Priority rule.</strong>
+      Critical and High findings with high confidence receive priority over low-confidence pattern matches.
+    </div>
+    <div class="col callout warn">
+      <strong>Noise reduction.</strong>
+      Suppressed findings ({{ suppressed_count }}) and Needs Review items are separated from the primary remediation queue.
+    </div>
+  </div>
+
+  {% if primary_risk %}
+  <div class="callout" style="margin-top:0.75rem;">
+    <strong>Recommended next action.</strong>
+    Start with {{ primary_risk.id }}{% if secondary_risk %} and {{ secondary_risk.id }}{% endif %}.
+    Re-scan affected modules after fixes, then run a full verification scan before release.
+  </div>
+  {% endif %}
+</section>

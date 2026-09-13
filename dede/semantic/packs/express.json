@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "name": "dede/express",
+  "version": "1.0.0",
+  "models": {
+    "javascript": {
+      "sources": [
+        {
+          "call": "request.input",
+          "kind": "http.custom"
+        }
+      ],
+      "sinks": [
+        {
+          "call": "sequelize.query",
+          "kind": "sql-execution",
+          "cwe": "CWE-89",
+          "severity": "HIGH"
+        }
+      ],
+      "sanitizers": []
+    }
+  },
+  "integrity": {
+    "sha256": "fc5d36a889071d3a727fd084dbc4ded263c1e78f5913d4b734714525116938b5"
+  }
+}

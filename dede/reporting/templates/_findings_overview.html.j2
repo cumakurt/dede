@@ -1,0 +1,76 @@
+{% from "_macros.html.j2" import page_chrome with context %}
+{{ page_chrome('02 / Findings Overview') }}
+<section class="section" id="findings-overview">
+  <p class="section-kicker">02 / Findings Overview</p>
+  <h2>Risk distribution and concentration</h2>
+
+  <div class="overview-layout">
+    <div class="col col-chart">
+      <svg width="150" height="150" viewBox="0 0 120 120" aria-label="Severity distribution">
+        <circle cx="60" cy="60" r="42" fill="none" stroke="#e5e7eb" stroke-width="14"/>
+        {% for seg in donut_segments %}
+        {% if seg.count > 0 %}
+        <circle cx="60" cy="60" r="42" fill="none"
+                stroke="{{ seg.color }}" stroke-width="14"
+                stroke-dasharray="{{ seg.dash }}"
+                stroke-dashoffset="{{ seg.offset }}"
+                transform="rotate(-90 60 60)"/>
+        {% endif %}
+        {% endfor %}
+        <text x="60" y="56" text-anchor="middle" fill="#111827" font-size="16" font-weight="700">{{ total_findings }}</text>
+        <text x="60" y="72" text-anchor="middle" fill="#6b7280" font-size="7">FINDINGS</text>
+      </svg>
+      <ul class="donut-legend">
+        {% for seg in donut_segments %}
+        <li><span class="swatch" style="background:{{ seg.color }}"></span>{{ seg.name }} · {{ seg.count }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="col">
+      <h3>Severity Distribution</h3>
+      <div class="bar" aria-hidden="true">
+        {% if critical_count %}<span class="bar-CRITICAL" style="width:{{ (100 * critical_count / bar_total)|round(2) }}%"></span>{% endif %}
+        {% if high_count %}<span class="bar-HIGH" style="width:{{ (100 * high_count / bar_total)|round(2) }}%"></span>{% endif %}
+        {% if medium_count %}<span class="bar-MEDIUM" style="width:{{ (100 * medium_count / bar_total)|round(2) }}%"></span>{% endif %}
+        {% if low_count %}<span class="bar-LOW" style="width:{{ (100 * low_count / bar_total)|round(2) }}%"></span>{% endif %}
+        {% if info_count %}<span class="bar-INFO" style="width:{{ (100 * info_count / bar_total)|round(2) }}%"></span>{% endif %}
+      </div>
+
+      <h3>Findings by Category</h3>
+      {% if findings_by_category %}
+        {% for row in findings_by_category %}
+        <div class="hbar">
+          <div class="hbar-label"><span>{{ row.name }}</span><span>{{ row.count }}</span></div>
+          <div class="hbar-track"><div class="hbar-fill" style="width:{{ row.bar }}%"></div></div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <p class="muted">No findings to categorize.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if pdf %}
+  <table class="kpi-row" role="presentation">
+    <tr>
+      <td><span class="kpi-label">High Confidence</span><span class="kpi-value">{{ high_confidence_count }}</span><span class="kpi-hint">{{ high_confidence_pct }}% of findings</span></td>
+      <td><span class="kpi-label">Fix Available</span><span class="kpi-value">{{ fix_available_count }}</span><span class="kpi-hint">Suggested remediation</span></td>
+      <td><span class="kpi-label">Suppressed</span><span class="kpi-value">{{ suppressed_count }}</span><span class="kpi-hint">Excluded from queue</span></td>
+      <td><span class="kpi-label">Critical / High</span><span class="kpi-value HIGH">{{ critical_high_count }}</span><span class="kpi-hint">Release gate</span></td>
+      <td><span class="kpi-label">Total</span><span class="kpi-value">{{ total_findings }}</span><span class="kpi-hint">Active findings</span></td>
+    </tr>
+  </table>
+  {% else %}
+  <div class="kpi-row">
+    <div class="kpi-card"><span class="kpi-label">High Confidence</span><span class="kpi-value">{{ high_confidence_count }}</span><span class="kpi-hint">{{ high_confidence_pct }}% of findings</span></div>
+    <div class="kpi-card"><span class="kpi-label">Fix Available</span><span class="kpi-value">{{ fix_available_count }}</span><span class="kpi-hint">Suggested remediation</span></div>
+    <div class="kpi-card"><span class="kpi-label">Suppressed</span><span class="kpi-value">{{ suppressed_count }}</span><span class="kpi-hint">Excluded from queue</span></div>
+    <div class="kpi-card"><span class="kpi-label">Critical / High</span><span class="kpi-value HIGH">{{ critical_high_count }}</span><span class="kpi-hint">Release gate</span></div>
+    <div class="kpi-card"><span class="kpi-label">Total</span><span class="kpi-value">{{ total_findings }}</span><span class="kpi-hint">Active findings</span></div>
+  </div>
+  {% endif %}
+
+  <h3>Trend Narrative</h3>
+  <p>{{ trend_narrative }}</p>
+  <p class="footer-note">Charts and counts are generated from the current scan result only. Reachability is not inferred when the engine did not produce supporting data.</p>
+</section>

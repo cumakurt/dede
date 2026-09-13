@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "name": "dede/rails",
+  "version": "1.0.0",
+  "models": {
+    "ruby": {
+      "sources": [
+        {
+          "call": "request.params",
+          "kind": "http.request"
+        }
+      ],
+      "sinks": [
+        {
+          "call": "ActiveRecord::Base.connection.execute",
+          "kind": "sql-execution",
+          "cwe": "CWE-89",
+          "severity": "HIGH"
+        },
+        {
+          "call": "find_by_sql",
+          "kind": "sql-execution",
+          "cwe": "CWE-89",
+          "severity": "HIGH"
+        }
+      ],
+      "sanitizers": [
+        "Integer"
+      ]
+    }
+  },
+  "integrity": {
+    "sha256": "82903b853733e78df6f27ff2792c90eafe52e97d43a359bcb9bf80510aa5ebc8"
+  }
+}

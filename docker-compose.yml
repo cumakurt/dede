@@ -1,0 +1,161 @@
+name: dede
+
+x-scanner-env: &scanner-env
+  SEMGREP_SEND_METRICS: "off"
+  SEMGREP_ENABLE_VERSION_CHECK: "0"
+  DO_NOT_TRACK: "1"
+  DEDE_MODEL: ${DEDE_MODEL:-qwen3-coder:30b}
+  DEDE_DEVICE: ${DEDE_DEVICE:-auto}
+  DEDE_OLLAMA_HOST: http://ollama:11434
+  DEDE_OFFLINE: ${DEDE_OFFLINE:-false}
+  DEDE_IN_CONTAINER: "1"
+  DEDE_CACHE_DIR: /var/lib/dede/cache
+  GOCACHE: /var/lib/dede/cache/go-build
+  GOMODCACHE: /var/lib/dede/cache/go-mod
+  DEDE_MAX_FILE_SIZE_MB: ${DEDE_MAX_FILE_SIZE_MB:-5}
+  DEDE_LLM_MAX_CONTEXT: ${DEDE_LLM_MAX_CONTEXT:-32768}
+  ANALYZER_TIMEOUT_SECONDS: ${ANALYZER_TIMEOUT_SECONDS:-300}
+  MAX_FILES: ${MAX_FILES:-50000}
+  MAX_LLM_FINDINGS: ${MAX_LLM_FINDINGS:-200}
+  LLM_CONCURRENCY: ${LLM_CONCURRENCY:-2}
+
+services:
+  ollama:
+    image: ${DEDE_OLLAMA_IMAGE:-ollama/ollama@sha256:1685741456770df6e3cceb2a945a5f75e020f658d1701509668d6f4688f1dd3f}
+    volumes:
+      - ollama-data:/root/.ollama
+    ports:
+      # Host CLI (dede model pull/list) reaches Ollama on localhost
+      - "127.0.0.1:11434:11434"
+    networks:
+      - audit-net
+      - setup-net
+    environment:
+      OLLAMA_KEEP_ALIVE: "0"
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 5s
+      timeout: 3s
+      retries: 24
+    # GPU optional — enable via compose override when NVIDIA available
+    restart: "no"
+    labels:
+      com.dede.managed: "true"
+      com.dede.component: "ollama"
+
+  model-init:
+    image: ${DEDE_OLLAMA_IMAGE:-ollama/ollama@sha256:1685741456770df6e3cceb2a945a5f75e020f658d1701509668d6f4688f1dd3f}
+    depends_on:
+      - ollama
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -e
+        export OLLAMA_HOST=http://ollama:11434
+        echo "Waiting for Ollama..."
+        i=0
+        until ollama list >/dev/null 2>&1; do
+          i=$$((i+1))
+          if [ "$$i" -gt 90 ]; then echo "Ollama not ready"; exit 1; fi
+          sleep 2
+        done
+        MODEL="$${DEDE_MODEL:-qwen3-coder:30b}"
+        # The model lives in the persistent 'ollama-data' volume, so it must
+        # survive reinstalls and updates. Skip the download when it is there.
+        if ollama list 2>/dev/null | awk 'NR>1 {print $1}' | grep -Fxq "$$MODEL"; then
+          echo "Model $$MODEL already installed — skipping download (persistent volume)."
+          exit 0
+        fi
+        echo "Pulling model $$MODEL (setup only)..."
+        ollama pull "$$MODEL"
+        echo "Model ready."
+    environment:
+      DEDE_MODEL: ${DEDE_MODEL:-qwen3-coder:30b}
+      OLLAMA_HOST: http://ollama:11434
+    networks:
+      - setup-net
+    profiles: ["setup"]
+    restart: "no"
+    labels:
+      com.dede.managed: "true"
+      com.dede.component: "model-init"
+
+  scanner:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: base
+    image: ${DEDE_SCANNER_IMAGE:-dede-scanner:1.10.0}
+    depends_on:
+      ollama:
+        condition: service_healthy
+    environment:
+      <<: *scanner-env
+    volumes:
+      - ${TARGET:-.}:/workspace:ro
+      - ${OUTPUT:-/tmp/workspace}:/reports
+      - ${DEDE_HOST_CACHE:-/tmp/dede-cache}:/var/lib/dede/cache
+    working_dir: /workspace
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    tmpfs:
+      - /tmp:size=512m,mode=1777
+      - /home/auditor:size=64m,mode=1777
+    networks:
+      - audit-net
+    user: "${DEDE_UID:-10001}:${DEDE_GID:-10001}"
+    labels:
+      com.dede.managed: "true"
+      com.dede.component: "scanner"
+
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: test
+    image: ${DEDE_SCANNER_TEST_IMAGE:-dede-scanner-test:1.10.0}
+    environment:
+      SEMGREP_SEND_METRICS: "off"
+      SEMGREP_ENABLE_VERSION_CHECK: "0"
+      DO_NOT_TRACK: "1"
+      DEDE_IN_CONTAINER: "1"
+      GOCACHE: /tmp/dede-go-build
+      GOMODCACHE: /tmp/dede-go-mod
+    volumes:
+      - .:/workspace:ro
+    working_dir: /workspace
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    tmpfs:
+      - /tmp:size=1g,mode=1777
+      - /home/auditor:size=64m,mode=1777
+    network_mode: none
+    user: "10001:10001"
+    profiles: ["test"]
+    labels:
+      com.dede.managed: "true"
+      com.dede.component: "test"
+
+networks:
+  audit-net:
+    internal: true
+    labels:
+      com.dede.managed: "true"
+      com.dede.component: "network"
+  setup-net:
+    # Used only by model-init / bootstrap to reach registry & model downloads
+    driver: bridge
+    labels:
+      com.dede.managed: "true"
+      com.dede.component: "network"
+
+volumes:
+  # Keep this definition compatible with existing installations. Changing
+  # volume labels makes Compose prompt to recreate it, deleting model data.
+  ollama-data:

@@ -1,0 +1,145 @@
+{
+  "schema_version": 1,
+  "cases": [
+    {
+      "id": "python-tls-positive",
+      "filename": "a.py",
+      "source": "import requests\nrequests.get(url, verify=False)\n",
+      "expected": [
+        {
+          "rule_id": "dede.hardening.python.tls-verify-false"
+        }
+      ]
+    },
+    {
+      "id": "python-tls-negative",
+      "filename": "a.py",
+      "source": "import requests\nrequests.get(url, verify=True)\n",
+      "expected": []
+    },
+    {
+      "id": "js-tls-positive",
+      "filename": "a.js",
+      "source": "const agent = new https.Agent({ rejectUnauthorized: false });\n",
+      "expected": [
+        {
+          "rule_id": "dede.hardening.javascript.tls-reject-unauthorized"
+        }
+      ]
+    },
+    {
+      "id": "go-tls-positive",
+      "filename": "a.go",
+      "source": "package main\nvar c = tls.Config{InsecureSkipVerify: true}\n",
+      "expected": [
+        {
+          "rule_id": "dede.hardening.go.insecure-skip-verify"
+        }
+      ]
+    },
+    {
+      "id": "php-tls-positive",
+      "filename": "a.php",
+      "source": "<?php curl_setopt($c, CURLOPT_SSL_VERIFYPEER, false);\n",
+      "expected": [
+        {
+          "rule_id": "dede.hardening.php.curl-no-verify"
+        }
+      ]
+    },
+    {
+      "id": "python-ecb-positive",
+      "filename": "a.py",
+      "source": "cipher = AES.new(key, AES.MODE_ECB)\n",
+      "expected": [
+        {
+          "rule_id": "dede.hardening.python.ecb"
+        }
+      ]
+    },
+    {
+      "id": "python-logging-positive",
+      "filename": "a.py",
+      "source": "logger.info('token=%s', access_token)\n",
+      "expected": [
+        {
+          "rule_id": "dede.hardening.sensitive-data.logging"
+        }
+      ]
+    },
+    {
+      "id": "python-logging-string-negative",
+      "filename": "a.py",
+      "source": "logger.info('password reset requested')\n",
+      "expected": []
+    },
+    {
+      "id": "js-logging-positive",
+      "filename": "a.ts",
+      "source": "logger.info('auth', authorizationToken);\n",
+      "expected": [
+        {
+          "rule_id": "dede.hardening.sensitive-data.logging"
+        }
+      ]
+    },
+    {
+      "id": "js-logging-string-negative",
+      "filename": "a.ts",
+      "source": "logger.info('token refreshed');\n",
+      "expected": []
+    },
+    {
+      "id": "python-random-token-positive",
+      "filename": "a.py",
+      "source": "reset_token = random.randint(100000,999999)\n",
+      "expected": [
+        {
+          "rule_id": "dede.hardening.security-token.insecure-random"
+        }
+      ]
+    },
+    {
+      "id": "python-random-nonsecurity-negative",
+      "filename": "a.py",
+      "source": "dice = random.randint(1,6)\n",
+      "expected": []
+    },
+    {
+      "id": "csharp-cert-positive",
+      "filename": "a.cs",
+      "source": "handler.ServerCertificateCustomValidationCallback = (m,c,ch,e) => true;\n",
+      "expected": [
+        {
+          "rule_id": "dede.hardening.csharp.cert-validation"
+        }
+      ]
+    },
+    {
+      "id": "java-cookie-positive",
+      "filename": "A.java",
+      "source": "cookie.setSecure(false);\n",
+      "expected": [
+        {
+          "rule_id": "dede.hardening.java-cookie-secure"
+        }
+      ]
+    },
+    {
+      "id": "java-cookie-negative",
+      "filename": "A.java",
+      "source": "cookie.setSecure(true);\n",
+      "expected": []
+    },
+    {
+      "id": "python-mktemp-positive",
+      "filename": "a.py",
+      "source": "name = tempfile.mktemp()\n",
+      "expected": [
+        {
+          "rule_id": "dede.hardening.python-mktemp"
+        }
+      ]
+    }
+  ]
+}

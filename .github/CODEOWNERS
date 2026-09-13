@@ -1,0 +1,6 @@
+# Require maintainer review for production and release inputs.
+* @cumakurt
+/Dockerfile @cumakurt
+/.github/ @cumakurt
+/rules/ @cumakurt
+/scripts/ @cumakurt

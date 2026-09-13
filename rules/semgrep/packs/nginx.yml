@@ -1,0 +1,338 @@
+rules:
+- id: generic.nginx.security.missing-ssl-version.missing-ssl-version
+  patterns:
+  - pattern: server { ... listen $PORT ssl; ... }
+  - pattern-not-inside: server { ... ssl_protocols ... }
+  paths:
+    include:
+    - '*.conf'
+    - '*.vhost'
+    - '**/sites-available/*'
+    - '**/sites-enabled/*'
+  languages:
+  - generic
+  severity: WARNING
+  message: This server configuration is missing the 'ssl_protocols' directive. By
+    default, this server will use 'ssl_protocols TLSv1 TLSv1.1 TLSv1.2', and versions
+    older than TLSv1.2 are known to be broken. Explicitly specify 'ssl_protocols TLSv1.2
+    TLSv1.3' to use secure TLS versions.
+  metadata:
+    cwe:
+    - 'CWE-326: Inadequate Encryption Strength'
+    references:
+    - https://www.acunetix.com/blog/web-security-zone/hardening-nginx/
+    - https://nginx.org/en/docs/http/configuring_https_servers.html
+    category: security
+    technology:
+    - nginx
+    confidence: MEDIUM
+    owasp:
+    - A03:2017 - Sensitive Data Exposure
+    - A02:2021 - Cryptographic Failures
+    - A04:2025 - Cryptographic Failures
+    subcategory:
+    - audit
+    likelihood: LOW
+    impact: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Cryptographic Issues
+    source: https://semgrep.dev/r/generic.nginx.security.missing-ssl-version.missing-ssl-version
+    shortlink: https://sg.run/3xzl
+    semgrep.dev:
+      rule:
+        r_id: 9043
+        rv_id: 1262678
+        rule_id: KxUbeA
+        version_id: ZRTKAle
+        url: https://semgrep.dev/playground/r/ZRTKAle/generic.nginx.security.missing-ssl-version.missing-ssl-version
+        origin: community
+- id: generic.nginx.security.dynamic-proxy-host.dynamic-proxy-host
+  paths:
+    include:
+    - '*.conf'
+    - '*.vhost'
+    - '**/sites-available/*'
+    - '**/sites-enabled/*'
+  languages:
+  - generic
+  severity: WARNING
+  message: The host for this proxy URL is dynamically determined. This can be dangerous
+    if the host can be injected by an attacker because it may forcibly alter destination
+    of the proxy. Consider hardcoding acceptable destinations and retrieving them
+    with 'map' or something similar.
+  metadata:
+    source-rule-url: https://github.com/yandex/gixy/blob/master/docs/en/plugins/ssrf.md
+    references:
+    - https://nginx.org/en/docs/http/ngx_http_map_module.html
+    category: security
+    technology:
+    - nginx
+    confidence: MEDIUM
+    cwe:
+    - 'CWE-441: Unintended Proxy or Intermediary (''Confused Deputy'')'
+    owasp:
+    - A01:2021 - Broken Access Control
+    - A01:2025 - Broken Access Control
+    subcategory:
+    - audit
+    likelihood: LOW
+    impact: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Server-Side Request Forgery (SSRF)
+    source: https://semgrep.dev/r/generic.nginx.security.dynamic-proxy-host.dynamic-proxy-host
+    shortlink: https://sg.run/ndpb
+    semgrep.dev:
+      rule:
+        r_id: 9036
+        rv_id: 1262671
+        rule_id: GdU7yl
+        version_id: kbTzG2j
+        url: https://semgrep.dev/playground/r/kbTzG2j/generic.nginx.security.dynamic-proxy-host.dynamic-proxy-host
+        origin: community
+  pattern-either:
+  - pattern: proxy_pass $SCHEME://$$HOST ...;
+  - pattern: proxy_pass $$SCHEME://$$HOST ...;
+- id: generic.nginx.security.request-host-used.request-host-used
+  pattern-either:
+  - pattern: $http_host
+  - pattern: $host
+  paths:
+    include:
+    - '*conf*'
+    - '*nginx*'
+    - '*vhost*'
+    - '**/sites-available/*'
+    - '**/sites-enabled/*'
+  languages:
+  - generic
+  severity: WARNING
+  message: '''$http_host'' and ''$host'' variables may contain a malicious value from
+    attacker controlled ''Host'' request header. Use an explicitly configured host
+    value or a allow list for validation.'
+  metadata:
+    cwe:
+    - 'CWE-290: Authentication Bypass by Spoofing'
+    references:
+    - https://github.com/yandex/gixy/blob/master/docs/en/plugins/hostspoofing.md
+    - https://portswigger.net/web-security/host-header
+    category: security
+    technology:
+    - nginx
+    confidence: MEDIUM
+    owasp:
+    - A07:2021 - Identification and Authentication Failures
+    - A07:2025 - Authentication Failures
+    subcategory:
+    - audit
+    likelihood: LOW
+    impact: LOW
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Improper Authentication
+    source: https://semgrep.dev/r/generic.nginx.security.request-host-used.request-host-used
+    shortlink: https://sg.run/4x3Z
+    semgrep.dev:
+      rule:
+        r_id: 9044
+        rv_id: 1262680
+        rule_id: qNUjGg
+        version_id: ExTExrN
+        url: https://semgrep.dev/playground/r/ExTExrN/generic.nginx.security.request-host-used.request-host-used
+        origin: community
+- id: generic.nginx.security.dynamic-proxy-scheme.dynamic-proxy-scheme
+  paths:
+    include:
+    - '*.conf'
+    - '*.vhost'
+    - '**/sites-available/*'
+    - '**/sites-enabled/*'
+  languages:
+  - generic
+  severity: WARNING
+  message: The protocol scheme for this proxy is dynamically determined. This can
+    be dangerous if the scheme can be injected by an attacker because it may forcibly
+    alter the connection scheme. Consider hardcoding a scheme for this proxy.
+  metadata:
+    cwe:
+    - 'CWE-16: CWE CATEGORY: Configuration'
+    references:
+    - https://github.com/yandex/gixy/blob/master/docs/en/plugins/ssrf.md
+    category: security
+    technology:
+    - nginx
+    confidence: MEDIUM
+    owasp:
+    - A06:2017 - Security Misconfiguration
+    - A05:2021 - Security Misconfiguration
+    - A02:2025 - Security Misconfiguration
+    subcategory:
+    - audit
+    likelihood: LOW
+    impact: LOW
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Other
+    source: https://semgrep.dev/r/generic.nginx.security.dynamic-proxy-scheme.dynamic-proxy-scheme
+    shortlink: https://sg.run/EkAo
+    semgrep.dev:
+      rule:
+        r_id: 9037
+        rv_id: 1262672
+        rule_id: ReUg7n
+        version_id: w8TRoAJ
+        url: https://semgrep.dev/playground/r/w8TRoAJ/generic.nginx.security.dynamic-proxy-scheme.dynamic-proxy-scheme
+        origin: community
+  pattern: proxy_pass $$SCHEME:// ...;
+- id: generic.nginx.security.insecure-redirect.insecure-redirect
+  patterns:
+  - pattern-either:
+    - pattern: rewrite ... redirect
+    - pattern: rewrite ... permanent
+  - pattern-not-inside: rewrite ... https ... $host ... redirect
+  - pattern-not-inside: rewrite ... https ... $host ... permanent
+  - pattern-not-regex: (?i)https:\/\/
+  paths:
+    include:
+    - '*.conf'
+    - '*.vhost'
+    - '**/sites-available/*'
+    - '**/sites-enabled/*'
+  message: Detected an insecure redirect in this nginx configuration. If no scheme
+    is specified, nginx will forward the request with the incoming scheme. This could
+    result in unencrypted communications. To fix this, include the 'https' scheme.
+  languages:
+  - generic
+  severity: WARNING
+  metadata:
+    cwe:
+    - 'CWE-319: Cleartext Transmission of Sensitive Information'
+    category: security
+    technology:
+    - nginx
+    confidence: LOW
+    owasp:
+    - A03:2017 - Sensitive Data Exposure
+    - A02:2021 - Cryptographic Failures
+    - A04:2025 - Cryptographic Failures
+    references:
+    - https://owasp.org/Top10/A02_2021-Cryptographic_Failures
+    subcategory:
+    - audit
+    likelihood: LOW
+    impact: LOW
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/generic.nginx.security.insecure-redirect.insecure-redirect
+    shortlink: https://sg.run/8y14
+    semgrep.dev:
+      rule:
+        r_id: 9040
+        rv_id: 1262675
+        rule_id: DbUpJe
+        version_id: e1TyjDz
+        url: https://semgrep.dev/playground/r/e1TyjDz/generic.nginx.security.insecure-redirect.insecure-redirect
+        origin: community
+- id: generic.nginx.security.header-injection.header-injection
+  pattern: |
+    location ... <$VARIABLE> ... {
+      ...
+      add_header ... $$VARIABLE
+      ...
+    }
+  paths:
+    include:
+    - '*.conf'
+    - '*.vhost'
+    - '**/sites-available/*'
+    - '**/sites-enabled/*'
+  languages:
+  - generic
+  severity: ERROR
+  message: 'The $$VARIABLE path parameter is added as a header in the response. This
+    could allow an attacker to inject a newline and add a new header into the response.
+    This is called HTTP response splitting. To fix, do not allow whitespace in the
+    path parameter: ''[^\s]+''.'
+  metadata:
+    cwe:
+    - 'CWE-113: Improper Neutralization of CRLF Sequences in HTTP Headers (''HTTP
+      Request/Response Splitting'')'
+    references:
+    - https://github.com/yandex/gixy/blob/master/docs/en/plugins/httpsplitting.md
+    - https://owasp.org/www-community/attacks/HTTP_Response_Splitting
+    category: security
+    technology:
+    - nginx
+    confidence: MEDIUM
+    owasp:
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    subcategory:
+    - audit
+    likelihood: LOW
+    impact: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Improper Validation
+    source: https://semgrep.dev/r/generic.nginx.security.header-injection.header-injection
+    shortlink: https://sg.run/7oj4
+    semgrep.dev:
+      rule:
+        r_id: 9038
+        rv_id: 1262673
+        rule_id: AbUz8p
+        version_id: xyTjzNW
+        url: https://semgrep.dev/playground/r/xyTjzNW/generic.nginx.security.header-injection.header-injection
+        origin: community
+- id: generic.nginx.security.insecure-ssl-version.insecure-ssl-version
+  patterns:
+  - pattern-not: ssl_protocols TLSv1.2 TLSv1.3;
+  - pattern-not: ssl_protocols TLSv1.3 TLSv1.2;
+  - pattern-not: ssl_protocols TLSv1.2;
+  - pattern-not: ssl_protocols TLSv1.3;
+  - pattern: ssl_protocols ...;
+  paths:
+    include:
+    - '*.conf'
+    - '*.vhost'
+    - '**/sites-available/*'
+    - '**/sites-enabled/*'
+  languages:
+  - generic
+  severity: WARNING
+  message: Detected use of an insecure SSL version. Secure SSL versions are TLSv1.2
+    and TLS1.3; older versions are known to be broken and are susceptible to attacks.
+    Prefer use of TLSv1.2 or later.
+  metadata:
+    cwe:
+    - 'CWE-326: Inadequate Encryption Strength'
+    references:
+    - https://www.acunetix.com/blog/web-security-zone/hardening-nginx/
+    - https://www.acunetix.com/blog/articles/tls-ssl-cipher-hardening/
+    category: security
+    technology:
+    - nginx
+    confidence: HIGH
+    owasp:
+    - A03:2017 - Sensitive Data Exposure
+    - A02:2021 - Cryptographic Failures
+    - A04:2025 - Cryptographic Failures
+    subcategory:
+    - audit
+    likelihood: MEDIUM
+    impact: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Cryptographic Issues
+    source: https://semgrep.dev/r/generic.nginx.security.insecure-ssl-version.insecure-ssl-version
+    shortlink: https://sg.run/gLKy
+    semgrep.dev:
+      rule:
+        r_id: 9041
+        rv_id: 1262676
+        rule_id: WAUo9k
+        version_id: vdT06O4
+        url: https://semgrep.dev/playground/r/vdT06O4/generic.nginx.security.insecure-ssl-version.insecure-ssl-version
+        origin: community

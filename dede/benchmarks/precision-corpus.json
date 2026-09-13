@@ -1,0 +1,317 @@
+{
+  "schema_version": 1,
+  "cases": [
+    {
+      "id": "python-sqli-positive",
+      "filename": "app.py",
+      "source": "from flask import request\ndef search(db):\n    q = request.args.get('q')\n    return db.execute('SELECT * FROM t WHERE q=' + q)\n",
+      "expected": [
+        {
+          "cwe": [
+            "CWE-89"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "python-sqli-parameterized-negative",
+      "filename": "app.py",
+      "source": "from flask import request\ndef search(db):\n    q = request.args.get('q')\n    return db.execute('SELECT * FROM t WHERE q=?', (q,))\n",
+      "expected": []
+    },
+    {
+      "id": "javascript-sqli-positive",
+      "filename": "app.js",
+      "source": "function search(req, db) {\n  const q = req.query.q;\n  return db.query('SELECT * FROM t WHERE q=' + q);\n}\n",
+      "expected": [
+        {
+          "cwe": [
+            "CWE-89"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "javascript-generic-execute-negative",
+      "filename": "app.js",
+      "source": "function run(req, executor) {\n  const q = req.query.q;\n  return executor.execute(q);\n}\n",
+      "expected": []
+    },
+    {
+      "id": "typescript-sqli-positive",
+      "filename": "app.ts",
+      "source": "function search(req: any, db: any) {\n const q=req.query.q;\n return db.query('SELECT '+q);\n}\n",
+      "expected": [
+        {
+          "cwe": [
+            "CWE-89"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "typescript-number-negative",
+      "filename": "app.ts",
+      "source": "function search(req: any, db: any) {\n const q=req.query.q;\n const id=Number(q);\n return db.query('SELECT '+id);\n}\n",
+      "expected": []
+    },
+    {
+      "id": "java-sqli-positive",
+      "filename": "App.java",
+      "source": "class App { String run(HttpServletRequest request){\n String q=request.getParameter(\"q\");\n return statement.executeQuery(\"select \"+q);\n} }\n",
+      "expected": [
+        {
+          "cwe": [
+            "CWE-89"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "java-typed-param-negative",
+      "filename": "App.java",
+      "source": "class App {\n @GetMapping(\"/u\")\n String run(@RequestParam int id){\n  return statement.executeQuery(\"select \"+id);\n }\n}\n",
+      "expected": []
+    },
+    {
+      "id": "kotlin-sqli-positive",
+      "filename": "App.kt",
+      "source": "fun run(call: ApplicationCall): String {\n val q=call.parameters[\"q\"]\n return statement.executeQuery(\"select \"+q)\n}\n",
+      "expected": [
+        {
+          "cwe": [
+            "CWE-89"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "kotlin-sanitized-negative",
+      "filename": "App.kt",
+      "source": "fun run(call: ApplicationCall): String {\n val q=call.parameters[\"q\"]\n val id=q.toIntOrNull()\n return statement.executeQuery(\"select \"+id)\n}\n",
+      "expected": []
+    },
+    {
+      "id": "csharp-sqli-positive",
+      "filename": "App.cs",
+      "source": "class App { string Run(){\n var q=Request.Query[\"q\"];\n return Database.ExecuteSqlRaw(\"select \"+q);\n} }\n",
+      "expected": [
+        {
+          "cwe": [
+            "CWE-89"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "go-sqli-positive",
+      "filename": "app.go",
+      "source": "package app\nfunc Run(r *http.Request) string {\n q:=r.URL.Query().Get(\"q\")\n return db.Query(\"select \"+q)\n}\n",
+      "expected": [
+        {
+          "cwe": [
+            "CWE-89"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "go-parameterized-negative",
+      "filename": "app.go",
+      "source": "package app\nfunc Run(r *http.Request) string {\n q:=r.URL.Query().Get(\"q\")\n return db.Query(\"select where q=?\", q)\n}\n",
+      "expected": []
+    },
+    {
+      "id": "php-sqli-positive",
+      "filename": "app.php",
+      "source": "<?php\nfunction run(){\n $q=$_GET['q'];\n return mysqli_query($db, 'select '.$q);\n}\n",
+      "expected": [
+        {
+          "cwe": [
+            "CWE-89"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "php-intval-negative",
+      "filename": "app.php",
+      "source": "<?php\nfunction run(){\n $q=$_GET['q'];\n $id=intval($q);\n return mysqli_query($db, 'select '.$id);\n}\n",
+      "expected": []
+    },
+    {
+      "id": "ruby-sqli-positive",
+      "filename": "app.rb",
+      "source": "def run\n q=params[:q]\n connection.execute('select '+q)\nend\n",
+      "expected": [
+        {
+          "cwe": [
+            "CWE-89"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rust-sqli-positive",
+      "filename": "app.rs",
+      "source": "fn run(req: Request){\n let q=Query(req);\n sqlx::query(q);\n}\n",
+      "expected": [
+        {
+          "cwe": [
+            "CWE-89"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c-command-positive",
+      "filename": "app.c",
+      "source": "void run(int argc,char **argv){\n char *q=argv[1];\n system(q);\n}\n",
+      "expected": [
+        {
+          "cwe": [
+            "CWE-78"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cpp-command-positive",
+      "filename": "app.cpp",
+      "source": "void run(int argc,char **argv){\n auto q=argv[1];\n system(q);\n}\n",
+      "expected": [
+        {
+          "cwe": [
+            "CWE-78"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "swift-path-positive",
+      "filename": "App.swift",
+      "source": "func run(request: Request){\n let q=request.query\n FileManager.default.contents(q)\n}\n",
+      "expected": [
+        {
+          "cwe": [
+            "CWE-22"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "scala-sqli-positive",
+      "filename": "App.scala",
+      "source": "def run(request: Req): String = {\n val q=request.getQueryString(\"q\")\n statement.executeQuery(\"select \"+q)\n}\n",
+      "expected": [
+        {
+          "cwe": [
+            "CWE-89"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dart-ssrf-positive",
+      "filename": "app.dart",
+      "source": "void run(request){\n var q=request.uri.queryParameters['q'];\n http.get(q);\n}\n",
+      "expected": [
+        {
+          "cwe": [
+            "CWE-918"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "javascript-fixed-origin-ssrf-negative",
+      "filename": "app.js",
+      "source": "function run(req){\n const q=req.query.q;\n fetch('https://safe.example/api/'+q);\n}\n",
+      "expected": []
+    },
+    {
+      "id": "python-secret-log-positive",
+      "filename": "app.py",
+      "source": "import os, logging\ndef f():\n    token=os.getenv(\"API_SECRET\")\n    logging.info(\"token=%s\", token)\n",
+      "expected": [
+        {
+          "cwe": [
+            "CWE-532"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "python-secret-log-string-negative",
+      "filename": "app.py",
+      "source": "import logging\ndef f():\n    logging.info(\"password reset requested\")\n",
+      "expected": []
+    },
+    {
+      "id": "python-pickle-positive",
+      "filename": "app.py",
+      "source": "from flask import request\nimport pickle\ndef f():\n    data=request.args.get(\"payload\")\n    return pickle.loads(data)\n",
+      "expected": [
+        {
+          "cwe": [
+            "CWE-502"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "python-ldap-positive",
+      "filename": "app.py",
+      "source": "from flask import request\ndef f(ldap_conn):\n    q=request.args.get(\"q\")\n    return ldap_conn.search(\"dc=example\", q)\n",
+      "expected": [
+        {
+          "cwe": [
+            "CWE-90"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "javascript-secret-log-positive",
+      "filename": "app.js",
+      "source": "function f(){\n const token=process.env.API_SECRET;\n console.log(\"token\", token);\n}\n",
+      "expected": [
+        {
+          "cwe": [
+            "CWE-532"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "javascript-secret-log-string-negative",
+      "filename": "app.js",
+      "source": "function f(){ console.log(\"token refreshed\"); }\n",
+      "expected": []
+    },
+    {
+      "id": "javascript-nosql-positive",
+      "filename": "app.js",
+      "source": "function f(req, collection){\n const q=req.query.q;\n return collection.find(q);\n}\n",
+      "expected": [
+        {
+          "cwe": [
+            "CWE-943"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "php-nosql-positive",
+      "filename": "app.php",
+      "source": "<?php\nfunction f($collection){\n $q=$_GET[\"q\"];\n return $collection->find($q);\n}\n",
+      "expected": [
+        {
+          "cwe": [
+            "CWE-943"
+          ]
+        }
+      ]
+    }
+  ]
+}

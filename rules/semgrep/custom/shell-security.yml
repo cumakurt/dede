@@ -1,0 +1,22 @@
+rules:
+  - id: dede.shell.security.curl-pipe-bash
+    message: "Piping curl/wget into a shell executes remote content (CWE-494)."
+    languages: [bash]
+    severity: ERROR
+    metadata:
+      cwe: ["CWE-494"]
+      owasp: ["A08:2021"]
+      category: security
+    pattern-either:
+      - pattern-regex: curl\s+[^\n|]*\|\s*(ba)?sh
+      - pattern-regex: wget\s+[^\n|]*\|\s*(ba)?sh
+
+  - id: dede.shell.security.chmod-777
+    message: "chmod 777 grants world-writable permissions (CWE-732)."
+    languages: [bash]
+    severity: WARNING
+    metadata:
+      cwe: ["CWE-732"]
+      owasp: ["A01:2021"]
+      category: security
+    pattern-regex: chmod\s+(-R\s+)?777\b

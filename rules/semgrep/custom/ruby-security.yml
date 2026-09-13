@@ -1,0 +1,24 @@
+rules:
+  - id: dede.ruby.security.eval
+    message: "Detected eval() which can lead to code injection (CWE-95)."
+    languages: [ruby]
+    severity: ERROR
+    metadata:
+      cwe: ["CWE-95"]
+      owasp: ["A03:2021"]
+      category: security
+    pattern: eval(...)
+
+  - id: dede.ruby.security.system-call
+    message: "Kernel.system / exec / backticks may allow command injection (CWE-78)."
+    languages: [ruby]
+    severity: ERROR
+    metadata:
+      cwe: ["CWE-78"]
+      owasp: ["A03:2021"]
+      category: security
+    pattern-either:
+      - pattern: system(...)
+      - pattern: exec(...)
+      - pattern: Open3.capture2(...)
+      - pattern: Open3.popen3(...)

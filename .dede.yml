@@ -1,0 +1,124 @@
+scan:
+  respect_gitignore: false
+  max_file_size_mb: 5
+
+exclude:
+  - node_modules
+  - vendor
+  - tests/fixtures
+
+severity:
+  fail_on: null
+
+semgrep:
+  profile: smart
+  extra_packs: []
+  disable_packs: []
+
+ai:
+  enabled: true
+  model: qwen3-coder:30b
+  max_context: 32768
+
+reports:
+  formats:
+    - json
+    - html
+    - pdf
+
+suppress:
+  fingerprints: []
+  rules: []
+  entries: []
+  # Example scoped, expiring suppression:
+  # - rule: dede.example.rule
+  #   path: tests/**
+  #   reason: approved test fixture
+  #   expires: 2027-01-01
+  #   approved_by: security-team
+
+policy:
+  enabled: false
+  rules: []
+  # Example:
+  # - name: public-services
+  #   path: services/public/**
+  #   deny_severity: HIGH
+  #   categories: [security, secret]
+
+engine:
+  # Precision-first default. Profiles: strict | smart | audit | experimental.
+  # smart suppresses uncorroborated LOW native and EXPERIMENTAL findings.
+  profile: smart
+  # Backward-compatible escape hatch; true makes smart behave like audit breadth.
+  report_low_confidence: false
+
+performance:
+  persistent_index: true
+  profile: true
+  dependency_aware: true
+  semantic_cache: true
+  index_path: ""
+
+semantic:
+  enabled: true
+  max_call_depth: 12
+  max_contexts: 10000
+  framework_models: true
+  endpoint_parameters_as_sources: true
+  builtin_flow_queries: true
+  sources: []
+  sinks: []
+  sanitizers: []
+  queries: []
+  # Custom deterministic DedeQL flow classification:
+  # queries:
+  #   - id: corp.internet-sql
+  #     source: http.*
+  #     sink: "*execute"
+  #     cwe: [CWE-89]
+  #     internet_exposed: true
+  #     min_exploitability: 90
+  # Custom model example:
+  # sources:
+  #   - call: mycompany.http.request_value
+  #     kind: http.custom
+  # sinks:
+  #   - call: legacydb.execute
+  #     kind: sql-execution
+  #     cwe: CWE-89
+  #     severity: HIGH
+
+
+model_packs:
+  enabled: true
+  paths: []
+  # Set true for organization-provided packs and configure DEDE_MODEL_PACK_KEY.
+  require_signature: false
+  hmac_key_env: DEDE_MODEL_PACK_KEY
+
+sca:
+  enabled: true
+  builtin_advisories: true
+  advisory_paths: []
+  report_unreachable: true
+  require_exact_version: true
+  # Place offline Dede/OSV JSON snapshots under .dede/advisories/ or list them above.
+
+feedback:
+  enabled: true
+  path: ""
+  annotate_similar: true
+  auto_suppress_false_positive: false
+
+precision_lab:
+  enabled: true
+  minimum_precision: 0.90
+  minimum_recall: 0.75
+
+experimental:
+  # Disabled by default because authorization/business-logic inference is heuristic.
+  authorization_analysis: false
+  business_logic_analysis: false
+  # Explicit dangerous MCP/agent permission checks are high-precision and enabled.
+  agent_security: true

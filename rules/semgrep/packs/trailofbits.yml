@@ -1,0 +1,5869 @@
+rules:
+- id: trailofbits.yaml.ansible.rpm-key-validate-certs-disabled.rpm-key-validate-certs-disabled
+  message: Found RPM key with SSL verification disabled
+  languages:
+  - yaml
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-295: Improper Certificate Validation'
+    subcategory:
+    - audit
+    technology:
+    - ansible
+    - rpm
+    confidence: HIGH
+    likelihood: HIGH
+    impact: HIGH
+    references:
+    - https://docs.ansible.com/ansible/latest/collections/ansible/builtin/rpm_key_module.html#parameter-validate_certs
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Improper Authentication
+    source: https://semgrep.dev/r/trailofbits.yaml.ansible.rpm-key-validate-certs-disabled.rpm-key-validate-certs-disabled
+    shortlink: https://sg.run/v8LWW
+    semgrep.dev:
+      rule:
+        r_id: 113233
+        rv_id: 833322
+        rule_id: lBU4Jee
+        version_id: xyTNeQ2
+        url: https://semgrep.dev/playground/r/xyTNeQ2/trailofbits.yaml.ansible.rpm-key-validate-certs-disabled.rpm-key-validate-certs-disabled
+        origin: community
+  patterns:
+  - pattern-inside: |
+      $RPMKEY:
+        ...
+        key: ...
+        ...
+  - metavariable-pattern:
+      metavariable: $RPMKEY
+      pattern-either:
+      - pattern: rpm_key
+      - pattern: ansible.builtin.rpm_key
+  - pattern: '$KEY: $VALUE'
+  - metavariable-pattern:
+      metavariable: $KEY
+      pattern-either:
+      - pattern: validate_certs
+  - metavariable-pattern:
+      metavariable: $VALUE
+      pattern-either:
+      - pattern: 'false'
+- id: trailofbits.yaml.ansible.apt-key-validate-certs-disabled.apt-key-validate-certs-disabled
+  message: Found apt key with SSL verification disabled
+  languages:
+  - yaml
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-295: Improper Certificate Validation'
+    subcategory:
+    - audit
+    technology:
+    - ansible
+    - apt
+    confidence: HIGH
+    likelihood: HIGH
+    impact: HIGH
+    references:
+    - https://docs.ansible.com/ansible/latest/collections/ansible/builtin/apt_key_module.html#parameter-validate_certs
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Improper Authentication
+    source: https://semgrep.dev/r/trailofbits.yaml.ansible.apt-key-validate-certs-disabled.apt-key-validate-certs-disabled
+    shortlink: https://sg.run/bwPnP
+    semgrep.dev:
+      rule:
+        r_id: 113226
+        rv_id: 833315
+        rule_id: AbU9gyg
+        version_id: 9lTJ06D
+        url: https://semgrep.dev/playground/r/9lTJ06D/trailofbits.yaml.ansible.apt-key-validate-certs-disabled.apt-key-validate-certs-disabled
+        origin: community
+  patterns:
+  - pattern-inside: |
+      $APTKEY:
+        ...
+        url: ...
+        ...
+  - metavariable-pattern:
+      metavariable: $APTKEY
+      pattern-either:
+      - pattern: apt_key
+      - pattern: ansible.builtin.apt_key
+  - pattern: '$KEY: $VALUE'
+  - metavariable-pattern:
+      metavariable: $KEY
+      pattern-either:
+      - pattern: validate_certs
+  - metavariable-pattern:
+      metavariable: $VALUE
+      pattern-either:
+      - pattern: 'false'
+- id: trailofbits.yaml.ansible.wrm-cert-validation-ignore.wrm-cert-validation-ignore
+  message: Found Windows Remote Management connection with certificate validation
+    disabled
+  languages:
+  - yaml
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-295: Improper Certificate Validation'
+    subcategory:
+    - audit
+    technology:
+    - ansible
+    confidence: HIGH
+    likelihood: HIGH
+    impact: HIGH
+    references:
+    - https://docs.ansible.com/ansible/latest/os_guide/windows_winrm.html#https-certificate-validation
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Improper Authentication
+    source: https://semgrep.dev/r/trailofbits.yaml.ansible.wrm-cert-validation-ignore.wrm-cert-validation-ignore
+    shortlink: https://sg.run/nJlP1
+    semgrep.dev:
+      rule:
+        r_id: 113236
+        rv_id: 833325
+        rule_id: oqUgbWQ
+        version_id: vdTOzBO
+        url: https://semgrep.dev/playground/r/vdTOzBO/trailofbits.yaml.ansible.wrm-cert-validation-ignore.wrm-cert-validation-ignore
+        origin: community
+  pattern: 'ansible_winrm_server_cert_validation: ignore'
+- id: trailofbits.yaml.ansible.dnf-validate-certs-disabled.dnf-validate-certs-disabled
+  message: Found dnf with SSL verification disabled
+  languages:
+  - yaml
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-295: Improper Certificate Validation'
+    subcategory:
+    - audit
+    technology:
+    - ansible
+    - dnf
+    confidence: HIGH
+    likelihood: HIGH
+    impact: HIGH
+    references:
+    - https://docs.ansible.com/ansible/latest/collections/ansible/builtin/dnf_module.html#parameter-validate_certs
+    - https://docs.ansible.com/ansible/latest/collections/ansible/builtin/dnf5_module.html#parameter-validate_certs
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Improper Authentication
+    source: https://semgrep.dev/r/trailofbits.yaml.ansible.dnf-validate-certs-disabled.dnf-validate-certs-disabled
+    shortlink: https://sg.run/wdL06
+    semgrep.dev:
+      rule:
+        r_id: 113229
+        rv_id: 833318
+        rule_id: WAUWqkG
+        version_id: bZTBe6R
+        url: https://semgrep.dev/playground/r/bZTBe6R/trailofbits.yaml.ansible.dnf-validate-certs-disabled.dnf-validate-certs-disabled
+        origin: community
+  patterns:
+  - pattern-inside: |
+      $DNF:
+        ...
+  - metavariable-pattern:
+      metavariable: $DNF
+      pattern-either:
+      - pattern: dnf
+      - pattern: ansible.builtin.dnf
+      - pattern: dnf5
+      - pattern: ansible.builtin.dnf5
+  - pattern: '$KEY: $VALUE'
+  - metavariable-pattern:
+      metavariable: $KEY
+      pattern-either:
+      - pattern: validate_certs
+  - metavariable-pattern:
+      metavariable: $VALUE
+      pattern-either:
+      - pattern: 'false'
+- id: trailofbits.yaml.ansible.dnf-unencrypted-url.dnf-unencrypted-url
+  message: Found dnf download with unencrypted URL (e.g. HTTP, FTP, etc.)
+  languages:
+  - yaml
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    subcategory:
+    - audit
+    technology:
+    - ansible
+    - dnf
+    confidence: HIGH
+    likelihood: HIGH
+    impact: HIGH
+    references:
+    - https://docs.ansible.com/ansible/latest/collections/ansible/builtin/dnf_module.html#parameter-name
+    - https://docs.ansible.com/ansible/latest/collections/ansible/builtin/dnf5_module.html#parameter-name
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/trailofbits.yaml.ansible.dnf-unencrypted-url.dnf-unencrypted-url
+    shortlink: https://sg.run/kx0y1
+    semgrep.dev:
+      rule:
+        r_id: 113228
+        rv_id: 833317
+        rule_id: DbU6R3w
+        version_id: rxTDzGy
+        url: https://semgrep.dev/playground/r/rxTDzGy/trailofbits.yaml.ansible.dnf-unencrypted-url.dnf-unencrypted-url
+        origin: community
+  patterns:
+  - pattern-inside: |
+      $DNF:
+        ...
+  - metavariable-pattern:
+      metavariable: $DNF
+      pattern-either:
+      - pattern: dnf
+      - pattern: ansible.builtin.dnf
+      - pattern: dnf5
+      - pattern: ansible.builtin.dnf5
+  - pattern: '$KEY: ''$VALUE'''
+  - metavariable-pattern:
+      metavariable: $KEY
+      pattern-either:
+      - pattern: name
+      - pattern: pkg
+  - metavariable-regex:
+      metavariable: $VALUE
+      regex: (?i)^(http|ftp)://.*
+- id: trailofbits.yaml.ansible.apt-key-unencrypted-url.apt-key-unencrypted-url
+  message: Found apt key download with unencrypted URL (e.g. HTTP, FTP, etc.)
+  languages:
+  - yaml
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    subcategory:
+    - audit
+    technology:
+    - ansible
+    - apt
+    confidence: HIGH
+    likelihood: HIGH
+    impact: HIGH
+    references:
+    - https://docs.ansible.com/ansible/latest/collections/ansible/builtin/apt_key_module.html#parameter-url
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/trailofbits.yaml.ansible.apt-key-unencrypted-url.apt-key-unencrypted-url
+    shortlink: https://sg.run/r68RP
+    semgrep.dev:
+      rule:
+        r_id: 113225
+        rv_id: 833314
+        rule_id: ReUD0BR
+        version_id: 1QTPLQx
+        url: https://semgrep.dev/playground/r/1QTPLQx/trailofbits.yaml.ansible.apt-key-unencrypted-url.apt-key-unencrypted-url
+        origin: community
+  patterns:
+  - pattern-inside: |
+      $APTKEY:
+        ...
+  - metavariable-pattern:
+      metavariable: $APTKEY
+      pattern-either:
+      - pattern: apt_key
+      - pattern: ansible.builtin.apt_key
+  - pattern: '$KEY: ''$VALUE'''
+  - metavariable-pattern:
+      metavariable: $KEY
+      pattern-either:
+      - pattern: url
+  - metavariable-regex:
+      metavariable: $VALUE
+      regex: (?i)^(http|ftp)://.*
+- id: trailofbits.yaml.ansible.unarchive-unencrypted-url.unarchive-unencrypted-url
+  message: Found unarchive download with unencrypted URL (e.g. HTTP, FTP, etc.)
+  languages:
+  - yaml
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    subcategory:
+    - audit
+    technology:
+    - ansible
+    confidence: HIGH
+    likelihood: HIGH
+    impact: HIGH
+    references:
+    - https://docs.ansible.com/ansible/latest/collections/ansible/builtin/unarchive_module.html#parameter-src
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/trailofbits.yaml.ansible.unarchive-unencrypted-url.unarchive-unencrypted-url
+    shortlink: https://sg.run/d85yn
+    semgrep.dev:
+      rule:
+        r_id: 113234
+        rv_id: 833323
+        rule_id: YGUpZzx
+        version_id: O9TJWR6
+        url: https://semgrep.dev/playground/r/O9TJWR6/trailofbits.yaml.ansible.unarchive-unencrypted-url.unarchive-unencrypted-url
+        origin: community
+  patterns:
+  - pattern-inside: |
+      $UNARCHIVE:
+        ...
+  - metavariable-pattern:
+      metavariable: $UNARCHIVE
+      pattern-either:
+      - pattern: unarchive
+      - pattern: ansible.builtin.unarchive
+  - pattern: '$KEY: ''$VALUE'''
+  - metavariable-pattern:
+      metavariable: $KEY
+      pattern-either:
+      - pattern: src
+  - metavariable-regex:
+      metavariable: $VALUE
+      regex: (?i)^(http|ftp)://.*
+- id: trailofbits.yaml.ansible.yum-unencrypted-url.yum-unencrypted-url
+  message: Found yum download with unencrypted URL (e.g. HTTP, FTP, etc.)
+  languages:
+  - yaml
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    subcategory:
+    - audit
+    technology:
+    - ansible
+    - yum
+    confidence: HIGH
+    likelihood: HIGH
+    impact: HIGH
+    references:
+    - https://docs.ansible.com/ansible/latest/collections/ansible/builtin/yum_module.html#parameter-name
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/trailofbits.yaml.ansible.yum-unencrypted-url.yum-unencrypted-url
+    shortlink: https://sg.run/Ew4NE
+    semgrep.dev:
+      rule:
+        r_id: 113237
+        rv_id: 833326
+        rule_id: zdUKbXv
+        version_id: d6TKGp6
+        url: https://semgrep.dev/playground/r/d6TKGp6/trailofbits.yaml.ansible.yum-unencrypted-url.yum-unencrypted-url
+        origin: community
+  patterns:
+  - pattern-inside: |
+      $YUM:
+        ...
+  - metavariable-pattern:
+      metavariable: $YUM
+      pattern-either:
+      - pattern: yum
+      - pattern: ansible.builtin.yum
+  - pattern: '$KEY: ''$VALUE'''
+  - metavariable-pattern:
+      metavariable: $KEY
+      pattern-either:
+      - pattern: name
+      - pattern: pkg
+  - metavariable-regex:
+      metavariable: $VALUE
+      regex: (?i)^(http|ftp)://.*
+- id: trailofbits.yaml.ansible.apt-unencrypted-url.apt-unencrypted-url
+  message: Found apt deb with unencrypted URL (e.g. HTTP, FTP, etc.)
+  languages:
+  - yaml
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    subcategory:
+    - audit
+    technology:
+    - ansible
+    - apt
+    confidence: HIGH
+    likelihood: HIGH
+    impact: HIGH
+    references:
+    - https://docs.ansible.com/ansible/latest/collections/ansible/builtin/apt_module.html#parameter-deb
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/trailofbits.yaml.ansible.apt-unencrypted-url.apt-unencrypted-url
+    shortlink: https://sg.run/NbW3L
+    semgrep.dev:
+      rule:
+        r_id: 113227
+        rv_id: 833316
+        rule_id: BYUXkQb
+        version_id: yeTN15k
+        url: https://semgrep.dev/playground/r/yeTN15k/trailofbits.yaml.ansible.apt-unencrypted-url.apt-unencrypted-url
+        origin: community
+  patterns:
+  - pattern-inside: |
+      $APT:
+        ...
+  - metavariable-pattern:
+      metavariable: $APT
+      pattern-either:
+      - pattern: apt
+      - pattern: ansible.builtin.apt
+  - pattern: '$KEY: ''$VALUE'''
+  - metavariable-pattern:
+      metavariable: $KEY
+      pattern-either:
+      - pattern: deb
+  - metavariable-regex:
+      metavariable: $VALUE
+      regex: (?i)^(http|ftp)://.*
+- id: trailofbits.yaml.ansible.rpm-key-unencrypted-url.rpm-key-unencrypted-url
+  message: Found RPM key download with unencrypted URL (e.g. HTTP, FTP, etc.)
+  languages:
+  - yaml
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    subcategory:
+    - audit
+    technology:
+    - ansible
+    - rpm
+    confidence: HIGH
+    likelihood: HIGH
+    impact: HIGH
+    references:
+    - https://docs.ansible.com/ansible/latest/collections/ansible/builtin/rpm_key_module.html#parameter-key
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/trailofbits.yaml.ansible.rpm-key-unencrypted-url.rpm-key-unencrypted-url
+    shortlink: https://sg.run/eqGkR
+    semgrep.dev:
+      rule:
+        r_id: 113232
+        rv_id: 833321
+        rule_id: qNU2R9K
+        version_id: w8TAxy8
+        url: https://semgrep.dev/playground/r/w8TAxy8/trailofbits.yaml.ansible.rpm-key-unencrypted-url.rpm-key-unencrypted-url
+        origin: community
+  patterns:
+  - pattern-inside: |
+      $RPMKEY:
+        ...
+  - metavariable-pattern:
+      metavariable: $RPMKEY
+      pattern-either:
+      - pattern: rpm_key
+      - pattern: ansible.builtin.rpm_key
+  - pattern: '$KEY: ''$VALUE'''
+  - metavariable-pattern:
+      metavariable: $KEY
+      pattern-either:
+      - pattern: key
+  - metavariable-regex:
+      metavariable: $VALUE
+      regex: (?i)^(http|ftp)://.*
+- id: trailofbits.yaml.ansible.unarchive-validate-certs-disabled.unarchive-validate-certs-disabled
+  message: Found unarchive download with SSL verification disabled
+  languages:
+  - yaml
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-295: Improper Certificate Validation'
+    subcategory:
+    - audit
+    technology:
+    - ansible
+    confidence: HIGH
+    likelihood: HIGH
+    impact: HIGH
+    references:
+    - https://docs.ansible.com/ansible/latest/collections/ansible/builtin/unarchive_module.html#parameter-validate_certs
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Improper Authentication
+    source: https://semgrep.dev/r/trailofbits.yaml.ansible.unarchive-validate-certs-disabled.unarchive-validate-certs-disabled
+    shortlink: https://sg.run/ZqByA
+    semgrep.dev:
+      rule:
+        r_id: 113235
+        rv_id: 833324
+        rule_id: 6JUv2A4
+        version_id: e1TDkGr
+        url: https://semgrep.dev/playground/r/e1TDkGr/trailofbits.yaml.ansible.unarchive-validate-certs-disabled.unarchive-validate-certs-disabled
+        origin: community
+  patterns:
+  - pattern-inside: |
+      $UNARCHIVE:
+        ...
+  - metavariable-pattern:
+      metavariable: $UNARCHIVE
+      pattern-either:
+      - pattern: unarchive
+      - pattern: ansible.builtin.unarchive
+  - pattern: '$KEY: $VALUE'
+  - metavariable-pattern:
+      metavariable: $KEY
+      pattern-either:
+      - pattern: validate_certs
+  - metavariable-pattern:
+      metavariable: $VALUE
+      pattern-either:
+      - pattern: 'false'
+- id: trailofbits.yaml.ansible.get-url-unencrypted-url.get-url-unencrypted-url
+  message: Found file download with unencrypted URL (e.g. HTTP, FTP, etc.)
+  languages:
+  - yaml
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    subcategory:
+    - audit
+    technology:
+    - ansible
+    confidence: HIGH
+    likelihood: HIGH
+    impact: HIGH
+    references:
+    - https://docs.ansible.com/ansible/latest/collections/ansible/builtin/get_url_module.html#parameter-url
+    - https://docs.ansible.com/ansible/latest/collections/ansible/windows/win_get_url_module.html#parameter-url
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/trailofbits.yaml.ansible.get-url-unencrypted-url.get-url-unencrypted-url
+    shortlink: https://sg.run/x8LKj
+    semgrep.dev:
+      rule:
+        r_id: 113230
+        rv_id: 833319
+        rule_id: 0oULKQq
+        version_id: NdTB2r9
+        url: https://semgrep.dev/playground/r/NdTB2r9/trailofbits.yaml.ansible.get-url-unencrypted-url.get-url-unencrypted-url
+        origin: community
+  patterns:
+  - pattern-inside: |
+      $GETURL:
+        ...
+  - pattern-not-inside: |
+      $GETURL:
+        ...
+        checksum: ...
+        ...
+  - metavariable-pattern:
+      metavariable: $GETURL
+      pattern-either:
+      - pattern: get_url
+      - pattern: win_get_url
+      - pattern: ansible.builtin.get_url
+      - pattern: ansible.windows.win_get_url
+  - pattern: '$KEY: ''$VALUE'''
+  - metavariable-pattern:
+      metavariable: $KEY
+      pattern-either:
+      - pattern: url
+  - metavariable-regex:
+      metavariable: $VALUE
+      regex: (?i)^(http|ftp)://.*
+- id: trailofbits.yaml.ansible.yum-validate-certs-disabled.yum-validate-certs-disabled
+  message: Found yum with SSL verification disabled
+  languages:
+  - yaml
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-295: Improper Certificate Validation'
+    subcategory:
+    - audit
+    technology:
+    - ansible
+    - yum
+    confidence: HIGH
+    likelihood: HIGH
+    impact: HIGH
+    references:
+    - https://docs.ansible.com/ansible/latest/collections/ansible/builtin/yum_module.html#parameter-validate_certs
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Improper Authentication
+    source: https://semgrep.dev/r/trailofbits.yaml.ansible.yum-validate-certs-disabled.yum-validate-certs-disabled
+    shortlink: https://sg.run/7Kvdw
+    semgrep.dev:
+      rule:
+        r_id: 113238
+        rv_id: 833327
+        rule_id: pKU10q4
+        version_id: ZRTlPX3
+        url: https://semgrep.dev/playground/r/ZRTlPX3/trailofbits.yaml.ansible.yum-validate-certs-disabled.yum-validate-certs-disabled
+        origin: community
+  patterns:
+  - pattern-inside: |
+      $YUM:
+        ...
+  - metavariable-pattern:
+      metavariable: $YUM
+      pattern-either:
+      - pattern: yum
+      - pattern: ansible.builtin.yum
+  - pattern: '$KEY: $VALUE'
+  - metavariable-pattern:
+      metavariable: $KEY
+      pattern-either:
+      - pattern: validate_certs
+  - metavariable-pattern:
+      metavariable: $VALUE
+      pattern-either:
+      - pattern: 'false'
+- id: trailofbits.yaml.ansible.get-url-validate-certs-disabled.get-url-validate-certs-disabled
+  message: Found file download with SSL verification disabled
+  languages:
+  - yaml
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-295: Improper Certificate Validation'
+    subcategory:
+    - audit
+    technology:
+    - ansible
+    confidence: HIGH
+    likelihood: HIGH
+    impact: HIGH
+    references:
+    - https://docs.ansible.com/ansible/latest/collections/ansible/builtin/get_url_module.html#parameter-validate_certs
+    - https://docs.ansible.com/ansible/latest/collections/ansible/windows/win_get_url_module.html#parameter-validate_certs
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Improper Authentication
+    source: https://semgrep.dev/r/trailofbits.yaml.ansible.get-url-validate-certs-disabled.get-url-validate-certs-disabled
+    shortlink: https://sg.run/Or0N7
+    semgrep.dev:
+      rule:
+        r_id: 113231
+        rv_id: 833320
+        rule_id: KxUvKPQ
+        version_id: kbT2lek
+        url: https://semgrep.dev/playground/r/kbT2lek/trailofbits.yaml.ansible.get-url-validate-certs-disabled.get-url-validate-certs-disabled
+        origin: community
+  patterns:
+  - pattern-inside: |
+      $GETURL:
+        ...
+        url: ...
+        ...
+  - pattern-not-inside: |
+      $GETURL:
+        ...
+        checksum: ...
+        ...
+  - metavariable-pattern:
+      metavariable: $GETURL
+      pattern-either:
+      - pattern: get_url
+      - pattern: win_get_url
+      - pattern: ansible.builtin.get_url
+      - pattern: ansible.windows.win_get_url
+  - pattern: '$KEY: $VALUE'
+  - metavariable-pattern:
+      metavariable: $KEY
+      pattern-either:
+      - pattern: validate_certs
+  - metavariable-pattern:
+      metavariable: $VALUE
+      pattern-either:
+      - pattern: 'false'
+- id: trailofbits.yaml.docker-compose.port-all-interfaces.port-all-interfaces
+  message: Service port is exposed on all interfaces
+  languages:
+  - yaml
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-1327: Binding to an Unrestricted IP Address'
+    subcategory:
+    - audit
+    technology:
+    - docker
+    - compose
+    confidence: LOW
+    likelihood: LOW
+    impact: LOW
+    references:
+    - https://docs.docker.com/compose/compose-file/compose-file-v3/#ports
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Other
+    source: https://semgrep.dev/r/trailofbits.yaml.docker-compose.port-all-interfaces.port-all-interfaces
+    shortlink: https://sg.run/gxAyK
+    semgrep.dev:
+      rule:
+        r_id: 113241
+        rv_id: 833330
+        rule_id: j2UgnLW
+        version_id: 7ZTx9XE
+        url: https://semgrep.dev/playground/r/7ZTx9XE/trailofbits.yaml.docker-compose.port-all-interfaces.port-all-interfaces
+        origin: community
+  patterns:
+  - pattern-inside: |
+      services:
+        ...
+  - pattern: |
+      ports:
+        - ...
+        - "$PORT"
+        - ...
+  - focus-metavariable: $PORT
+  - metavariable-regex:
+      metavariable: $PORT
+      regex: ^(?!127.\d{1,3}.\d{1,3}.\d{1,3}:).+
+- id: trailofbits.ruby.rails-cache-store-marshal.rails-cache-store-marshal
+  message: |
+    Found Rails cache store configured to allow Marshaling. As of Rails 7.1
+    the default serializer is `:marshal_7_1`. If an attacker can inject
+    data into the cache store (SSRF, etc.), then they can achieve code
+    execution when the object is later deserialized. Consider using a
+    custom serializer like JSON or MessagePack that does not fallback on
+    Marshal.
+  languages:
+  - ruby
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-502: Deserialization of Untrusted Data'
+    subcategory:
+    - audit
+    confidence: MEDIUM
+    likelihood: LOW
+    impact: LOW
+    technology:
+    - rails
+    references:
+    - https://github.com/rails/rails/blob/v7.1.4/activesupport/lib/active_support/cache.rb#L327
+    - https://github.com/rails/rails/blob/v7.1.4/activesupport/lib/active_support/cache/serializer_with_fallback.rb#L166-L172
+    - https://api.rubyonrails.org/v7.1.3.4/classes/ActiveSupport/Cache/MemCacheStore.html
+    - https://api.rubyonrails.org/v7.1.3.4/classes/ActiveSupport/Cache/Store.html
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - 'Insecure Deserialization '
+    source: https://semgrep.dev/r/trailofbits.ruby.rails-cache-store-marshal.rails-cache-store-marshal
+    shortlink: https://sg.run/0oKN5
+    semgrep.dev:
+      rule:
+        r_id: 150310
+        rv_id: 943204
+        rule_id: 9AUdPvk
+        version_id: yeT0BAd
+        url: https://semgrep.dev/playground/r/yeT0BAd/trailofbits.ruby.rails-cache-store-marshal.rails-cache-store-marshal
+        origin: community
+  patterns:
+  - pattern-inside: |
+      Rails.application.configure do
+      ...
+      end
+  - pattern-either:
+    - patterns:
+      - pattern: config.cache_store = $STORE
+      - pattern-not: config.cache_store = $STORE2, ..., { ... }
+    - patterns:
+      - pattern: config.cache_store = $STORE, ..., { ... }
+      - pattern-not: 'config.cache_store = $STORE, ..., { ..., serializer: ..., ...
+          }'
+    - patterns:
+      - pattern: config.cache_store = $STORE, ..., $OPTIONS
+      - metavariable-pattern:
+          metavariable: $OPTIONS
+          patterns:
+          - pattern: '{ ..., serializer: :passthrough, ... }'
+          - pattern: '{ ..., serializer: :marshal_6_1, ... }'
+          - pattern: '{ ..., serializer: :marshal_7_0, ... }'
+          - pattern: '{ ..., serializer: :marshal_7_1, ... }'
+          - pattern: '{ ..., serializer: :message_pack, ... }'
+  - metavariable-pattern:
+      metavariable: $STORE
+      pattern-either:
+      - pattern: :file_store
+      - pattern: :mem_cache_store
+      - pattern: :redis_cache_store
+- id: trailofbits.ruby.insecure-rails-cookie-session-store.insecure-rails-cookie-session-store
+  message: |
+    Found Rails session cookie missing SameSite=Secure. As of Rails 7.2,
+    session cookies default to SameSite=Lax.
+  languages:
+  - ruby
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-345: Insufficient Verification of Data Authenticity'
+    subcategory:
+    - audit
+    confidence: HIGH
+    likelihood: HIGH
+    impact: LOW
+    technology:
+    - rails
+    references:
+    - https://api.rubyonrails.org/classes/ActionDispatch/Session/CookieStore.html
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Improper Authentication
+    source: https://semgrep.dev/r/trailofbits.ruby.insecure-rails-cookie-session-store.insecure-rails-cookie-session-store
+    shortlink: https://sg.run/DbO2o
+    semgrep.dev:
+      rule:
+        r_id: 150308
+        rv_id: 943202
+        rule_id: j2Ug78v
+        version_id: 1QTob5Q
+        url: https://semgrep.dev/playground/r/1QTob5Q/trailofbits.ruby.insecure-rails-cookie-session-store.insecure-rails-cookie-session-store
+        origin: community
+  patterns:
+  - pattern: Rails.application.config.session_store(:cookie_store, ...)
+  - pattern-not: 'Rails.application.config.session_store(:cookie_store, ..., same_site:
+      :secure, ...)'
+- id: trailofbits.ruby.marshal-load-method.marshal-load-method
+  message: |
+    Found `marshal_load` class method. This implies custom Marshal
+    deserialization is occuring. This can lead to RCE and other
+    deserialization-type bugs.  Usage should be audited and, at least, fuzzed.
+  languages:
+  - ruby
+  severity: INFO
+  metadata:
+    category: security
+    cwe: 'CWE-502: Deserialization of Untrusted Data'
+    subcategory:
+    - audit
+    confidence: LOW
+    likelihood: LOW
+    impact: HIGH
+    technology:
+    - ruby
+    references:
+    - https://github.blog/2024-06-20-execute-commands-by-sending-json-learn-how-unsafe-deserialization-vulnerabilities-work-in-ruby-projects/
+    - https://github.com/GitHubSecurityLab/ruby-unsafe-deserialization/blob/main/marshal/3.4-rc/marshal-rce-ruby-3.4-rc.rb
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - 'Insecure Deserialization '
+    source: https://semgrep.dev/r/trailofbits.ruby.marshal-load-method.marshal-load-method
+    shortlink: https://sg.run/NdRrp
+    semgrep.dev:
+      rule:
+        r_id: 205471
+        rv_id: 1130087
+        rule_id: 7KUDPeR
+        version_id: l4T6xED
+        url: https://semgrep.dev/playground/r/l4T6xED/trailofbits.ruby.marshal-load-method.marshal-load-method
+        origin: community
+  patterns:
+  - pattern-inside: |
+      class $CLS
+        ...
+      end
+  - pattern: |
+      def marshal_load(...)
+        ...
+      end
+- id: trailofbits.ruby.rails-params-json.rails-params-json
+  message: |
+    Found Rails parameters (`params`) using the `_json` parameter. This
+    parameter is subject to parser juggling. This may allow an attacker to
+    exploit differences in parameter processing at different points in the
+    request processing lifecycle. For example, object ID processing during
+    the authentication/authorization phase and action execution phase.
+  languages:
+  - ruby
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-843: Access of Resource Using Incompatible Type (''Type Confusion'')'
+    subcategory:
+    - audit
+    confidence: LOW
+    likelihood: MEDIUM
+    impact: HIGH
+    technology:
+    - rails
+    references:
+    - https://nastystereo.com/security/rails-_json-juggling-attack.html
+    - https://api.rubyonrails.org/v5.1.7/classes/ActionDispatch/Http/Parameters.html
+    - https://api.rubyonrails.org/classes/ActionController/Parameters.html
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Other
+    source: https://semgrep.dev/r/trailofbits.ruby.rails-params-json.rails-params-json
+    shortlink: https://sg.run/Reqz2
+    semgrep.dev:
+      rule:
+        r_id: 150949
+        rv_id: 973913
+        rule_id: qNU28qG
+        version_id: w8TKy6N
+        url: https://semgrep.dev/playground/r/w8TKy6N/trailofbits.ruby.rails-params-json.rails-params-json
+        origin: community
+  pattern-either:
+  - pattern: params[:_json]
+  - pattern: params['_json']
+  - pattern: params.require(:_json)
+  - pattern: params.require('_json')
+  - pattern: params.fetch(:_json, ...)
+  - pattern: params.fetch('_json', ...)
+  - pattern: params.dig(:_json, ...)
+  - pattern: params.dig('_json', ...)
+- id: trailofbits.ruby.global-timeout.global-timeout
+  message: |
+    Found `Timeout::timeout` (or `timeout`) use. Setting a global timeout
+    can cause an exception to be raised anywhere in the passed block of code.
+    This precludes any possible clean up action typically associated with
+    rescuing from exceptions. This can lead to denial-of-service, data
+    integrity failure, and general availability concerns. Instead prefer to
+    use the library's built in timeout functionality, if it has any, to
+    ensure processing happens as expected. If it does not have built in
+    timeout functionality, then consider implementing it.
+  languages:
+  - ruby
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-460: Improper Cleanup on Thrown Exception'
+    subcategory:
+    - audit
+    confidence: HIGH
+    likelihood: HIGH
+    impact: LOW
+    technology:
+    - ruby
+    references:
+    - https://ruby-doc.org/3.3.2/stdlibs/timeout/Timeout.html
+    - https://jvns.ca/blog/2015/11/27/why-rubys-timeout-is-dangerous-and-thread-dot-raise-is-terrifying/
+    - https://www.mikeperham.com/2015/05/08/timeout-rubys-most-dangerous-api/
+    - http://blog.headius.com/2008/02/rubys-threadraise-threadkill-timeoutrb.html
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Other
+    source: https://semgrep.dev/r/trailofbits.ruby.global-timeout.global-timeout
+    shortlink: https://sg.run/BYwz2
+    semgrep.dev:
+      rule:
+        r_id: 150307
+        rv_id: 943201
+        rule_id: X5UQ61w
+        version_id: jQTz6QD
+        url: https://semgrep.dev/playground/r/jQTz6QD/trailofbits.ruby.global-timeout.global-timeout
+        origin: community
+  pattern-either:
+  - pattern: Timeout::timeout(...)
+  - pattern: Timeout.timeout(...)
+  - pattern: timeout(...)
+- id: trailofbits.ruby.ruby-saml-skip-validation.ruby-saml-skip-validation
+  message: |
+    SAML response validation disabled for $KEY.
+  languages:
+  - ruby
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-345: Insufficient Verification of Data Authenticity'
+    subcategory:
+    - audit
+    confidence: HIGH
+    likelihood: MEDIUM
+    impact: MEDIUM
+    technology:
+    - saml
+    references:
+    - https://github.com/SAML-Toolkits/ruby-saml/blob/v1.16.0/lib/onelogin/ruby-saml/response.rb
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Improper Authentication
+    source: https://semgrep.dev/r/trailofbits.ruby.ruby-saml-skip-validation.ruby-saml-skip-validation
+    shortlink: https://sg.run/lBLO9
+    semgrep.dev:
+      rule:
+        r_id: 150313
+        rv_id: 943207
+        rule_id: bwUbjnB
+        version_id: NdTq9Xv
+        url: https://semgrep.dev/playground/r/NdTq9Xv/trailofbits.ruby.ruby-saml-skip-validation.ruby-saml-skip-validation
+        origin: community
+  pattern-either:
+  - pattern: 'OneLogin::RubySaml::Response.new($RESPONSE, {..., skip_audience: true,
+      ...})'
+  - pattern: 'OneLogin::RubySaml::Response.new($RESPONSE, {..., skip_authnstatement:
+      true, ...})'
+  - pattern: 'OneLogin::RubySaml::Response.new($RESPONSE, {..., skip_conditions: true,
+      ...})'
+  - pattern: 'OneLogin::RubySaml::Response.new($RESPONSE, {..., skip_destination:
+      true, ...})'
+  - pattern: 'OneLogin::RubySaml::Response.new($RESPONSE, {..., skip_recipient_check:
+      true, ...})'
+  - pattern: 'OneLogin::RubySaml::Response.new($RESPONSE, {..., skip_subject_confirmation:
+      true, ...})'
+  - patterns:
+    - pattern-either:
+      - pattern: |
+          $SETTINGS = OneLogin::RubySaml::Settings.new(...)
+          ...
+          $SETTINGS.$KEY = true
+      - pattern: |
+          $SETTINGS = OneLogin::RubySaml::Settings.new
+          ...
+          $SETTINGS.$KEY = true
+    - focus-metavariable: $KEY
+    - metavariable-pattern:
+        metavariable: $KEY
+        pattern-either:
+        - pattern: skip_audience
+        - pattern: skip_authnstatement
+        - pattern: skip_conditions
+        - pattern: skip_destination
+        - pattern: skip_recipient_check
+        - pattern: skip_subject_confirmation
+- id: trailofbits.ruby.yaml-unsafe-load.yaml-unsafe-load
+  message: |
+    Found YAML call to `unsafe_load`. This can lead to deserialization bugs and RCE.
+  languages:
+  - ruby
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-502: Deserialization of Untrusted Data'
+    subcategory:
+    - audit
+    confidence: HIGH
+    likelihood: MEDIUM
+    impact: HIGH
+    technology:
+    - yaml
+    references:
+    - https://bishopfox.com/blog/ruby-vulnerabilities-exploits
+    - https://github.com/semgrep/semgrep-rules/blob/develop/ruby/lang/security/bad-deserialization-yaml.yaml
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - 'Insecure Deserialization '
+    source: https://semgrep.dev/r/trailofbits.ruby.yaml-unsafe-load.yaml-unsafe-load
+    shortlink: https://sg.run/YG2q4
+    semgrep.dev:
+      rule:
+        r_id: 150314
+        rv_id: 943208
+        rule_id: NbU3wbe
+        version_id: kbTYj6v
+        url: https://semgrep.dev/playground/r/kbTYj6v/trailofbits.ruby.yaml-unsafe-load.yaml-unsafe-load
+        origin: community
+  patterns:
+  - pattern-either:
+    - pattern: YAML.unsafe_load(...)
+    - pattern: Psych.unsafe_load(...)
+    - pattern: 'serialize(..., yaml: { ..., unsafe_load: true, ... }, ...)'
+  - pattern-not: YAML.unsafe_load("...")
+  - pattern-not: Psych.unsafe_load("...")
+- id: trailofbits.ruby.json-create-deserialization.json-create-deserialization
+  message: |
+    Found `json_create` class method. This implies custom JSON deserialization
+    is occuring. This can lead to RCE and other deserialization-type bugs.
+    Usage should be audited and, at least, fuzzed.
+  languages:
+  - ruby
+  severity: INFO
+  metadata:
+    category: security
+    cwe: 'CWE-502: Deserialization of Untrusted Data'
+    subcategory:
+    - audit
+    confidence: LOW
+    likelihood: LOW
+    impact: HIGH
+    technology:
+    - ruby
+    references:
+    - https://github.blog/2024-06-20-execute-commands-by-sending-json-learn-how-unsafe-deserialization-vulnerabilities-work-in-ruby-projects/
+    - https://github.com/github/codeql/blob/main/ruby/ql/lib/codeql/ruby/security/UnsafeDeserializationCustomizations.qll
+    - https://stackoverflow.com/questions/17226402/whats-the-difference-between-json-load-and-json-parse-methods-of-ruby-lib
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - 'Insecure Deserialization '
+    source: https://semgrep.dev/r/trailofbits.ruby.json-create-deserialization.json-create-deserialization
+    shortlink: https://sg.run/WAz0g
+    semgrep.dev:
+      rule:
+        r_id: 150309
+        rv_id: 943203
+        rule_id: 10UOqrZ
+        version_id: 9lTyoZX
+        url: https://semgrep.dev/playground/r/9lTyoZX/trailofbits.ruby.json-create-deserialization.json-create-deserialization
+        origin: community
+  patterns:
+  - pattern-inside: |
+      class $CLS
+        ...
+      end
+  - pattern: |
+      def self.json_create($OBJ)
+        ...
+      end
+- id: trailofbits.yaml.ansible.zypper-unencrypted-url.zypper-unencrypted-url
+  message: Found Zypper package with unencrypted URL (e.g. HTTP, FTP, etc.)
+  languages:
+  - yaml
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    subcategory:
+    - audit
+    technology:
+    - ansible
+    - zypper
+    confidence: HIGH
+    likelihood: HIGH
+    impact: HIGH
+    references:
+    - https://docs.ansible.com/ansible/latest/collections/community/general/zypper_module.html#parameter-name
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/trailofbits.yaml.ansible.zypper-unencrypted-url.zypper-unencrypted-url
+    shortlink: https://sg.run/8GLdB
+    semgrep.dev:
+      rule:
+        r_id: 113240
+        rv_id: 833329
+        rule_id: X5UQzo1
+        version_id: ExTrDXA
+        url: https://semgrep.dev/playground/r/ExTrDXA/trailofbits.yaml.ansible.zypper-unencrypted-url.zypper-unencrypted-url
+        origin: community
+  patterns:
+  - pattern-inside: |
+      $ZYPPER:
+        ...
+  - pattern: '$KEY: ''$VALUE'''
+  - metavariable-pattern:
+      metavariable: $KEY
+      pattern-either:
+      - pattern: name
+      - pattern: pkg
+  - metavariable-pattern:
+      metavariable: $ZYPPER
+      pattern-either:
+      - pattern: zypper
+      - pattern: community.general.zypper
+  - metavariable-regex:
+      metavariable: $VALUE
+      regex: (?i)^(http|ftp)://.*
+- id: trailofbits.ruby.rest-client-disable-verification.rest-client-disable-verification
+  message: |
+    Found RestClient HTTP request disabling SSL/TLS verification.
+  languages:
+  - ruby
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-295: Improper Certificate Validation'
+    subcategory:
+    - audit
+    confidence: HIGH
+    likelihood: HIGH
+    impact: HIGH
+    technology:
+    - restclient
+    references:
+    - https://github.com/rest-client/rest-client#ssl-client-certificates
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Improper Authentication
+    source: https://semgrep.dev/r/trailofbits.ruby.rest-client-disable-verification.rest-client-disable-verification
+    shortlink: https://sg.run/qNnOy
+    semgrep.dev:
+      rule:
+        r_id: 150312
+        rv_id: 943206
+        rule_id: r6Uy7E2
+        version_id: bZTXKzJ
+        url: https://semgrep.dev/playground/r/bZTXKzJ/trailofbits.ruby.rest-client-disable-verification.rest-client-disable-verification
+        origin: community
+  patterns:
+  - pattern-either:
+    - pattern: $FUNC(..., :verify_ssl => false, ...)
+    - pattern: $FUNC(..., :verify_ssl => OpenSSL::SSL::VERIFY_NONE, ...)
+  - metavariable-pattern:
+      metavariable: $FUNC
+      pattern-either:
+      - pattern: RestClient::Resource.new
+      - pattern: RestClient::Request.new
+      - pattern: RestClient::Request.execute
+- id: trailofbits.swift.insecure-url-host-hassuffix-check.insecure-url-host-hassuffix-check
+  message: |
+    Potentially insecure URL host suffix check. Using hasSuffix("domain.com") without  a leading dot can match unintended domains like "fakedomain.com"
+  languages:
+  - swift
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: CWE-697
+    technology:
+    - swift
+    - ios
+    subcategory:
+    - audit
+    confidence: HIGH
+    likelihood: HIGH
+    impact: MEDIUM
+    references:
+    - https://developer.apple.com/documentation/foundation/url/host(percentencoded:)
+    - https://developer.apple.com/documentation/foundation/nsstring/hassuffix(_:)
+    - https://pentesterlab.com/blog/rust-cors-vulnerabilities
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Other
+    source: https://semgrep.dev/r/trailofbits.swift.insecure-url-host-hassuffix-check.insecure-url-host-hassuffix-check
+    shortlink: https://sg.run/e1Rl0
+    semgrep.dev:
+      rule:
+        r_id: 210176
+        rv_id: 1142332
+        rule_id: WAUO650
+        version_id: yeTZe3n
+        url: https://semgrep.dev/playground/r/yeTZe3n/trailofbits.swift.insecure-url-host-hassuffix-check.insecure-url-host-hassuffix-check
+        origin: community
+  pattern-either:
+  - patterns:
+    - pattern: $X.hasSuffix($SUFFIX)
+    - metavariable-regex:
+        metavariable: $SUFFIX
+        regex: ^"(?!\.)[a-zA-Z0-9\-]+(\.[a-zA-Z0-9\-]+)+"$
+    - metavariable-regex:
+        metavariable: $X
+        regex: .*\.host
+  - patterns:
+    - pattern-either:
+      - pattern: host?.hasSuffix($SUFFIX)
+      - pattern: host.hasSuffix($SUFFIX)
+      - pattern: self.host?.hasSuffix($SUFFIX)
+      - pattern: self.host.hasSuffix($SUFFIX)
+      - pattern: host?.hasSuffix($SUFFIX) ?? $D
+    - metavariable-regex:
+        metavariable: $SUFFIX
+        regex: ^"(?!\.)[a-zA-Z0-9\-]+(\.[a-zA-Z0-9\-]+)+"$
+    - pattern-inside: |
+        extension URL { ... }
+  - patterns:
+    - pattern: $VAR.hasSuffix($SUFFIX)
+    - metavariable-regex:
+        metavariable: $SUFFIX
+        regex: ^"(?!\.)[a-zA-Z0-9\-]+(\.[a-zA-Z0-9\-]+)+"$
+    - pattern-either:
+      - pattern-inside: |
+          if let $VAR = $_.host { ... }
+      - pattern-inside: |
+          guard let $VAR = $_.host else { ... }
+          ...
+      - pattern-inside: |
+          guard ..., let $VAR = $_.host, ... else { ... }
+          ...
+      - pattern-inside: |
+          let $VAR = $_.host
+          ...
+      - pattern-inside: |
+          var $VAR = $_.host
+          ...
+- id: trailofbits.yaml.ansible.zypper-repository-unencrypted-url.zypper-repository-unencrypted-url
+  message: Found Zypper repository with unencrypted URL (e.g. HTTP, FTP, etc.)
+  languages:
+  - yaml
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    subcategory:
+    - audit
+    technology:
+    - ansible
+    - zypper
+    confidence: HIGH
+    likelihood: HIGH
+    impact: HIGH
+    references:
+    - https://docs.ansible.com/ansible/latest/collections/community/general/zypper_module.html#parameter-name
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/trailofbits.yaml.ansible.zypper-repository-unencrypted-url.zypper-repository-unencrypted-url
+    shortlink: https://sg.run/L1Bkn
+    semgrep.dev:
+      rule:
+        r_id: 113239
+        rv_id: 833328
+        rule_id: 2ZUzvAk
+        version_id: nWTy40P
+        url: https://semgrep.dev/playground/r/nWTy40P/trailofbits.yaml.ansible.zypper-repository-unencrypted-url.zypper-repository-unencrypted-url
+        origin: community
+  patterns:
+  - pattern-inside: |
+      $ZYPPER:
+        ...
+  - pattern: '$KEY: ''$VALUE'''
+  - metavariable-pattern:
+      metavariable: $KEY
+      pattern-either:
+      - pattern: repo
+  - metavariable-pattern:
+      metavariable: $ZYPPER
+      pattern-either:
+      - pattern: zypper_repository
+      - pattern: community.general.zypper_repository
+  - metavariable-regex:
+      metavariable: $VALUE
+      regex: (?i)^(http|ftp)://.*
+- id: trailofbits.ruby.rails-cookie-attributes.rails-cookie-attributes
+  message: |
+    Found Rails cookie set with insecure attribute.
+  languages:
+  - ruby
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-345: Insufficient Verification of Data Authenticity'
+    subcategory:
+    - audit
+    confidence: HIGH
+    likelihood: HIGH
+    impact: LOW
+    technology:
+    - rails
+    references:
+    - https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie
+    - https://api.rubyonrails.org/classes/ActionDispatch/Session/CookieStore.html
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Improper Authentication
+    source: https://semgrep.dev/r/trailofbits.ruby.rails-cookie-attributes.rails-cookie-attributes
+    shortlink: https://sg.run/KxRbX
+    semgrep.dev:
+      rule:
+        r_id: 150311
+        rv_id: 943205
+        rule_id: yyUR7EP
+        version_id: rxT6o2b
+        url: https://semgrep.dev/playground/r/rxT6o2b/trailofbits.ruby.rails-cookie-attributes.rails-cookie-attributes
+        origin: community
+  patterns:
+  - pattern-either:
+    - pattern-inside: cookies[$ANY] = ...
+    - pattern-inside: cookies. ... .$ATTR[$ANY] = ...
+  - pattern-either:
+    - pattern: '{..., same_site: :none, ...}'
+    - pattern: '{..., same_site: :lax, ...}'
+    - pattern: '{..., httponly: false, ...}'
+    - pattern: '{..., secure: false, ...}'
+- id: trailofbits.yaml.github-actions.pypi-publish-password.pypi-publish-password
+  message: |
+    Found long-term access key. Instead prefer PyPI trusted publishing and
+    temporary OIDC security credentials.
+  languages:
+  - yaml
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-798: Use of Hard-coded Credentials'
+    subcategory:
+    - audit
+    confidence: HIGH
+    likelihood: HIGH
+    impact: MEDIUM
+    technology:
+    - pypi
+    - github-actions
+    references:
+    - https://docs.pypi.org/trusted-publishers/
+    - https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-pypi
+    - https://github.com/pypa/gh-action-pypi-publish
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Hard-coded Secrets
+    source: https://semgrep.dev/r/trailofbits.yaml.github-actions.pypi-publish-password.pypi-publish-password
+    shortlink: https://sg.run/2ZlPD
+    semgrep.dev:
+      rule:
+        r_id: 150319
+        rv_id: 1024984
+        rule_id: eqU0Nle
+        version_id: 7ZTogXQ
+        url: https://semgrep.dev/playground/r/7ZTogXQ/trailofbits.yaml.github-actions.pypi-publish-password.pypi-publish-password
+        origin: community
+  patterns:
+  - pattern-inside: |
+      uses: "$ACTION"
+      ...
+  - metavariable-regex:
+      metavariable: $ACTION
+      regex: ^pypa/gh-action-pypi-publish
+  - pattern: |
+      with:
+        ...
+        password: ...
+- id: trailofbits.yaml.github-actions.rubygems-publish-key.rubygems-publish-key
+  message: |
+    Found long-term access key. Instead prefer RubyGems trusted publishing and
+    temporary OIDC security credentials.
+  languages:
+  - yaml
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-798: Use of Hard-coded Credentials'
+    subcategory:
+    - audit
+    confidence: HIGH
+    likelihood: LOW
+    impact: MEDIUM
+    technology:
+    - rubygems
+    - github-actions
+    references:
+    - https://guides.rubygems.org/trusted-publishing/
+    - https://guides.rubygems.org/api-key-scopes/#usage-with-gem-cli
+    - https://github.com/rubygems/release-gem
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Hard-coded Secrets
+    source: https://semgrep.dev/r/trailofbits.yaml.github-actions.rubygems-publish-key.rubygems-publish-key
+    shortlink: https://sg.run/X5pKb
+    semgrep.dev:
+      rule:
+        r_id: 150320
+        rv_id: 943214
+        rule_id: v8UY7EL
+        version_id: d6TPQ4X
+        url: https://semgrep.dev/playground/r/d6TPQ4X/trailofbits.yaml.github-actions.rubygems-publish-key.rubygems-publish-key
+        origin: community
+  pattern: GEM_HOST_API_KEY
+- id: trailofbits.yaml.github-actions.aws-secret-key.aws-secret-key
+  message: |
+    Found long-term access key. Instead prefer AWS role assumption and
+    temporary OIDC security credentials.
+  languages:
+  - yaml
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-798: Use of Hard-coded Credentials'
+    subcategory:
+    - audit
+    confidence: HIGH
+    likelihood: HIGH
+    impact: MEDIUM
+    technology:
+    - aws
+    - github-actions
+    references:
+    - https://docs.aws.amazon.com/IAM/latest/UserGuide/security-creds.html#sec-alternatives-to-long-term-access-keys
+    - https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services
+    - https://github.com/aws-actions/configure-aws-credentials
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Hard-coded Secrets
+    source: https://semgrep.dev/r/trailofbits.yaml.github-actions.aws-secret-key.aws-secret-key
+    shortlink: https://sg.run/6JzRB
+    semgrep.dev:
+      rule:
+        r_id: 150315
+        rv_id: 1024980
+        rule_id: kxUdnEY
+        version_id: d6TArpw
+        url: https://semgrep.dev/playground/r/d6TArpw/trailofbits.yaml.github-actions.aws-secret-key.aws-secret-key
+        origin: community
+  patterns:
+  - pattern-inside: |
+      uses: "$ACTION"
+      ...
+  - metavariable-regex:
+      metavariable: $ACTION
+      regex: ^aws-actions/configure-aws-credentials
+  - pattern-either:
+    - pattern: |
+        with:
+          ...
+          aws-secret-access-key: ...
+    - pattern: |
+        env:
+          ...
+          AWS_SECRET_ACCESS_KEY: ...
+- id: trailofbits.yaml.github-actions.azure-principal-secret.azure-principal-secret
+  message: |
+    Found long-term access key. Instead prefer Azure subscription ID and
+    temporary OIDC security credentials.
+  languages:
+  - yaml
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-798: Use of Hard-coded Credentials'
+    subcategory:
+    - audit
+    confidence: HIGH
+    likelihood: HIGH
+    impact: MEDIUM
+    technology:
+    - azure
+    - github-actions
+    references:
+    - https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure
+    - https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-azure
+    - https://github.com/Azure/login
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Hard-coded Secrets
+    source: https://semgrep.dev/r/trailofbits.yaml.github-actions.azure-principal-secret.azure-principal-secret
+    shortlink: https://sg.run/oqgdR
+    semgrep.dev:
+      rule:
+        r_id: 150316
+        rv_id: 1024981
+        rule_id: wdU97En
+        version_id: ZRTNQXQ
+        url: https://semgrep.dev/playground/r/ZRTNQXQ/trailofbits.yaml.github-actions.azure-principal-secret.azure-principal-secret
+        origin: community
+  patterns:
+  - pattern-inside: |
+      uses: "$ACTION"
+      ...
+  - metavariable-regex:
+      metavariable: $ACTION
+      regex: ^azure/login
+  - pattern: |
+      with:
+        ...
+        creds: ...
+- id: trailofbits.yaml.github-actions.gcp-credentials-json.gcp-credentials-json
+  message: |
+    Found long-term access key. Instead prefer GCP workload identity
+    federation and temporary OIDC security credentials.
+  languages:
+  - yaml
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-798: Use of Hard-coded Credentials'
+    subcategory:
+    - audit
+    confidence: HIGH
+    likelihood: HIGH
+    impact: MEDIUM
+    technology:
+    - gcp
+    - github-actions
+    references:
+    - https://cloud.google.com/blog/products/identity-security/enabling-keyless-authentication-from-github-actions
+    - https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-google-cloud-platform
+    - https://github.com/google-github-actions/auth
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Hard-coded Secrets
+    source: https://semgrep.dev/r/trailofbits.yaml.github-actions.gcp-credentials-json.gcp-credentials-json
+    shortlink: https://sg.run/zdneW
+    semgrep.dev:
+      rule:
+        r_id: 150317
+        rv_id: 1024982
+        rule_id: x8UK7Ep
+        version_id: nWTPx0O
+        url: https://semgrep.dev/playground/r/nWTPx0O/trailofbits.yaml.github-actions.gcp-credentials-json.gcp-credentials-json
+        origin: community
+  patterns:
+  - pattern-inside: |
+      uses: "$ACTION"
+      ...
+  - metavariable-regex:
+      metavariable: $ACTION
+      regex: ^google-github-actions/auth
+  - pattern: |
+      with:
+        ...
+        credentials_json: ...
+- id: trailofbits.yaml.github-actions.vault-token.vault-token
+  message: |
+    Found long-term access key. Instead prefer Vault role assumption and
+    temporary OIDC security credentials.
+  languages:
+  - yaml
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-798: Use of Hard-coded Credentials'
+    subcategory:
+    - audit
+    confidence: HIGH
+    likelihood: HIGH
+    impact: MEDIUM
+    technology:
+    - vault
+    - github-actions
+    references:
+    - https://developer.hashicorp.com/vault/docs/platform/github-actions
+    - https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-hashicorp-vault
+    - https://github.com/hashicorp/vault-action
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Hard-coded Secrets
+    source: https://semgrep.dev/r/trailofbits.yaml.github-actions.vault-token.vault-token
+    shortlink: https://sg.run/j2n3J
+    semgrep.dev:
+      rule:
+        r_id: 150321
+        rv_id: 1024985
+        rule_id: d8Urdo7
+        version_id: LjTQql4
+        url: https://semgrep.dev/playground/r/LjTQql4/trailofbits.yaml.github-actions.vault-token.vault-token
+        origin: community
+  patterns:
+  - pattern-inside: |
+      uses: "$ACTION"
+      ...
+  - metavariable-regex:
+      metavariable: $ACTION
+      regex: ^hashicorp/vault-action
+  - pattern-either:
+    - pattern: |
+        with:
+          ...
+          token: ...
+    - pattern: |
+        env:
+          ...
+          VAULT_TOKEN: ...
+- id: trailofbits.yaml.github-actions.jfrog-hardcoded-credential.jfrog-hardcoded-credential
+  message: |
+    Found long-term access key. Instead prefer JFrog temporary OIDC security credentials
+  languages:
+  - yaml
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-798: Use of Hard-coded Credentials'
+    subcategory:
+    - audit
+    confidence: HIGH
+    likelihood: HIGH
+    impact: MEDIUM
+    technology:
+    - jfrog
+    - artifactory
+    - github-actions
+    references:
+    - https://jfrog.com/help/r/jfrog-platform-administration-documentation/openid-connect-integration
+    - https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-jfrog
+    - https://github.com/jfrog/setup-jfrog-cli#authorization
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Hard-coded Secrets
+    source: https://semgrep.dev/r/trailofbits.yaml.github-actions.jfrog-hardcoded-credential.jfrog-hardcoded-credential
+    shortlink: https://sg.run/pKnOL
+    semgrep.dev:
+      rule:
+        r_id: 150318
+        rv_id: 1024983
+        rule_id: OrUNg9p
+        version_id: ExTNjXp
+        url: https://semgrep.dev/playground/r/ExTNjXp/trailofbits.yaml.github-actions.jfrog-hardcoded-credential.jfrog-hardcoded-credential
+        origin: community
+  patterns:
+  - pattern-inside: |
+      uses: "$ACTION"
+      ...
+  - metavariable-regex:
+      metavariable: $ACTION
+      regex: ^jfrog/setup-jfrog-cli
+  - pattern: |
+      env:
+        ...
+        $VAR: ...
+  - focus-metavariable: $VAR
+  - metavariable-regex:
+      metavariable: $VAR
+      regex: ^(JF_PASSWORD|JF_ACCESS_TOKEN|JF_ENV_.+)$
+- id: trailofbits.python.pickles-in-pytorch.pickles-in-pytorch
+  message: Functions reliant on pickle can result in arbitrary code execution.  Consider
+    loading from `state_dict`, using fickling, or switching to a safer serialization
+    method like ONNX
+  languages:
+  - python
+  severity: ERROR
+  metadata:
+    category: security
+    cwe: 'CWE-502: Deserialization of Untrusted Data'
+    subcategory:
+    - vuln
+    confidence: MEDIUM
+    likelihood: MEDIUM
+    impact: HIGH
+    technology:
+    - pytorch
+    description: Potential arbitrary code execution from `PyTorch` functions reliant
+      on pickling
+    references:
+    - https://blog.trailofbits.com/2021/03/15/never-a-dill-moment-exploiting-machine-learning-pickle-files/
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - 'Insecure Deserialization '
+    source: https://semgrep.dev/r/trailofbits.python.pickles-in-pytorch.pickles-in-pytorch
+    shortlink: https://sg.run/NwQy
+    semgrep.dev:
+      rule:
+        r_id: 17171
+        rv_id: 833304
+        rule_id: JDU6WD
+        version_id: qkTQnJ3
+        url: https://semgrep.dev/playground/r/qkTQnJ3/trailofbits.python.pickles-in-pytorch.pickles-in-pytorch
+        origin: community
+  patterns:
+  - pattern-either:
+    - pattern: torch.save(...)
+    - pattern: torch.load(...)
+  - pattern-not: torch.load("...")
+  - pattern-not: torch.save(..., "...")
+  - pattern-not: torch.save($M.state_dict(), ...)
+  - pattern-not-inside: $M.load_state_dict(...)
+  - pattern-not:
+      patterns:
+      - pattern: torch.save($STATE_DICT, ...)
+      - pattern-inside: |
+          $STATE_DICT = $M.state_dict()
+          ...
+- id: trailofbits.go.servercodec-readrequestbody-unhandled-nil.servercodec-readrequestbody-unhandled-nil
+  message: The `func ($O *$CODEC) ReadRequestBody($ARG $TYPE) error` function does
+    not handle `nil` argument, as the `ServerCodec` interface requires. An incorrect
+    implementation could lead to denial of service
+  languages:
+  - go
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-476: NULL Pointer Dereference'
+    subcategory:
+    - vuln
+    confidence: HIGH
+    likelihood: MEDIUM
+    impact: LOW
+    technology:
+    - --no-technology--
+    description: Possible incorrect `ServerCodec` interface implementation
+    references:
+    - https://github.com/golang/go/blob/go1.15.2/src/net/rpc/server.go#L643-L658
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Other
+    source: https://semgrep.dev/r/trailofbits.go.servercodec-readrequestbody-unhandled-nil.servercodec-readrequestbody-unhandled-nil
+    shortlink: https://sg.run/lx09
+    semgrep.dev:
+      rule:
+        r_id: 11757
+        rv_id: 833272
+        rule_id: QrUp7k
+        version_id: yeTN1ek
+        url: https://semgrep.dev/playground/r/yeTN1ek/trailofbits.go.servercodec-readrequestbody-unhandled-nil.servercodec-readrequestbody-unhandled-nil
+        origin: community
+  patterns:
+  - pattern: |
+      func ($O *$CODEC) ReadRequestBody($ARG $TYPE) error {
+        ...
+      }
+  - pattern-not: |
+      func ($O *$CODEC) ReadRequestBody($ARG $TYPE) error {
+        ...
+        if $ARG == nil { ... }
+        ...
+      }
+  - pattern-not: |
+      func ($O *$CODEC) ReadRequestBody($ARG $TYPE) error {
+        ...
+        if $ARG != nil { ... }
+        ...
+      }
+- id: trailofbits.go.racy-write-to-map.racy-write-to-map
+  message: Writing `$MAP` from multiple goroutines is not concurrency safe
+  languages:
+  - go
+  severity: ERROR
+  metadata:
+    category: security
+    cwe: 'CWE-362: Concurrent Execution using Shared Resource with Improper Synchronization
+      (''Race Condition'')'
+    subcategory:
+    - vuln
+    confidence: MEDIUM
+    likelihood: HIGH
+    impact: MEDIUM
+    technology:
+    - --no-technology--
+    description: Concurrent writes to the same map in multiple goroutines
+    references:
+    - https://go.dev/blog/maps#concurrency
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Other
+    source: https://semgrep.dev/r/trailofbits.go.racy-write-to-map.racy-write-to-map
+    shortlink: https://sg.run/1Gnw
+    semgrep.dev:
+      rule:
+        r_id: 11866
+        rv_id: 833271
+        rule_id: AbUGWD
+        version_id: 9lTJ0qD
+        url: https://semgrep.dev/playground/r/9lTJ0qD/trailofbits.go.racy-write-to-map.racy-write-to-map
+        origin: community
+  patterns:
+  - pattern: |
+      $MAP[$KEY] = $VALUE
+  - pattern-inside: |
+      $MAP = make(map[$KTYPE]$VTYPE)
+      ...
+      for ... {
+        ...
+        go func(...) {
+          ...
+          $MAP[$KEY] = $VALUE
+          ...
+        }(...)
+        ...
+      }
+  - pattern-not-inside: |
+      $MUTEX.Lock()
+      ...
+      $MUTEX.Unlock()
+  - pattern-not-inside: |
+      $MUTEX.Lock()
+      ...
+      defer $MUTEX.Unlock()
+      ...
+- id: trailofbits.hcl.terraform.aws-oidc-role-policy-missing-sub.aws-oidc-role-policy-missing-sub
+  message: |
+    Found AWS role policy for GitHub Actions missing OIDC subject. This
+    means any GitHub repository can assume this role in CI.
+  languages:
+  - hcl
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-284: Improper Access Control'
+    subcategory:
+    - audit
+    confidence: HIGH
+    likelihood: HIGH
+    impact: HIGH
+    technology:
+    - terraform
+    - aws
+    references:
+    - https://securitylabs.datadoghq.com/articles/exploring-github-to-aws-keyless-authentication-flaws/
+    - https://www.rezonate.io/blog/github-misconfigurations-put-gcp-aws-in-account-takeover-risk
+    - https://github.com/Rezonate-io/github-oidc-checker/
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Improper Authorization
+    source: https://semgrep.dev/r/trailofbits.hcl.terraform.aws-oidc-role-policy-missing-sub.aws-oidc-role-policy-missing-sub
+    shortlink: https://sg.run/KxRn5
+    semgrep.dev:
+      rule:
+        r_id: 150299
+        rv_id: 943193
+        rule_id: qNU28dk
+        version_id: l4TxrWy
+        url: https://semgrep.dev/playground/r/l4TxrWy/trailofbits.hcl.terraform.aws-oidc-role-policy-missing-sub.aws-oidc-role-policy-missing-sub
+        origin: community
+  patterns:
+  - pattern-inside: |
+      {
+        ...
+        Statement = [...]
+        ...
+      }
+  - pattern-inside: |
+      {
+        ...,
+        "Action": "sts:AssumeRoleWithWebIdentity",
+        ...
+      }
+  - pattern: |
+      {
+        ...
+        "Condition": {
+            ...
+            "StringEquals": {
+                ...
+                "token.actions.githubusercontent.com:aud": ...,
+                ...
+            }
+            ...
+        }
+        ...
+      }
+  - pattern-not: |
+      {
+        ...
+        "Condition": {
+            ...
+            "StringEquals": {
+                ...
+                "token.actions.githubusercontent.com:sub": ...,
+                ...
+                "token.actions.githubusercontent.com:aud": ...,
+                ...
+            }
+            ...
+        }
+        ...
+      }
+  - pattern-not: |
+      {
+        ...
+        "Condition": {
+            ...
+            "StringEquals": {
+                ...
+                "token.actions.githubusercontent.com:aud": ...,
+                ...
+                "token.actions.githubusercontent.com:sub": ...,
+                ...
+            }
+            ...
+        }
+        ...
+      }
+  - pattern-not: |
+      {
+        ...
+        "Condition": {
+            ...
+            "StringLike": {
+                ...
+                "token.actions.githubusercontent.com:sub": ...,
+                ...
+            }
+            ...
+            "StringEquals": {
+                ...
+                "token.actions.githubusercontent.com:aud": ...,
+                ...
+            }
+            ...
+        }
+        ...
+      }
+  - pattern-not: |
+      {
+        ...
+        "Condition": {
+            ...
+            "StringEquals": {
+                ...
+                "token.actions.githubusercontent.com:aud": ...,
+                ...
+            }
+            ...
+            "StringLike": {
+                ...
+                "token.actions.githubusercontent.com:sub": ...,
+                ...
+            }
+            ...
+        }
+        ...
+      }
+- id: trailofbits.python.pytorch-classes-load-library.pytorch-classes-load-library
+  message: Loading custom operator libraries can result in arbitrary code execution
+  languages:
+  - python
+  severity: ERROR
+  metadata:
+    category: security
+    cwe: 'CWE-676: Use of Potentially Dangerous Function'
+    subcategory:
+    - audit
+    confidence: MEDIUM
+    likelihood: MEDIUM
+    impact: HIGH
+    technology:
+    - pytorch
+    description: Potential arbitrary code execution from `PyTorch` library loading
+    references:
+    - https://pytorch.org/tutorials/advanced/torch_script_custom_classes.html
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Dangerous Method or Function
+    source: https://semgrep.dev/r/trailofbits.python.pytorch-classes-load-library.pytorch-classes-load-library
+    shortlink: https://sg.run/nD6d
+    semgrep.dev:
+      rule:
+        r_id: 44136
+        rv_id: 833306
+        rule_id: lBUYD9
+        version_id: YDTl040
+        url: https://semgrep.dev/playground/r/YDTl040/trailofbits.python.pytorch-classes-load-library.pytorch-classes-load-library
+        origin: community
+  patterns:
+  - pattern: torch.classes.load_library(...)
+  - pattern-not: torch.classes.load_library("...")
+- id: trailofbits.go.string-to-int-signedness-cast.string-to-int-signedness-cast
+  message: Downcasting or changing sign of an integer with `$CAST_METHOD` method
+  languages:
+  - go
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-681: Incorrect Conversion between Numeric Types'
+    subcategory:
+    - audit
+    confidence: HIGH
+    likelihood: LOW
+    impact: MEDIUM
+    technology:
+    - --no-technology--
+    description: Integer underflows
+    references:
+    - https://github.com/golang/go/issues/30209
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Other
+    source: https://semgrep.dev/r/trailofbits.go.string-to-int-signedness-cast.string-to-int-signedness-cast
+    shortlink: https://sg.run/65WB
+    semgrep.dev:
+      rule:
+        r_id: 11759
+        rv_id: 833273
+        rule_id: 4bU2AZ
+        version_id: rxTDzNy
+        url: https://semgrep.dev/playground/r/rxTDzNy/trailofbits.go.string-to-int-signedness-cast.string-to-int-signedness-cast
+        origin: community
+  pattern-either:
+  - patterns:
+    - metavariable-pattern:
+        metavariable: $CAST_METHOD
+        pattern-either:
+        - pattern: uint8
+        - pattern: uint16
+        - pattern: uint32
+        - pattern: int8
+        - pattern: int16
+        - pattern: int32
+    - pattern-either:
+      - pattern: |
+          $X, ... = strconv.Atoi(...)
+          ...
+          $CAST_METHOD($X)
+      - pattern: |
+          $X, ... = strconv.ParseInt(..., ..., 64)
+          ...
+          $CAST_METHOD($X)
+      - pattern: |
+          $X, ... = strconv.ParseUint(..., ..., 64)
+          ...
+          $CAST_METHOD($X)
+  - pattern: |
+      $X, ... = strconv.Atoi(...)
+      ...
+      uint64($X)
+  - pattern: |
+      $X, ... = strconv.ParseInt(..., ..., 64)
+      ...
+      uint64($X)
+  - pattern: |
+      $X, ... = strconv.ParseUint(..., ..., 64)
+      ...
+      int64($X)
+  - patterns:
+    - metavariable-pattern:
+        metavariable: $CAST_METHOD
+        pattern-either:
+        - pattern: uint8
+        - pattern: uint16
+        - pattern: int8
+        - pattern: int16
+    - pattern-either:
+      - pattern: |
+          $X, ... = strconv.ParseInt(..., ..., 32)
+          ...
+          $CAST_METHOD($X)
+      - pattern: |
+          $X, ... = strconv.ParseUint(..., ..., 32)
+          ...
+          $CAST_METHOD($X)
+  - pattern: |
+      $X, ... = strconv.ParseInt(..., ..., 32)
+      ...
+      uint32($X)
+  - pattern: |
+      $X, ... = strconv.ParseUint(..., ..., 32)
+      ...
+      int32($X)
+  - patterns:
+    - metavariable-pattern:
+        metavariable: $CAST_METHOD
+        pattern-either:
+        - pattern: uint8
+        - pattern: int8
+    - pattern-either:
+      - pattern: |
+          $X, ... = strconv.ParseInt(..., ..., 16)
+          ...
+          $CAST_METHOD($X)
+      - pattern: |
+          $X, ... = strconv.ParseUint(..., ..., 16)
+          ...
+          $CAST_METHOD($X)
+  - pattern: |
+      $X, ... = strconv.ParseInt(..., ..., 16)
+      ...
+      uint16($X)
+  - pattern: |
+      $X, ... = strconv.ParseUint(..., ..., 16)
+      ...
+      int16($X)
+  - pattern: |
+      $X, ... = strconv.ParseInt(..., ..., 8)
+      ...
+      uint8($X)
+  - pattern: |
+      $X, ... = strconv.ParseUint(..., ..., 8)
+      ...
+      int8($X)
+- id: trailofbits.python.pytorch-package.pytorch-package
+  message: Avoid importing torch.package - it can result in arbitrary code execution
+    via pickle
+  languages:
+  - python
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-502: Deserialization of Untrusted Data'
+    subcategory:
+    - audit
+    confidence: LOW
+    likelihood: MEDIUM
+    impact: HIGH
+    technology:
+    - pytorch
+    description: Potential arbitrary code execution from `torch.package`
+    references:
+    - https://pytorch.org/docs/1.13/package.html#torch-package
+    - https://blog.trailofbits.com/2021/03/15/never-a-dill-moment-exploiting-machine-learning-pickle-files/
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - 'Insecure Deserialization '
+    source: https://semgrep.dev/r/trailofbits.python.pytorch-package.pytorch-package
+    shortlink: https://sg.run/EK35
+    semgrep.dev:
+      rule:
+        r_id: 44137
+        rv_id: 833307
+        rule_id: PeUKGk
+        version_id: 6xTDgWX
+        url: https://semgrep.dev/playground/r/6xTDgWX/trailofbits.python.pytorch-package.pytorch-package
+        origin: community
+  pattern: import torch.package
+- id: trailofbits.hcl.terraform.vault-hardcoded-token.vault-hardcoded-token
+  message: |
+    Found Terraform Vault instance with hardcoded token
+  languages:
+  - hcl
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-798: Use of Hard-coded Credentials'
+    subcategory:
+    - audit
+    confidence: HIGH
+    likelihood: HIGH
+    impact: HIGH
+    technology:
+    - terraform
+    references:
+    - https://registry.terraform.io/providers/hashicorp/vault/latest/docs#token
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Hard-coded Secrets
+    source: https://semgrep.dev/r/trailofbits.hcl.terraform.vault-hardcoded-token.vault-hardcoded-token
+    shortlink: https://sg.run/4b6qz
+    semgrep.dev:
+      rule:
+        r_id: 150300
+        rv_id: 943194
+        rule_id: lBU4nKL
+        version_id: YDTv6AY
+        url: https://semgrep.dev/playground/r/YDTv6AY/trailofbits.hcl.terraform.vault-hardcoded-token.vault-hardcoded-token
+        origin: community
+  patterns:
+  - pattern-inside: provider "vault" { ... }
+  - pattern: token = "..."
+- id: trailofbits.python.pytorch-tensor.pytorch-tensor
+  message: Avoid using `torch.Tensor()` to directly create a tensor for efficiency
+    and proper parsing
+  languages:
+  - python
+  severity: WARNING
+  metadata:
+    category: performance
+    subcategory:
+    - audit
+    confidence: HIGH
+    technology:
+    - pytorch
+    description: Possible parsing issues and inefficiency from improper tensor creation
+    references:
+    - https://pytorch.org/docs/stable/tensors.html
+    license: AGPL-3.0 license
+    source: https://semgrep.dev/r/trailofbits.python.pytorch-tensor.pytorch-tensor
+    shortlink: https://sg.run/72xG
+    semgrep.dev:
+      rule:
+        r_id: 44138
+        rv_id: 833308
+        rule_id: JDU4RQ
+        version_id: o5TBEJD
+        url: https://semgrep.dev/playground/r/o5TBEJD/trailofbits.python.pytorch-tensor.pytorch-tensor
+        origin: community
+  pattern: torch.Tensor(...)
+- id: trailofbits.jvm.gc-call.gc-call
+  message: |
+    Calling `gc` suggests to the JVM that the garbage collector should be
+    run, and memory should be reclaimed. This is only a suggestion, and there
+    is no guarantee that anything will happen. Relying on this behavior for
+    correctness or memory management is an anti-pattern.
+  languages:
+  - java
+  - kotlin
+  severity: WARNING
+  metadata:
+    category: best-practice
+    subcategory:
+    - audit
+    technology:
+    - java
+    - kotlin
+    confidence: HIGH
+    likelihood: HIGH
+    impact: LOW
+    references:
+    - https://stackoverflow.com/questions/2414105/why-is-it-bad-practice-to-call-system-gc
+    license: AGPL-3.0 license
+    source: https://semgrep.dev/r/trailofbits.jvm.gc-call.gc-call
+    shortlink: https://sg.run/9ApQ0
+    semgrep.dev:
+      rule:
+        r_id: 113223
+        rv_id: 833287
+        rule_id: 5rUdoB9
+        version_id: LjTEbBG
+        url: https://semgrep.dev/playground/r/LjTEbBG/trailofbits.jvm.gc-call.gc-call
+        origin: community
+  pattern-either:
+  - pattern: System.gc()
+  - pattern: Runtime.getRuntime().gc()
+- id: trailofbits.python.tarfile-extractall-traversal.tarfile-extractall-traversal
+  message: Possible path traversal through `tarfile.open($PATH).extractall()` if the
+    source tar is controlled by an attacker
+  languages:
+  - python
+  severity: ERROR
+  metadata:
+    category: security
+    cwe: 'CWE-22: Improper Limitation of a Pathname to a Restricted Directory (''Path
+      Traversal'')'
+    subcategory:
+    - vuln
+    confidence: MEDIUM
+    likelihood: MEDIUM
+    impact: MEDIUM
+    technology:
+    - --no-technology--
+    description: Potential path traversal in call to `extractall` for a `tarfile`
+    references:
+    - https://docs.python.org/3/library/tarfile.html#tarfile.TarFile.extractall
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Path Traversal
+    source: https://semgrep.dev/r/trailofbits.python.tarfile-extractall-traversal.tarfile-extractall-traversal
+    shortlink: https://sg.run/2RLD
+    semgrep.dev:
+      rule:
+        r_id: 11763
+        rv_id: 833310
+        rule_id: GdUZxq
+        version_id: pZTXjAW
+        url: https://semgrep.dev/playground/r/pZTXjAW/trailofbits.python.tarfile-extractall-traversal.tarfile-extractall-traversal
+        origin: community
+  patterns:
+  - pattern-either:
+    - pattern: |
+        with tarfile.open(...) as $TAR:
+            ...
+            $TAR.extractall(...)
+    - pattern: |
+        tarfile.open(...).extractall(...)
+    - pattern: |
+        $TAR = tarfile.open(...)
+        ...
+        $TAR.extractall(...)
+  - pattern-not: |
+      with tarfile.open(...) as $TAR:
+          ...
+          $TAR.extractall(..., members=$MEMBERS, ...)
+  - pattern-not: |
+      tarfile.open(...).extractall(..., members=$MEMBERS, ...)
+  - pattern-not: |
+      $TAR = tarfile.open(...)
+      ...
+      $TAR.extractall(..., members=$MEMBERS, ...)
+- id: trailofbits.go.waitgroup-wait-inside-loop.waitgroup-wait-inside-loop
+  message: Calling `$WG.Wait()` inside a loop blocks the call to `$WG.Done()`
+  languages:
+  - go
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-667: Improper Locking'
+    subcategory:
+    - vuln
+    confidence: MEDIUM
+    likelihood: MEDIUM
+    impact: MEDIUM
+    technology:
+    - --no-technology--
+    description: Calls to `sync.WaitGroup.Wait` inside a loop
+    references:
+    - https://go101.org/article/concurrent-common-mistakes.html
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Other
+    source: https://semgrep.dev/r/trailofbits.go.waitgroup-wait-inside-loop.waitgroup-wait-inside-loop
+    shortlink: https://sg.run/pkGL
+    semgrep.dev:
+      rule:
+        r_id: 11762
+        rv_id: 833277
+        rule_id: 5rU8Po
+        version_id: w8TAx58
+        url: https://semgrep.dev/playground/r/w8TAx58/trailofbits.go.waitgroup-wait-inside-loop.waitgroup-wait-inside-loop
+        origin: community
+  patterns:
+  - pattern-either:
+    - pattern: |
+        var $WG sync.WaitGroup
+        ...
+        for ... {
+          ...
+          go func(...){
+            ...
+            defer $WG.Done()
+            ...
+          }()
+          ...
+          $WG.Wait()
+          ...
+        }
+    - pattern: |
+        $WG := &sync.WaitGroup{}
+        ...
+        for ... {
+          ...
+          go func(...){
+            ...
+            defer $WG.Done()
+            ...
+          }()
+          ...
+          $WG.Wait()
+          ...
+        }
+    - pattern: |
+        var $WG sync.WaitGroup
+        ...
+        for ... {
+          ...
+          go func(...){
+            ...
+            $WG.Done()
+            ...
+          }()
+          ...
+          $WG.Wait()
+          ...
+        }
+    - pattern: |
+        $WG := &sync.WaitGroup{}
+        ...
+        for ... {
+          ...
+          go func(...){
+            ...
+            $WG.Done()
+            ...
+          }()
+          ...
+          $WG.Wait()
+          ...
+        }
+- id: trailofbits.python.pandas-eval.pandas-eval
+  message: Pandas eval() and query() may be dangerous if used to evaluate dynamic
+    content. If this content can be input from outside the program, this may be a
+    code injection vulnerability. Ensure evaluated content is not definable by external
+    sources.
+  languages:
+  - python
+  severity: ERROR
+  metadata:
+    category: security
+    cwe: 'CWE-95: Improper Neutralization of Directives in Dynamically Evaluated Code
+      (''Eval Injection'')'
+    subcategory:
+    - audit
+    confidence: LOW
+    likelihood: LOW
+    impact: HIGH
+    technology:
+    - pandas
+    description: Potential arbitrary code execution from `pandas` functions that evaluate
+      user-provided expressions
+    references:
+    - https://blog.trailofbits.com/2021/03/15/never-a-dill-moment-exploiting-machine-learning-pickle-files/
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Code Injection
+    source: https://semgrep.dev/r/trailofbits.python.pandas-eval.pandas-eval
+    shortlink: https://sg.run/bwJed
+    semgrep.dev:
+      rule:
+        r_id: 124726
+        rv_id: 1162801
+        rule_id: ReUDw9J
+        version_id: 5PTeQRe
+        url: https://semgrep.dev/playground/r/5PTeQRe/trailofbits.python.pandas-eval.pandas-eval
+        origin: community
+  patterns:
+  - pattern-inside: |
+      import pandas
+      ...
+  - pattern-either:
+    - patterns:
+      - pattern: pandas.DataFrame.$FN(...)
+      - pattern-not: pandas.DataFrame.$FN("...", ...)
+    - patterns:
+      - pattern: pandas.$FN(...)
+      - pattern-not: pandas.$FN("...", ...)
+    - patterns:
+      - pattern-inside: |
+          $DF = pandas.DataFrame(...)
+          ...
+      - pattern: $DF.$FN(...)
+      - pattern-not: $DF.$FN("...", ...)
+  - metavariable-regex:
+      metavariable: $FN
+      regex: (eval|query)
+- id: trailofbits.hcl.terraform.vault-skip-tls-verify.vault-skip-tls-verify
+  message: |
+    Found Terraform Vault instance with TLS verification disabled
+  languages:
+  - hcl
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-295: Improper Certificate Validation'
+    subcategory:
+    - audit
+    confidence: HIGH
+    likelihood: HIGH
+    impact: HIGH
+    technology:
+    - terraform
+    references:
+    - https://registry.terraform.io/providers/hashicorp/vault/latest/docs#skip_tls_verify
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Improper Authentication
+    source: https://semgrep.dev/r/trailofbits.hcl.terraform.vault-skip-tls-verify.vault-skip-tls-verify
+    shortlink: https://sg.run/Pe0nW
+    semgrep.dev:
+      rule:
+        r_id: 150301
+        rv_id: 943195
+        rule_id: YGUp91o
+        version_id: 6xTx5Ex
+        url: https://semgrep.dev/playground/r/6xTx5Ex/trailofbits.hcl.terraform.vault-skip-tls-verify.vault-skip-tls-verify
+        origin: community
+  patterns:
+  - pattern-inside: provider "vault" { ... }
+  - pattern: skip_tls_verify = true
+- id: trailofbits.python.tensorflow-load-library.tensorflow-load-library
+  message: Loading custom operator libraries can result in arbitrary code execution
+  languages:
+  - python
+  severity: ERROR
+  metadata:
+    category: security
+    cwe: 'CWE-676: Use of Potentially Dangerous Function'
+    subcategory:
+    - audit
+    confidence: MEDIUM
+    likelihood: MEDIUM
+    impact: HIGH
+    technology:
+    - tensorflow
+    description: Potential arbitrary code execution from `TensorFlow` library loading
+    references:
+    - https://www.tensorflow.org/api_docs/python/tf/load_library
+    - https://www.tensorflow.org/api_docs/python/tf/load_op_library
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Dangerous Method or Function
+    source: https://semgrep.dev/r/trailofbits.python.tensorflow-load-library.tensorflow-load-library
+    shortlink: https://sg.run/xp0j
+    semgrep.dev:
+      rule:
+        r_id: 43930
+        rv_id: 833311
+        rule_id: WAUgBJ
+        version_id: 2KT7xEg
+        url: https://semgrep.dev/playground/r/2KT7xEg/trailofbits.python.tensorflow-load-library.tensorflow-load-library
+        origin: community
+  patterns:
+  - pattern-either:
+    - pattern: tensorflow.load_library(...)
+    - pattern: tensorflow.load_op_library(...)
+  - pattern-not: tensorflow.load_library("...")
+  - pattern-not: tensorflow.load_op_library("...")
+- id: trailofbits.ruby.active-record-encrypts-misorder.active-record-encrypts-misorder
+  message: |
+    Found an ActiveRecord value with encryption before serialization. The
+    declaration of the serialized attribute should go before the encryption
+    declaration.
+  languages:
+  - ruby
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-311: Missing Encryption of Sensitive Data'
+    subcategory:
+    - audit
+    confidence: HIGH
+    likelihood: HIGH
+    impact: HIGH
+    technology:
+    - rails
+    - activerecord
+    references:
+    - https://guides.rubyonrails.org/active_record_encryption.html#supported-types
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Cryptographic Issues
+    source: https://semgrep.dev/r/trailofbits.ruby.active-record-encrypts-misorder.active-record-encrypts-misorder
+    shortlink: https://sg.run/GdP12
+    semgrep.dev:
+      rule:
+        r_id: 150304
+        rv_id: 943198
+        rule_id: zdUK7Oq
+        version_id: pZTN6z0
+        url: https://semgrep.dev/playground/r/pZTN6z0/trailofbits.ruby.active-record-encrypts-misorder.active-record-encrypts-misorder
+        origin: community
+  patterns:
+  - pattern-inside: |
+      class $CLS < ApplicationRecord
+        ...
+      end
+  - pattern: |
+      encrypts($SYM, ...)
+      ...
+      serialize($SYM, ...)
+- id: trailofbits.python.waiting-with-pytorch-distributed.waiting-with-pytorch-distributed
+  message: Not waiting for requests is a source of undefined behavior
+  languages:
+  - python
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-758: Reliance on Undefined, Unspecified, or Implementation-Defined Behavior'
+    subcategory:
+    - vuln
+    confidence: MEDIUM
+    likelihood: LOW
+    impact: LOW
+    technology:
+    - pytorch
+    description: Possible `PyTorch` undefined behavior when not waiting for requests
+    references:
+    - https://pytorch.org/docs/stable/distributed.html#torch.distributed.isend
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Other
+    source: https://semgrep.dev/r/trailofbits.python.waiting-with-pytorch-distributed.waiting-with-pytorch-distributed
+    shortlink: https://sg.run/LpoX
+    semgrep.dev:
+      rule:
+        r_id: 44139
+        rv_id: 833312
+        rule_id: 5rUxGL
+        version_id: X0T5Nnv
+        url: https://semgrep.dev/playground/r/X0T5Nnv/trailofbits.python.waiting-with-pytorch-distributed.waiting-with-pytorch-distributed
+        origin: community
+  patterns:
+  - pattern-either:
+    - pattern: $REQ = torch.distributed.irecv(...)
+    - pattern: $REQ = torch.distributed.isend(...)
+  - pattern-not-inside: |
+      ...
+      $REQ.wait()
+- id: trailofbits.go.unmarshal_tag_is_dash.unmarshal-tag-is-dash
+  message: Struct field can be decoded with the `-` key because the JSON tag starts
+    with a `-` but is followed by a comma.
+  languages:
+  - go
+  severity: WARNING
+  metadata:
+    cwe: 'CWE-172: Encoding Error'
+    category: security
+    subcategory:
+    - vuln
+    confidence: HIGH
+    likelihood: MEDIUM
+    impact: MEDIUM
+    technology:
+    - --no-technology--
+    references:
+    - https://blog.trailofbits.com/
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Other
+    source: https://semgrep.dev/r/trailofbits.go.unmarshal_tag_is_dash.unmarshal-tag-is-dash
+    shortlink: https://sg.run/Bj1k7
+    semgrep.dev:
+      rule:
+        r_id: 193795
+        rv_id: 1028640
+        rule_id: d8UqAjp
+        version_id: YDT26ZA
+        url: https://semgrep.dev/playground/r/YDT26ZA/trailofbits.go.unmarshal_tag_is_dash.unmarshal-tag-is-dash
+        origin: community
+  patterns:
+  - pattern: |
+      type $T1 struct {
+        ...
+        $X $T2 `$TAG`
+        ...
+      }
+  - focus-metavariable: $TAG
+  - metavariable-regex:
+      metavariable: $TAG
+      regex: .*(json|yaml|xml):"-,[^"]*"
+- id: trailofbits.python.pickles-in-keras-deprecation.pickles-in-keras-deprecation
+  message: The usage of pickle and hdf5 formats for model files are deprecated in
+    Keras. The keras.models.load_model function is deprecated as well. Keras is now
+    embedded in Tensorflow 2 under tensorflow.keras.
+  languages:
+  - python
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-502: Deserialization of Untrusted Data'
+    subcategory:
+    - vuln
+    confidence: MEDIUM
+    likelihood: MEDIUM
+    impact: HIGH
+    technology:
+    - keras
+    description: Potential arbitrary code execution from Keras' load_model function
+    references:
+    - https://blog.trailofbits.com/2021/03/15/never-a-dill-moment-exploiting-machine-learning-pickle-files/
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - 'Insecure Deserialization '
+    source: https://semgrep.dev/r/trailofbits.python.pickles-in-keras-deprecation.pickles-in-keras-deprecation
+    shortlink: https://sg.run/NbJRG
+    semgrep.dev:
+      rule:
+        r_id: 124727
+        rv_id: 833299
+        rule_id: AbU9npB
+        version_id: BjTe0vg
+        url: https://semgrep.dev/playground/r/BjTe0vg/trailofbits.python.pickles-in-keras-deprecation.pickles-in-keras-deprecation
+        origin: community
+  patterns:
+  - pattern-either:
+    - pattern: keras.models.load_model(...)
+    - pattern: tensorflow.keras.models.load_model(...)
+    - pattern: keras.saving.load_model(...)
+    - pattern: tensorflow.keras.saving.load_model(...)
+  - pattern-not:
+      patterns:
+      - pattern-either:
+        - pattern: keras.models.load_model($FILE)
+        - pattern: tensorflow.keras.models.load_model($FILE)
+        - pattern: keras.saving.load_model($FILE)
+        - pattern: tensorflow.keras.saving.load_model($FILE)
+      - metavariable-regex:
+          metavariable: $FILE
+          regex: .*\.keras
+- id: trailofbits.javascript.apollo-graphql.v3-cors-audit.v3-potentially-bad-cors
+  languages:
+  - js
+  - ts
+  message: The Apollo GraphQL server is setup with a CORS policy that does not deny
+    all origins. Carefully review the origins to see if any of them are incorrectly
+    setup (third-party websites, bad regexes, functions that reflect every origin,
+    etc.).
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-942: Permissive Cross-domain Policy with Untrusted Domains'
+    subcategory:
+    - audit
+    confidence: LOW
+    likelihood: MEDIUM
+    impact: MEDIUM
+    technology:
+    - graphql
+    - apollo-graphql-server
+    - apollo-graphql-server-v3
+    description: Potentially bad CORS policy
+    references:
+    - https://www.apollographql.com/docs/apollo-server/v3/security/cors#configuring-cors-options-for-apollo-server
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Improper Validation
+    source: https://semgrep.dev/r/trailofbits.javascript.apollo-graphql.v3-cors-audit.v3-potentially-bad-cors
+    shortlink: https://sg.run/ORxR
+    semgrep.dev:
+      rule:
+        r_id: 60575
+        rv_id: 833280
+        rule_id: v8UlNl
+        version_id: e1TDkqr
+        url: https://semgrep.dev/playground/r/e1TDkqr/trailofbits.javascript.apollo-graphql.v3-cors-audit.v3-potentially-bad-cors
+        origin: community
+  mode: taint
+  pattern-sources:
+  - pattern: |
+      { origin: function(...) {...} }
+  - patterns:
+    - pattern-inside: |
+        { origin: $NOT_KNOWN_GOOD_CORS_ORIGIN }
+    - metavariable-pattern:
+        metavariable: $NOT_KNOWN_GOOD_CORS_ORIGIN
+        patterns:
+        - pattern-not: |
+            false
+        - pattern-not: |
+            []
+  pattern-sinks:
+  - patterns:
+    - pattern: |
+        {..., cors: $CORS_ORIGIN, ...}
+    - focus-metavariable: $CORS_ORIGIN
+- id: trailofbits.rs.panic-in-function-returning-result.panic-in-function-returning-result
+  message: '`expect` or `unwrap` called in function returning a `Result`'
+  languages:
+  - rust
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-755: Improper Handling of Exceptional Conditions'
+    subcategory:
+    - audit
+    confidence: HIGH
+    likelihood: MEDIUM
+    impact: LOW
+    technology:
+    - --no-technology--
+    description: Calling `unwrap` or `expect` in a function returning a `Result`
+    references:
+    - https://doc.rust-lang.org/std/result/
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Other
+    source: https://semgrep.dev/r/trailofbits.rs.panic-in-function-returning-result.panic-in-function-returning-result
+    shortlink: https://sg.run/WpeL
+    semgrep.dev:
+      rule:
+        r_id: 13697
+        rv_id: 1028609
+        rule_id: 2ZUPQ3
+        version_id: NdTd9o5
+        url: https://semgrep.dev/playground/r/NdTd9o5/trailofbits.rs.panic-in-function-returning-result.panic-in-function-returning-result
+        origin: community
+  patterns:
+  - pattern-either:
+    - pattern: $EXPR.unwrap()
+    - pattern: $EXPR.expect(...)
+  - pattern-either:
+    - pattern-inside: |
+        fn $FUNC(...) -> Result<$T1, $T2> {
+            ...
+        }
+    - pattern-inside: |
+        fn $FUNC(...) -> Result<$T> {
+            ...
+        }
+    - patterns:
+      - pattern-inside: |
+          fn $FUNC(...) -> $RETTYPE {
+              ...
+          }
+      - pattern-either:
+        - pattern-inside: |
+            type $RETTYPE = Result<$T>;
+            ...
+            fn $FUNC(...) -> $RETTYPE {
+                ...
+            }
+        - pattern-inside: |
+            type $RETTYPE = Result<$T1, $T2>;
+            ...
+            fn $FUNC(...) -> $RETTYPE {
+                ...
+            }
+  - pattern-not-inside: |
+      #[cfg(test)]
+      mod tests {
+          ...
+          #[test]
+          fn $TESTFUNC(...) -> Result<$T1, $T2> {
+              ...
+          }
+          ...
+      }
+  - pattern-not-inside: |
+      #[cfg(test)]
+      mod tests {
+          ...
+          #[test]
+          fn $TESTFUNC(...) -> Result<$T> {
+              ...
+          }
+          ...
+      }
+  - pattern-not-inside: |
+      #[cfg(test)]
+      mod tests {
+          ...
+          type $CUSTOMRESULT = Result<$T1, $T2>;
+          ...
+          #[test]
+          fn $TESTFUNC(...) -> $CUSTOMRESULT {
+              ...
+          }
+          ...
+      }
+- id: trailofbits.go.nil-check-after-call.nil-check-after-call
+  message: Potential `$FOO` nil dereference when `$BAR` is called
+  languages:
+  - go
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-253: Incorrect Check of Function Return Value'
+    subcategory:
+    - vuln
+    confidence: MEDIUM
+    likelihood: MEDIUM
+    impact: MEDIUM
+    technology:
+    - --no-technology--
+    description: Possible nil dereferences
+    references:
+    - https://blog.trailofbits.com/2019/11/07/attacking-go-vr-ttps/
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Other
+    source: https://semgrep.dev/r/trailofbits.go.nil-check-after-call.nil-check-after-call
+    shortlink: https://sg.run/05g5
+    semgrep.dev:
+      rule:
+        r_id: 11754
+        rv_id: 833269
+        rule_id: L1Ur2r
+        version_id: jQTrXDK
+        url: https://semgrep.dev/playground/r/jQTrXDK/trailofbits.go.nil-check-after-call.nil-check-after-call
+        origin: community
+  patterns:
+  - pattern-either:
+    - pattern: |
+        $FOO.$BAR(...)
+        ...
+        if $FOO != nil { ... }
+    - pattern: |
+        $FOO.$BAR(...)
+        ...
+        if $FOO == nil { ... }
+    - pattern: |
+        $FUNC(..., $FOO.$BAR(...), ...)
+        ...
+        if $FOO != nil { ... }
+    - pattern: |
+        $FUNC(..., $FOO.$BAR(...), ...)
+        ...
+        if $FOO == nil { ... }
+  - pattern-not: |
+      $FOO.$BAR(...)
+      ...
+      $FOO = ...
+      ...
+      if $FOO != nil { ... }
+  - pattern-not: |
+      $FOO.$BAR(...)
+      ...
+      ..., $FOO, ... = ...
+      ...
+      if $FOO == nil { ... }
+  - pattern-not: |
+      $FOO.$BAR(...)
+      ...
+      ..., $FOO, ... = ...
+      ...
+      if $FOO != nil { ... }
+  - pattern-not: |
+      $FOO.$BAR(...)
+      ...
+      $FOO = ...
+      ...
+      if $FOO == nil { ... }
+  - pattern-not: |
+      ..., $FOO = $FOO.$BAR(...)
+      ...
+      if $FOO == nil { ... }
+  - pattern-not: |
+      ..., $FOO = $FOO.$BAR(...)
+      ...
+      if $FOO != nil { ... }
+  - pattern-not: |
+      $FOO = $FOO.$BAR(...)
+      ...
+      if $FOO == nil { ... }
+  - pattern-not: |
+      $FOO = $FOO.$BAR(...)
+      ...
+      if $FOO != nil { ... }
+- id: trailofbits.go.unsafe-dll-loading.unsafe-dll-loading
+  message: The function is vulnerable to DLL hijacking attacks. Use `windows.NewLazySystemDLL()`
+    function to limit DLL search to the Windows directory
+  languages:
+  - go
+  severity: ERROR
+  metadata:
+    category: security
+    cwe: 'CWE-427: Uncontrolled Search Path Element'
+    subcategory:
+    - vuln
+    confidence: HIGH
+    likelihood: MEDIUM
+    impact: HIGH
+    technology:
+    - --no-technology--
+    description: Use of function vulnerable to DLL hijacking attacks
+    references:
+    - https://pkg.go.dev/golang.org/x/sys/windows#LazyDLL
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Other
+    source: https://semgrep.dev/r/trailofbits.go.unsafe-dll-loading.unsafe-dll-loading
+    shortlink: https://sg.run/poE3
+    semgrep.dev:
+      rule:
+        r_id: 40518
+        rv_id: 833275
+        rule_id: pKUQBW
+        version_id: NdTB2J9
+        url: https://semgrep.dev/playground/r/NdTB2J9/trailofbits.go.unsafe-dll-loading.unsafe-dll-loading
+        origin: community
+  patterns:
+  - pattern-either:
+    - pattern: syscall.LoadDLL(...)
+    - pattern: syscall.LoadLibrary(...)
+    - pattern: windows.LoadDLL(...)
+    - pattern: windows.MustLoadDLL(...)
+    - pattern: syscall.NewLazyDLL(...)
+    - pattern: |
+        $X = windows.NewLazyDLL(...)
+        ...
+        $X.$Y()
+        ...
+        $X.System = true
+    - pattern: |
+        $X = windows.NewLazyDLL(...)
+        ...
+        $X.$Y()
+  - pattern-not: |
+      $X = windows.NewLazyDLL(...)
+      ...
+      $X.System = true
+      ...
+      $X.$Y()
+- id: trailofbits.go.waitgroup-add-called-inside-goroutine.waitgroup-add-called-inside-goroutine
+  message: |
+    Calling `$WG.Add` inside of an anonymous goroutine may result in `$WG.Wait`
+    waiting for more or less calls to `$WG.Done()` than expected
+  languages:
+  - go
+  severity: ERROR
+  metadata:
+    category: security
+    cwe: 'CWE-667: Improper Locking'
+    subcategory:
+    - vuln
+    confidence: MEDIUM
+    likelihood: MEDIUM
+    impact: MEDIUM
+    technology:
+    - --no-technology--
+    description: Calls to `sync.WaitGroup.Add` inside of anonymous goroutines
+    references:
+    - https://go101.org/article/concurrent-common-mistakes.html
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Other
+    source: https://semgrep.dev/r/trailofbits.go.waitgroup-add-called-inside-goroutine.waitgroup-add-called-inside-goroutine
+    shortlink: https://sg.run/z98W
+    semgrep.dev:
+      rule:
+        r_id: 11761
+        rv_id: 833276
+        rule_id: JDUQ3v
+        version_id: kbT2l5k
+        url: https://semgrep.dev/playground/r/kbT2l5k/trailofbits.go.waitgroup-add-called-inside-goroutine.waitgroup-add-called-inside-goroutine
+        origin: community
+  patterns:
+  - pattern-either:
+    - pattern: |
+        $WG := &sync.WaitGroup{}
+        ...
+        go func(...) {
+          ...
+          $WG.Add(...)
+          ...
+        }(...)
+        ...
+        $WG.Wait()
+    - pattern: |
+        var $WG sync.WaitGroup
+        ...
+        go func(...) {
+          ...
+          $WG.Add(...)
+          ...
+        }(...)
+        ...
+        $WG.Wait()
+  - pattern-not-inside: |
+      for ... {
+        ...
+        $WG.Add(...)
+        ...
+      }
+- id: trailofbits.go.missing-unlock-before-return.missing-unlock-before-return
+  message: Missing mutex unlock (`$T` variable) before returning from a function.  This
+    could result in panics resulting from double lock operations
+  languages:
+  - go
+  severity: ERROR
+  metadata:
+    category: security
+    cwe: 'CWE-667: Improper Locking'
+    subcategory:
+    - vuln
+    confidence: MEDIUM
+    likelihood: HIGH
+    impact: MEDIUM
+    technology:
+    - --no-technology--
+    description: Missing `mutex` unlock before returning from a function
+    references:
+    - https://pkg.go.dev/sync#Mutex
+    - https://blog.trailofbits.com/2020/06/09/how-to-check-if-a-mutex-is-locked-in-go/
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Other
+    source: https://semgrep.dev/r/trailofbits.go.missing-unlock-before-return.missing-unlock-before-return
+    shortlink: https://sg.run/18Bk
+    semgrep.dev:
+      rule:
+        r_id: 14222
+        rv_id: 937959
+        rule_id: L1U5Gz
+        version_id: O9TXj4X
+        url: https://semgrep.dev/playground/r/O9TXj4X/trailofbits.go.missing-unlock-before-return.missing-unlock-before-return
+        origin: community
+  patterns:
+  - pattern-either:
+    - pattern: panic(...)
+    - pattern: return ...
+  - metavariable-pattern:
+      metavariable: $T
+      patterns:
+      - pattern: |
+          ($T : sync.Mutex)
+  - pattern-inside: |
+      $T.Lock()
+      ...
+  - pattern-not-inside: |
+      $T.Unlock()
+      ...
+  - pattern-not-inside: |
+      defer $T.Unlock()
+      ...
+  - pattern-not-inside: |
+      defer func(...) {
+        ...
+        $T.Unlock()
+        ...
+      }(...)
+      ...
+  - pattern-not-inside: "$FOO(..., ..., func(...) { \n    ... \n})\n"
+  - pattern-not-inside: |
+      return func(...) {
+          ...
+          $T.Unlock()
+          ...
+      }
+- id: trailofbits.javascript.apollo-graphql.v3-cors.v3-no-cors
+  languages:
+  - js
+  - ts
+  message: The Apollo GraphQL server lacks a CORS policy. By default, the batteries-included
+    apollo-server package serves the Access-Control-Allow-Origin HTTP header with
+    the wildcard value (*).
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-942: Permissive Cross-domain Policy with Untrusted Domains'
+    subcategory:
+    - vuln
+    confidence: HIGH
+    likelihood: LOW
+    impact: LOW
+    technology:
+    - graphql
+    - apollo-graphql-server
+    - apollo-graphql-server-v3
+    description: Lack of CORS policy
+    references:
+    - https://www.apollographql.com/docs/apollo-server/v3/security/cors#configuring-cors-options-for-apollo-server
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Improper Validation
+    source: https://semgrep.dev/r/trailofbits.javascript.apollo-graphql.v3-cors.v3-no-cors
+    shortlink: https://sg.run/dbNX
+    semgrep.dev:
+      rule:
+        r_id: 60578
+        rv_id: 833283
+        rule_id: nJU3P4
+        version_id: ZRTlPW3
+        url: https://semgrep.dev/playground/r/ZRTlPW3/trailofbits.javascript.apollo-graphql.v3-cors.v3-no-cors
+        origin: community
+  patterns:
+  - pattern-either:
+    - pattern-inside: |
+        $X = require('apollo-server');
+        ...
+    - pattern-inside: |
+        import 'apollo-server';
+        ...
+  - pattern: |
+      new ApolloServer({...})
+  - pattern-not: |
+      new ApolloServer({..., cors: ..., ...})
+- id: trailofbits.go.hanging-goroutine.hanging-goroutine
+  message: Potential goroutine leak due to unbuffered channel send inside loop or
+    unbuffered channel receive in select block
+  languages:
+  - go
+  severity: ERROR
+  metadata:
+    category: security
+    cwe: 'CWE-833: Deadlock'
+    subcategory:
+    - vuln
+    confidence: MEDIUM
+    likelihood: MEDIUM
+    impact: LOW
+    technology:
+    - --no-technology--
+    description: Goroutine leaks
+    references:
+    - https://blog.trailofbits.com/2021/11/08/discovering-goroutine-leaks-with-semgrep
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Other
+    source: https://semgrep.dev/r/trailofbits.go.hanging-goroutine.hanging-goroutine
+    shortlink: https://sg.run/Dw8o
+    semgrep.dev:
+      rule:
+        r_id: 11752
+        rv_id: 833264
+        rule_id: EwUQp2
+        version_id: o5TBEoD
+        url: https://semgrep.dev/playground/r/o5TBEoD/trailofbits.go.hanging-goroutine.hanging-goroutine
+        origin: community
+  patterns:
+  - pattern-either:
+    - pattern: |
+        for ... {
+          ...
+          go func(...) {
+            ...
+            $CHANNEL <- $VAL
+            ...
+          }(...)
+        }
+        ...
+        $Y = <- $CHANNEL
+        ...
+    - pattern: |
+        for ... {
+          ...
+          go func(...) {
+            ...
+            $CHANNEL <- $VAL
+            ...
+          }(...)
+        }
+        ...
+        return <- $CHANNEL
+    - pattern: |
+        for ... {
+          ...
+          go func(...) {
+            ...
+            select {
+              case ...
+              case $CHANNEL <- $VAL: ...
+              case ...
+            }
+            ...
+          }(...)
+        ...
+        }
+        ...
+        return <- $CHANNEL
+    - pattern: "go func(...){\n  ...\n  $CHANNEL <- $X\n  ...\n}(...)\n...\nselect
+        {\ncase ...\ncase $Y = <- $CHANNEL: \n...\n}\n"
+    - pattern: "go func(...){\n  ...\n  $CHANNEL <- $X\n  ...\n}(...)\n...\nselect
+        {\ncase ...\ncase <- $CHANNEL: \n...\n}\n"
+    - pattern: "go func(...){\n  ...\n  $CHANNEL <- $X\n  ...\n}(...)\n...\nselect
+        {\ncase ...\ncase $Y <- $CHANNEL: \n...\n}\n"
+  - pattern-inside: |
+      $CHANNEL := make(...)
+      ...
+  - pattern-not-inside: |
+      $CHANNEL := make(..., $T)
+      ...
+  - pattern-not: "go func(...){\n  ...\n  $CHANNEL <- $X\n  ...\n}(...)\n...\nselect
+      {\ncase ...\ncase ...: \n  ...\n  ... = <- $CHANNEL\n  ...\n}\n"
+  - pattern-not: "go func(...){\n  ...\n  $CHANNEL <- $X\n  ...\n}(...)\n...\nselect
+      {\ncase ...\ncase ...: \n  ...\n  <-$CHANNEL\n  ...\n}\n"
+- id: trailofbits.python.numpy-distutils.numpy-distutils
+  message: NumPy distutils is deprecated, and will be removed in the future
+  languages:
+  - python
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-676: Use of Potentially Dangerous Function'
+    subcategory:
+    - audit
+    confidence: HIGH
+    likelihood: MEDIUM
+    impact: LOW
+    technology:
+    - numpy
+    description: Use of deprecated `numpy.distutils`
+    references:
+    - https://numpy.org/doc/stable/reference/distutils.html
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Dangerous Method or Function
+    source: https://semgrep.dev/r/trailofbits.python.numpy-distutils.numpy-distutils
+    shortlink: https://sg.run/rqGP
+    semgrep.dev:
+      rule:
+        r_id: 43925
+        rv_id: 833292
+        rule_id: GdUgN8
+        version_id: 44TQP8Y
+        url: https://semgrep.dev/playground/r/44TQP8Y/trailofbits.python.numpy-distutils.numpy-distutils
+        origin: community
+  patterns:
+  - pattern: |
+      import numpy.distutils
+- id: trailofbits.javascript.apollo-graphql.v3-cors-express.v3-express-bad-cors
+  languages:
+  - js
+  - ts
+  message: The Apollo GraphQL server is setup with a CORS policy that reflects any
+    origin, or with a regex that has known flaws.
+  severity: ERROR
+  metadata:
+    category: security
+    cwe: 'CWE-942: Permissive Cross-domain Policy with Untrusted Domains'
+    subcategory:
+    - vuln
+    confidence: MEDIUM
+    likelihood: HIGH
+    impact: HIGH
+    technology:
+    - graphql
+    - apollo-graphql-server
+    - apollo-graphql-server-v3
+    description: Bad CORS policy
+    references:
+    - https://www.apollographql.com/docs/apollo-server/v3/security/cors#configuring-cors-options-for-apollo-server
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Improper Validation
+    source: https://semgrep.dev/r/trailofbits.javascript.apollo-graphql.v3-cors-express.v3-express-bad-cors
+    shortlink: https://sg.run/vE1n
+    semgrep.dev:
+      rule:
+        r_id: 60577
+        rv_id: 833282
+        rule_id: ZqUbNY
+        version_id: d6TKGL6
+        url: https://semgrep.dev/playground/r/d6TKGL6/trailofbits.javascript.apollo-graphql.v3-cors-express.v3-express-bad-cors
+        origin: community
+  mode: taint
+  pattern-sources:
+  - patterns:
+    - pattern-inside: |
+        { origin: $BAD_CORS_ORIGIN }
+    - metavariable-pattern:
+        metavariable: $BAD_CORS_ORIGIN
+        pattern-either:
+        - pattern: |
+            true
+        - patterns:
+          - pattern-either:
+            - pattern: |
+                $CORS_SINGLE_ORIGIN
+            - pattern: |
+                [..., $CORS_SINGLE_ORIGIN, ...]
+          - metavariable-pattern:
+              metavariable: $CORS_SINGLE_ORIGIN
+              pattern-either:
+              - pattern-regex: ^/.*[^\\]\..*/$
+              - pattern-regex: ^/.*[^$]/$
+              - pattern: |
+                  'null'
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - pattern-inside: |
+          $X = require('apollo-server-express');
+          ...
+      - pattern-inside: |
+          import 'apollo-server-express';
+          ...
+    - pattern-either:
+      - patterns:
+        - pattern-inside: |
+            $X = new ApolloServer({...})
+            ...
+            $X.applyMiddleware({...})
+        - pattern: |
+            $X.applyMiddleware({..., cors: $CORS_ORIGIN, ...})
+    - focus-metavariable: $CORS_ORIGIN
+- id: trailofbits.python.pickles-in-keras.pickles-in-keras
+  message: |-
+    Keras' load_model function may result in arbitrary code execution: - It can load vulnerable pickled models - It can load an hdf5 model that contains a lambda layer with arbitrary code
+      that will be executed every time the model is used (loading, training, eval)
+    Note: Keras loading with the built-in file format should be safe as long as checks are not disabled.
+  languages:
+  - python
+  severity: ERROR
+  metadata:
+    category: security
+    cwe: 'CWE-502: Deserialization of Untrusted Data'
+    subcategory:
+    - vuln
+    confidence: MEDIUM
+    likelihood: MEDIUM
+    impact: HIGH
+    technology:
+    - keras
+    description: Potential arbitrary code execution from Keras' load_model function
+    references:
+    - https://blog.trailofbits.com/2021/03/15/never-a-dill-moment-exploiting-machine-learning-pickle-files/
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - 'Insecure Deserialization '
+    source: https://semgrep.dev/r/trailofbits.python.pickles-in-keras.pickles-in-keras
+    shortlink: https://sg.run/kxK8o
+    semgrep.dev:
+      rule:
+        r_id: 124728
+        rv_id: 833300
+        rule_id: BYUXGv6
+        version_id: DkTG07g
+        url: https://semgrep.dev/playground/r/DkTG07g/trailofbits.python.pickles-in-keras.pickles-in-keras
+        origin: community
+  patterns:
+  - pattern-either:
+    - patterns:
+      - pattern: keras.models.load_model(...)
+      - pattern-not: keras.models.load_model("...", ...)
+    - patterns:
+      - pattern: tensorflow.keras.models.load_model(...)
+      - pattern-not: tensorflow.keras.models.load_model("...", ...)
+    - patterns:
+      - pattern: keras.saving.load_model(...)
+      - pattern-not: keras.saving.load_model("...", ...)
+    - patterns:
+      - pattern: tensorflow.keras.saving.load_model(...)
+      - pattern-not: tensorflow.keras.saving.load_model("...", ...)
+- id: trailofbits.python.scikit-joblib-load.scikit-joblib-load
+  message: Scikit `joblib` uses pickle under the hood. Functions reliant on pickle
+    can result in arbitrary code execution. Consider using `skops` instead.
+  languages:
+  - python
+  severity: ERROR
+  metadata:
+    category: security
+    cwe: 'CWE-502: Deserialization of Untrusted Data'
+    subcategory:
+    - vuln
+    confidence: MEDIUM
+    likelihood: MEDIUM
+    impact: HIGH
+    technology:
+    - scikit
+    description: Potential arbitrary code execution from `SciKit.Joblib` functions
+      reliant on pickling
+    references:
+    - https://scikit-learn.org/stable/model_persistence.html
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - 'Insecure Deserialization '
+    source: https://semgrep.dev/r/trailofbits.python.scikit-joblib-load.scikit-joblib-load
+    shortlink: https://sg.run/wzW6
+    semgrep.dev:
+      rule:
+        r_id: 43929
+        rv_id: 833309
+        rule_id: DbULlX
+        version_id: zyTWJrZ
+        url: https://semgrep.dev/playground/r/zyTWJrZ/trailofbits.python.scikit-joblib-load.scikit-joblib-load
+        origin: community
+  patterns:
+  - pattern: joblib.load(...)
+  - pattern-not: joblib.load("...")
+- id: trailofbits.go.iterate-over-empty-map.iterate-over-empty-map
+  message: Iteration over a possibly empty map `$C`. This is likely a bug or redundant
+    code
+  languages:
+  - go
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-665: Improper Initialization'
+    subcategory:
+    - audit
+    confidence: MEDIUM
+    likelihood: LOW
+    impact: LOW
+    technology:
+    - --no-technology--
+    description: Probably redundant iteration over an empty map
+    references:
+    - https://blog.trailofbits.com/2019/11/07/attacking-go-vr-ttps/
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Other
+    source: https://semgrep.dev/r/trailofbits.go.iterate-over-empty-map.iterate-over-empty-map
+    shortlink: https://sg.run/08jj
+    semgrep.dev:
+      rule:
+        r_id: 17198
+        rv_id: 1039527
+        rule_id: wdUlww
+        version_id: ExTNqnL
+        url: https://semgrep.dev/playground/r/ExTNqnL/trailofbits.go.iterate-over-empty-map.iterate-over-empty-map
+        origin: community
+  patterns:
+  - pattern: |
+      $C = make(map[$T1] $T2)
+      ...
+      for $K := range $C { ... }
+  - pattern-not: |
+      $C = make(map[$T1] $T2, ...)
+      ...
+      $C[$X] = $V
+      ...
+      for $K := range $C { ... }
+  - pattern-not: |
+      $C = make(map[$T1] $T2, ...)
+      ...
+      $C[$X]++
+      ...
+      for $K := range $C { ... }
+  - pattern-not: |
+      $C = make(map[$T1] $T2, ...)
+      ...
+      $C[$X]--
+      ...
+      for $K := range $C { ... }
+  - pattern-not: |
+      $C = make(map[$T1] $T2, ...)
+      ...
+      $CODEC.Unmarshal($BYTES, &$C)
+      ...
+      for $K := range $C { ... }
+- id: trailofbits.javascript.apollo-graphql.v3-csrf-prevention.v3-csrf-prevention
+  languages:
+  - js
+  - ts
+  message: The Apollo GraphQL server lacks the 'csrfPrevention' option. This option
+    is 'false' by the default in v3 of the Apollo GraphQL v3, which can enable CSRF
+    attacks.
+  severity: ERROR
+  metadata:
+    category: security
+    cwe: 'CWE-352: Cross-Site Request Forgery (CSRF)'
+    subcategory:
+    - vuln
+    confidence: HIGH
+    likelihood: MEDIUM
+    impact: MEDIUM
+    technology:
+    - graphql
+    - apollo-graphql-server
+    - apollo-graphql-server-v3
+    description: Lack of CSRF prevention
+    references:
+    - https://www.apollographql.com/docs/apollo-server/v3/security/cors/#preventing-cross-site-request-forgery-csrf
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Cross-Site Request Forgery (CSRF)
+    source: https://semgrep.dev/r/trailofbits.javascript.apollo-graphql.v3-csrf-prevention.v3-csrf-prevention
+    shortlink: https://sg.run/nEGg
+    semgrep.dev:
+      rule:
+        r_id: 60580
+        rv_id: 833285
+        rule_id: 7KU8o3
+        version_id: ExTrD6A
+        url: https://semgrep.dev/playground/r/ExTrD6A/trailofbits.javascript.apollo-graphql.v3-csrf-prevention.v3-csrf-prevention
+        origin: community
+  patterns:
+  - pattern: new ApolloServer({...})
+  - pattern-not: |
+      new ApolloServer({..., csrfPrevention: true, ...})
+- id: trailofbits.generic.container-user-root.container-user-root
+  message: Found container command running as root
+  languages:
+  - generic
+  severity: WARNING
+  metadata:
+    category: security
+    subcategory:
+    - audit
+    technology:
+    - shell
+    cwe: 'CWE-250: Execution with Unnecessary Privileges'
+    confidence: MEDIUM
+    likelihood: MEDIUM
+    impact: HIGH
+    references:
+    - https://docs.docker.com/engine/reference/commandline/run/
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Improper Authorization
+    source: https://semgrep.dev/r/trailofbits.generic.container-user-root.container-user-root
+    shortlink: https://sg.run/lBKyB
+    semgrep.dev:
+      rule:
+        r_id: 113213
+        rv_id: 833252
+        rule_id: AbU9gy9
+        version_id: GxTDEYO
+        url: https://semgrep.dev/playground/r/GxTDEYO/trailofbits.generic.container-user-root.container-user-root
+        origin: community
+  pattern-either:
+  - pattern: docker ... -u root
+  - pattern: docker ... -u 0
+  - pattern: docker ... --user root
+  - pattern: docker ... --user 0
+  - pattern: podman ... -u root
+  - pattern: podman ... --u 0
+  - pattern: podman ... --user root
+  - pattern: podman ... --user 0
+- id: trailofbits.go.missing-runlock-on-rwmutex.missing-runlock-on-rwmutex
+  message: Missing `RUnlock` on an `RWMutex` (`$T` variable) lock before returning
+    from a function
+  languages:
+  - go
+  severity: ERROR
+  metadata:
+    category: security
+    cwe: 'CWE-667: Improper Locking'
+    subcategory:
+    - vuln
+    confidence: MEDIUM
+    likelihood: HIGH
+    impact: MEDIUM
+    technology:
+    - --no-technology--
+    description: Missing `RUnlock` on an `RWMutex` lock before returning from a function
+    references:
+    - https://pkg.go.dev/sync#RWMutex
+    - https://blog.trailofbits.com/2020/06/09/how-to-check-if-a-mutex-is-locked-in-go/
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Other
+    source: https://semgrep.dev/r/trailofbits.go.missing-runlock-on-rwmutex.missing-runlock-on-rwmutex
+    shortlink: https://sg.run/9r40
+    semgrep.dev:
+      rule:
+        r_id: 14223
+        rv_id: 937958
+        rule_id: 8GUzNK
+        version_id: xyTqL9d
+        url: https://semgrep.dev/playground/r/xyTqL9d/trailofbits.go.missing-runlock-on-rwmutex.missing-runlock-on-rwmutex
+        origin: community
+  patterns:
+  - pattern-either:
+    - pattern: panic(...)
+    - pattern: return ...
+  - metavariable-pattern:
+      metavariable: $T
+      patterns:
+      - pattern: |
+          ($T : sync.RWMutex)
+  - pattern-inside: |
+      $T.RLock()
+      ...
+  - pattern-not-inside: |
+      $T.RUnlock()
+      ...
+  - pattern-not-inside: |
+      defer $T.RUnlock()
+      ...
+  - pattern-not-inside: |
+      defer func(...) {
+        ...
+        $T.RUnlock()
+        ...
+      }(...)
+      ...
+  - pattern-not-inside: "$FOO(..., ..., func(...) { \n    ... \n})\n"
+  - pattern-not-inside: |
+      return func(...) {
+          ...
+          $T.RUnlock()
+          ...
+      }
+- id: trailofbits.go.invalid-usage-of-modified-variable.invalid-usage-of-modified-variable
+  message: Variable `$X` is likely modified and later used on error. In some cases
+    this could result  in panics due to a nil dereference
+  languages:
+  - go
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-665: Improper Initialization'
+    subcategory:
+    - audit
+    confidence: HIGH
+    likelihood: MEDIUM
+    impact: MEDIUM
+    technology:
+    - --no-technology--
+    description: Possible unintentional assignment when an error occurs
+    references:
+    - https://blog.trailofbits.com/2019/11/07/attacking-go-vr-ttps/
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Other
+    source: https://semgrep.dev/r/trailofbits.go.invalid-usage-of-modified-variable.invalid-usage-of-modified-variable
+    shortlink: https://sg.run/WWQ2
+    semgrep.dev:
+      rule:
+        r_id: 17197
+        rv_id: 833265
+        rule_id: kxU6Xb
+        version_id: zyTWJNZ
+        url: https://semgrep.dev/playground/r/zyTWJNZ/trailofbits.go.invalid-usage-of-modified-variable.invalid-usage-of-modified-variable
+        origin: community
+  patterns:
+  - pattern: |
+      ..., $X, ..., $ERR = ...
+      if $ERR != nil {
+        ...
+        <... $X.$Y ...>
+      }
+  - pattern-not: |
+      ..., $X, ..., $ERR = ...
+      if $ERR != nil {
+        ...
+        $X, ... = ...
+        ...
+        <... $X.$Y ...>
+      }
+  - pattern-not: |
+      ..., $X, ..., $ERR = ...
+      if $ERR != nil {
+        ...
+        $X = ...
+        ...
+        <... $X.$Y ...>
+      }
+  - pattern-not: |
+      ..., $X, ..., $ERR = ...
+      if $ERR != nil {
+        ...
+        if $X != nil {
+          <... $X.$Y ...>
+        }
+        ...
+      }
+  - pattern-not: |
+      ..., $X, ..., $ERR := ...
+      if $ERR != nil {
+        ...
+        if  $X != nil && <... $X.$Y ...> {
+          ...
+        }
+        ...
+      }
+- id: trailofbits.ruby.action-dispatch-insecure-ssl.action-dispatch-insecure-ssl
+  message: |
+    Found Rails application with insecure SSL setting.
+  languages:
+  - ruby
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-295: Improper Certificate Validation'
+    subcategory:
+    - audit
+    confidence: HIGH
+    likelihood: HIGH
+    impact: HIGH
+    technology:
+    - rails
+    references:
+    - https://api.rubyonrails.org/v7.1.3.4/classes/ActionDispatch/SSL.html
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Improper Authentication
+    source: https://semgrep.dev/r/trailofbits.ruby.action-dispatch-insecure-ssl.action-dispatch-insecure-ssl
+    shortlink: https://sg.run/JDGnW
+    semgrep.dev:
+      rule:
+        r_id: 150302
+        rv_id: 943196
+        rule_id: 6JUvPlK
+        version_id: o5TZy2l
+        url: https://semgrep.dev/playground/r/o5TZy2l/trailofbits.ruby.action-dispatch-insecure-ssl.action-dispatch-insecure-ssl
+        origin: community
+  patterns:
+  - pattern-inside: |
+      Rails.application.configure do
+        ...
+      end
+  - pattern-either:
+    - pattern: config.force_ssl = false
+    - pattern: 'config.ssl_options = { ..., secure_cookies: false, ... }'
+    - pattern: 'config.ssl_options = { ..., hsts: false, ... }'
+    - pattern: 'config.ssl_options = { ..., hsts: { ..., subdomains: false, ... },
+        ... }'
+- id: trailofbits.generic.curl-insecure.curl-insecure
+  message: Found `curl` command disabling SSL verification
+  languages:
+  - generic
+  severity: WARNING
+  metadata:
+    category: security
+    subcategory:
+    - audit
+    technology:
+    - shell
+    cwe: 'CWE-295: Improper Certificate Validation'
+    confidence: MEDIUM
+    likelihood: MEDIUM
+    impact: HIGH
+    references:
+    - https://curl.se/docs/manpage.html
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Improper Authentication
+    source: https://semgrep.dev/r/trailofbits.generic.curl-insecure.curl-insecure
+    shortlink: https://sg.run/YG37D
+    semgrep.dev:
+      rule:
+        r_id: 113214
+        rv_id: 833253
+        rule_id: BYUXkQx
+        version_id: RGTKGnY
+        url: https://semgrep.dev/playground/r/RGTKGnY/trailofbits.generic.curl-insecure.curl-insecure
+        origin: community
+  pattern-either:
+  - pattern: 'curl ... -k '
+  - pattern: curl ... --insecure
+- id: trailofbits.javascript.apollo-graphql.schema-directives.schema-directives
+  message: The Apollo GraphQL uses the 'schemaDirectives' option. This works in ApolloServer
+    v2, but does nothing in version >=3. Depending on what the directives are used
+    for, this can expose authenticated endpoints, disable rate limiting, and more.
+    See the references on how to create custom directives in v3 and v4.
+  languages:
+  - js
+  - ts
+  severity: ERROR
+  metadata:
+    category: security
+    cwe: 'CWE-686: Function Call With Incorrect Argument Type'
+    subcategory:
+    - vuln
+    confidence: MEDIUM
+    likelihood: MEDIUM
+    impact: HIGH
+    technology:
+    - graphql
+    - apollo-graphql-server
+    description: Use of outdated ApolloServer option 'schemaDirectives'
+    references:
+    - https://www.apollographql.com/docs/apollo-server/schema/directives/#custom-directives
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Other
+    source: https://semgrep.dev/r/trailofbits.javascript.apollo-graphql.schema-directives.schema-directives
+    shortlink: https://sg.run/wE2N
+    semgrep.dev:
+      rule:
+        r_id: 60573
+        rv_id: 833278
+        rule_id: OrU1Oz
+        version_id: xyTNew2
+        url: https://semgrep.dev/playground/r/xyTNew2/trailofbits.javascript.apollo-graphql.schema-directives.schema-directives
+        origin: community
+  pattern-either:
+  - pattern: |
+      new ApolloServer({..., schemaDirectives: ..., ...})
+- id: trailofbits.javascript.apollo-graphql.v4-csrf-prevention.v4-csrf-prevention
+  languages:
+  - js
+  - ts
+  message: The Apollo GraphQL server sets the 'csrfPrevention' option to false. This
+    can enable CSRF attacks.
+  severity: ERROR
+  metadata:
+    category: security
+    cwe: 'CWE-352: Cross-Site Request Forgery (CSRF)'
+    subcategory:
+    - vuln
+    confidence: HIGH
+    likelihood: MEDIUM
+    impact: MEDIUM
+    technology:
+    - graphql
+    - apollo-graphql-server
+    - apollo-graphql-server-v4
+    description: CSRF protection disabled
+    references:
+    - https://www.apollographql.com/docs/apollo-server/v3/security/cors/#preventing-cross-site-request-forgery-csrf
+    fix-regex:
+      regex: csrfPrevention:\s*false
+      replacement: 'csrfPrevention: true'
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Cross-Site Request Forgery (CSRF)
+    source: https://semgrep.dev/r/trailofbits.javascript.apollo-graphql.v4-csrf-prevention.v4-csrf-prevention
+    shortlink: https://sg.run/Eb1P
+    semgrep.dev:
+      rule:
+        r_id: 60581
+        rv_id: 833286
+        rule_id: L1UjQ3
+        version_id: 7ZTx9PE
+        url: https://semgrep.dev/playground/r/7ZTx9PE/trailofbits.javascript.apollo-graphql.v4-csrf-prevention.v4-csrf-prevention
+        origin: community
+  patterns:
+  - pattern: |
+      new ApolloServer({..., csrfPrevention: false, ...})
+- id: trailofbits.javascript.apollo-graphql.use-of-graphql-upload.use-of-graphql-upload
+  languages:
+  - js
+  - ts
+  message: 'The Apollo GraphQL server is using the graphql-upload library. This library
+    allows file uploads using POSTs with content-type: multipart/form-data, which
+    can enable to CSRF attacks. Ensure that you are enabling CSRF protection if you
+    really need to use graphql-upload .'
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-352: Cross-Site Request Forgery (CSRF)'
+    subcategory:
+    - vuln
+    confidence: LOW
+    likelihood: MEDIUM
+    impact: MEDIUM
+    technology:
+    - graphql
+    - apollo-graphql-server
+    description: Use of the graphql-upload library
+    references:
+    - https://github.com/apollographql/apollo-server/security/advisories/GHSA-2p3c-p3qw-69r4
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Cross-Site Request Forgery (CSRF)
+    source: https://semgrep.dev/r/trailofbits.javascript.apollo-graphql.use-of-graphql-upload.use-of-graphql-upload
+    shortlink: https://sg.run/xE20
+    semgrep.dev:
+      rule:
+        r_id: 60574
+        rv_id: 833279
+        rule_id: eqUB1Q
+        version_id: O9TJWB6
+        url: https://semgrep.dev/playground/r/O9TJWB6/trailofbits.javascript.apollo-graphql.use-of-graphql-upload.use-of-graphql-upload
+        origin: community
+  patterns:
+  - pattern: app.use(graphqlUploadExpress());
+- id: trailofbits.jvm.mongo-hostname-verification-disabled.mongo-hostname-verification-disabled
+  message: Found MongoDB client with SSL hostname verification disabled
+  languages:
+  - java
+  - kotlin
+  severity: WARNING
+  metadata:
+    category: security
+    subcategory:
+    - audit
+    technology:
+    - java
+    - kotlin
+    - mongodb
+    cwe: 'CWE-295: Improper Certificate Validation'
+    confidence: HIGH
+    likelihood: HIGH
+    impact: HIGH
+    references:
+    - https://www.mongodb.com/docs/drivers/java/sync/current/fundamentals/connection/tls/#disable-hostname-verification
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Improper Authentication
+    source: https://semgrep.dev/r/trailofbits.jvm.mongo-hostname-verification-disabled.mongo-hostname-verification-disabled
+    shortlink: https://sg.run/yyLqk
+    semgrep.dev:
+      rule:
+        r_id: 113224
+        rv_id: 833288
+        rule_id: GdUvk46
+        version_id: 8KTGkn3
+        url: https://semgrep.dev/playground/r/8KTGkn3/trailofbits.jvm.mongo-hostname-verification-disabled.mongo-hostname-verification-disabled
+        origin: community
+  pattern: $SETTINGS.invalidHostNameAllowed(true)
+- id: trailofbits.hcl.nomad.docker-hardcoded-password.docker-hardcoded-password
+  message: |
+    Found Nomad task using Docker auth with hardcoded password
+  languages:
+  - hcl
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-798: Use of Hard-coded Credentials'
+    subcategory:
+    - audit
+    confidence: HIGH
+    likelihood: HIGH
+    impact: HIGH
+    technology:
+    - nomad
+    - docker
+    - podman
+    references:
+    - https://developer.hashicorp.com/nomad/docs/drivers/docker#password
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Hard-coded Secrets
+    source: https://semgrep.dev/r/trailofbits.hcl.nomad.docker-hardcoded-password.docker-hardcoded-password
+    shortlink: https://sg.run/Reqnq
+    semgrep.dev:
+      rule:
+        r_id: 150293
+        rv_id: 943187
+        rule_id: AbU9oOo
+        version_id: BjT1DzD
+        url: https://semgrep.dev/playground/r/BjT1DzD/trailofbits.hcl.nomad.docker-hardcoded-password.docker-hardcoded-password
+        origin: community
+  patterns:
+  - pattern-inside: |
+      task "..." {
+        ...
+        driver = "$RUNTIME"
+        ...
+        config {
+          ...
+          auth {
+            ...
+          }
+          ...
+        }
+        ...
+      }
+  - pattern: password = "..."
+  - metavariable-regex:
+      metavariable: $RUNTIME
+      regex: (docker|podman)
+- id: trailofbits.python.automatic-memory-pinning.automatic-memory-pinning
+  message: If possible, it is better to rely on automatic pinning in PyTorch to avoid
+    undefined behavior and for efficiency
+  languages:
+  - python
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-676: Use of Potentially Dangerous Function'
+    subcategory:
+    - audit
+    confidence: HIGH
+    likelihood: LOW
+    impact: LOW
+    technology:
+    - pytorch
+    description: '`PyTorch` memory not automatically pinned'
+    references:
+    - https://pytorch.org/docs/stable/data.html#memory-pinning
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Dangerous Method or Function
+    source: https://semgrep.dev/r/trailofbits.python.automatic-memory-pinning.automatic-memory-pinning
+    shortlink: https://sg.run/jz5N
+    semgrep.dev:
+      rule:
+        r_id: 17165
+        rv_id: 833289
+        rule_id: WAUN1Z
+        version_id: gETy20E
+        url: https://semgrep.dev/playground/r/gETy20E/trailofbits.python.automatic-memory-pinning.automatic-memory-pinning
+        origin: community
+  pattern-either:
+  - patterns:
+    - pattern: torch.utils.data.DataLoader(...)
+    - pattern-not: torch.utils.data.DataLoader(..., pin_memory=$VALUE, ...)
+  - pattern: torch.utils.data.DataLoader(..., pin_memory=False, ...)
+- id: trailofbits.ruby.action-mailer-insecure-tls.action-mailer-insecure-tls
+  message: |
+    Found ActionMailer SMTP configuration with insecure TLS setting. These
+    settings do not require a successful, encrypted, verified TLS connection
+    is made. Set `enable_starttls: true` and `openssl_verify_mode` to verify
+    peer
+  languages:
+  - ruby
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-295: Improper Certificate Validation'
+    subcategory:
+    - audit
+    confidence: HIGH
+    likelihood: HIGH
+    impact: HIGH
+    technology:
+    - rails
+    - actionmailer
+    references:
+    - https://guides.rubyonrails.org/action_mailer_basics.html#action-mailer-configuration
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Improper Authentication
+    source: https://semgrep.dev/r/trailofbits.ruby.action-mailer-insecure-tls.action-mailer-insecure-tls
+    shortlink: https://sg.run/5rolX
+    semgrep.dev:
+      rule:
+        r_id: 150303
+        rv_id: 943197
+        rule_id: oqUg83Y
+        version_id: zyTlAnD
+        url: https://semgrep.dev/playground/r/zyTlAnD/trailofbits.ruby.action-mailer-insecure-tls.action-mailer-insecure-tls
+        origin: community
+  pattern-either:
+  - pattern: 'ActionMailer::Base.smtp_settings = { ..., openssl_verify_mode: OpenSSL::SSL::VERIFY_NONE,
+      ... }'
+  - pattern: 'ActionMailer::Base.smtp_settings = { ..., openssl_verify_mode: ''none'',
+      ... }'
+  - pattern: 'ActionMailer::Base.smtp_settings = { ..., enable_starttls_auto: true,
+      ... }'
+- id: trailofbits.python.lxml-in-pandas.lxml-in-pandas
+  message: Found usage of the `$FLAVOR` library, which is vulnerable to attacks such
+    as XML external entity (XXE) attacks
+  languages:
+  - python
+  severity: ERROR
+  metadata:
+    category: security
+    cwe: 'CWE-611: Improper Restriction of XML External Entity Reference'
+    subcategory:
+    - vuln
+    confidence: HIGH
+    likelihood: MEDIUM
+    impact: MEDIUM
+    technology:
+    - pandas
+    description: Potential XXE attacks from loading `lxml` in pandas
+    references:
+    - https://lxml.de/FAQ.html
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - XML Injection
+    source: https://semgrep.dev/r/trailofbits.python.lxml-in-pandas.lxml-in-pandas
+    shortlink: https://sg.run/1z1G
+    semgrep.dev:
+      rule:
+        r_id: 17166
+        rv_id: 833290
+        rule_id: 0oUrdJ
+        version_id: QkTkr22
+        url: https://semgrep.dev/playground/r/QkTkr22/trailofbits.python.lxml-in-pandas.lxml-in-pandas
+        origin: community
+  pattern-either:
+  - patterns:
+    - pattern: pandas.read_html($IO)
+    - pattern-not: pandas.read_html(**$KWARGS)
+  - patterns:
+    - metavariable-pattern:
+        metavariable: $FLAVOR
+        patterns:
+        - pattern: '...'
+        - pattern-not: |
+            "bs4"
+        - pattern-not: |
+            "html5lib"
+    - pattern-either:
+      - pattern: pandas.read_html(..., flavor=$FLAVOR, ...)
+      - patterns:
+        - pattern-inside: |
+            $KWARGS = {..., "flavor": $FLAVOR, ...}
+            ...
+        - pattern: |
+            pandas.read_html(**$KWARGS)
+- id: trailofbits.hcl.nomad.docker-privileged-mode.docker-privileged-mode
+  message: |
+    Found Nomad task using Docker containers in privileged mode
+  languages:
+  - hcl
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-250: Execution with Unnecessary Privileges'
+    subcategory:
+    - audit
+    confidence: HIGH
+    likelihood: MEDIUM
+    impact: LOW
+    technology:
+    - nomad
+    - docker
+    - podman
+    references:
+    - https://developer.hashicorp.com/nomad/docs/drivers/docker#privileged
+    - https://developer.hashicorp.com/nomad/docs/drivers/docker#allow_privileged
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Improper Authorization
+    source: https://semgrep.dev/r/trailofbits.hcl.nomad.docker-privileged-mode.docker-privileged-mode
+    shortlink: https://sg.run/Abkr2
+    semgrep.dev:
+      rule:
+        r_id: 150294
+        rv_id: 943188
+        rule_id: BYUX3g0
+        version_id: DkTN9xp
+        url: https://semgrep.dev/playground/r/DkTN9xp/trailofbits.hcl.nomad.docker-privileged-mode.docker-privileged-mode
+        origin: community
+  pattern-either:
+  - patterns:
+    - pattern-inside: |
+        task "..." {
+          ...
+          config {
+            ...
+          }
+          ...
+        }
+    - pattern: privileged = true
+  - patterns:
+    - pattern-inside: |
+        plugin "$RUNTIME" {
+          ...
+          config {
+            ...
+          }
+          ...
+        }
+    - pattern: allow_privileged = true
+    - metavariable-regex:
+        metavariable: $RUNTIME
+        regex: (docker|podman)
+- id: trailofbits.python.numpy-f2py-compile.numpy-f2py-compile
+  message: Compiling arbitrary code can result in code execution. Ensure the source
+    code is from a trusted location
+  languages:
+  - python
+  severity: ERROR
+  metadata:
+    category: security
+    cwe: 'CWE-676: Use of Potentially Dangerous Function'
+    subcategory:
+    - audit
+    confidence: MEDIUM
+    likelihood: MEDIUM
+    impact: HIGH
+    technology:
+    - numpy
+    description: Potential arbitrary code execution from `NumPy` `f2py` compilation
+    references:
+    - https://numpy.org/doc/stable/f2py/usage.html
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Dangerous Method or Function
+    source: https://semgrep.dev/r/trailofbits.python.numpy-f2py-compile.numpy-f2py-compile
+    shortlink: https://sg.run/bEdP
+    semgrep.dev:
+      rule:
+        r_id: 43926
+        rv_id: 833293
+        rule_id: ReUdJ0
+        version_id: PkTxrbE
+        url: https://semgrep.dev/playground/r/PkTxrbE/trailofbits.python.numpy-f2py-compile.numpy-f2py-compile
+        origin: community
+  patterns:
+  - pattern: numpy.f2py.compile(...)
+  - pattern-not: numpy.f2py.compile("...", ...)
+- id: trailofbits.python.msgpack-numpy.msgpack-numpy
+  message: Found usage of msgpack-numpy unpacking, which relies on pickle to deserialize
+    numpy arrays containing objects. Functions reliant on pickle can result in arbitrary
+    code execution.  Consider switching to a safer serialization method.
+  languages:
+  - python
+  severity: ERROR
+  metadata:
+    category: security
+    cwe: 'CWE-502: Deserialization of Untrusted Data'
+    subcategory:
+    - vuln
+    confidence: MEDIUM
+    likelihood: MEDIUM
+    impact: HIGH
+    technology:
+    - numpy
+    description: Potential arbitrary code execution from functions reliant on pickling
+    references:
+    - https://blog.trailofbits.com/2021/03/15/never-a-dill-moment-exploiting-machine-learning-pickle-files/
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - 'Insecure Deserialization '
+    source: https://semgrep.dev/r/trailofbits.python.msgpack-numpy.msgpack-numpy
+    shortlink: https://sg.run/r6pr1
+    semgrep.dev:
+      rule:
+        r_id: 124725
+        rv_id: 833291
+        rule_id: GdUvWBy
+        version_id: 3ZT3Abe
+        url: https://semgrep.dev/playground/r/3ZT3Abe/trailofbits.python.msgpack-numpy.msgpack-numpy
+        origin: community
+  pattern-either:
+  - patterns:
+    - pattern: msgpack.$FN(...)
+    - metavariable-regex:
+        metavariable: $FN
+        regex: (loads?|dumps?|packb?|unpackb?)
+    - pattern-inside: |
+        msgpack_numpy.patch()
+        ...
+  - patterns:
+    - pattern: msgpack.$FN(..., object_hook=msgpack_numpy.decode, ...)
+    - metavariable-regex:
+        metavariable: $FN
+        regex: unpackb?
+  - patterns:
+    - pattern: msgpack.$FN(..., default=msgpack_numpy.encode, ...)
+    - metavariable-regex:
+        metavariable: $FN
+        regex: packb?
+- id: trailofbits.python.numpy-in-pytorch-datasets.numpy-in-pytorch-datasets
+  message: Using the NumPy RNG inside of a PyTorch dataset can lead to a number of
+    issues with loading data, including identical augmentations. Instead, use the
+    random number generators built into Python and PyTorch
+  languages:
+  - python
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-330: Use of Insufficiently Random Values'
+    subcategory:
+    - audit
+    confidence: HIGH
+    likelihood: MEDIUM
+    impact: LOW
+    technology:
+    - pytorch
+    - numpy
+    description: Calls to the `NumPy` RNG inside of a `Torch` dataset
+    references:
+    - https://tanelp.github.io/posts/a-bug-that-plagues-thousands-of-open-source-ml-projects
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Cryptographic Issues
+    source: https://semgrep.dev/r/trailofbits.python.numpy-in-pytorch-datasets.numpy-in-pytorch-datasets
+    shortlink: https://sg.run/dnR6
+    semgrep.dev:
+      rule:
+        r_id: 44134
+        rv_id: 833294
+        rule_id: KxURLn
+        version_id: JdTlrK4
+        url: https://semgrep.dev/playground/r/JdTlrK4/trailofbits.python.numpy-in-pytorch-datasets.numpy-in-pytorch-datasets
+        origin: community
+  patterns:
+  - pattern: |
+      class $X(torch.utils.data.Dataset):
+        ...
+        def __getitem__(...):
+          ...
+          numpy.random.randint(...)
+          ...
+- id: trailofbits.hcl.nomad.podman-tls-verify-disabled.podman-tls-verify-disabled
+  message: |
+    Found Nomad task using Podman with registry TLS verification disabled
+  languages:
+  - hcl
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-295: Improper Certificate Validation'
+    subcategory:
+    - audit
+    confidence: HIGH
+    likelihood: MEDIUM
+    impact: LOW
+    technology:
+    - nomad
+    - podman
+    references:
+    - https://developer.hashicorp.com/nomad/plugins/drivers/podman#auth
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Improper Authentication
+    source: https://semgrep.dev/r/trailofbits.hcl.nomad.podman-tls-verify-disabled.podman-tls-verify-disabled
+    shortlink: https://sg.run/BYwbA
+    semgrep.dev:
+      rule:
+        r_id: 150295
+        rv_id: 943189
+        rule_id: DbU6rPy
+        version_id: WrTElNZ
+        url: https://semgrep.dev/playground/r/WrTElNZ/trailofbits.hcl.nomad.podman-tls-verify-disabled.podman-tls-verify-disabled
+        origin: community
+  patterns:
+  - pattern-inside: |
+      task "..." {
+        ...
+        driver = "podman"
+        ...
+        config {
+          ...
+          auth {
+            ...
+          }
+          ...
+        }
+        ...
+      }
+  - pattern: tlsVerify = false
+- id: trailofbits.go.sync-mutex-value-copied.sync-mutex-value-copied
+  message: A `sync.Mutex` is copied in function `$FUNC` given that `$T` is value receiver.  As
+    a result, the struct `$T` may not be locked as intended
+  languages:
+  - go
+  severity: ERROR
+  metadata:
+    category: security
+    cwe: 'CWE-688: Function Call With Incorrect Variable or Reference as Argument'
+    subcategory:
+    - vuln
+    confidence: HIGH
+    likelihood: HIGH
+    impact: LOW
+    technology:
+    - --no-technology--
+    description: Copying of `sync.Mutex` via value receivers
+    references:
+    - https://go101.org/article/concurrent-common-mistakes.html
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Other
+    source: https://semgrep.dev/r/trailofbits.go.sync-mutex-value-copied.sync-mutex-value-copied
+    shortlink: https://sg.run/owlR
+    semgrep.dev:
+      rule:
+        r_id: 11760
+        rv_id: 833274
+        rule_id: PeUBW1
+        version_id: bZTBelR
+        url: https://semgrep.dev/playground/r/bZTBelR/trailofbits.go.sync-mutex-value-copied.sync-mutex-value-copied
+        origin: community
+  patterns:
+  - pattern-either:
+    - pattern: |
+        func ($T $TYPE) $FUNC(...){
+          ...
+          $T.Lock()
+          ...
+        }
+    - pattern: |
+        func ($T $TYPE) $FUNC(...){
+          ...
+          $T.RLock()
+          ...
+        }
+  - pattern-not: |
+      func ($T2 *$TYPE2) $FUNC(...){
+        ...
+      }
+- id: trailofbits.python.numpy-in-pytorch-modules.numpy-in-pytorch-modules
+  message: Usage of NumPy library inside PyTorch `$MODULE` module was found. Avoid
+    mixing these libraries for efficiency and proper ONNX loading
+  languages:
+  - python
+  severity: WARNING
+  metadata:
+    category: performance
+    subcategory:
+    - audit
+    confidence: MEDIUM
+    technology:
+    - pytorch
+    - numpy
+    description: Uses of `NumPy` functions inside `PyTorch` modules
+    references:
+    - https://tanelp.github.io/posts/a-bug-that-plagues-thousands-of-open-source-ml-projects
+    license: AGPL-3.0 license
+    source: https://semgrep.dev/r/trailofbits.python.numpy-in-pytorch-modules.numpy-in-pytorch-modules
+    shortlink: https://sg.run/9vxr
+    semgrep.dev:
+      rule:
+        r_id: 17167
+        rv_id: 833295
+        rule_id: KxU507
+        version_id: 5PTyDEK
+        url: https://semgrep.dev/playground/r/5PTyDEK/trailofbits.python.numpy-in-pytorch-modules.numpy-in-pytorch-modules
+        origin: community
+  patterns:
+  - pattern-either:
+    - pattern: numpy.$FN(...)
+    - pattern: numpy. ... .$FN(...)
+  - pattern-inside: |
+      class $MODULE(torch.nn.Module):
+          ...
+- id: trailofbits.hcl.nomad.root-user.root-user
+  message: |
+    Found Nomad task using root user
+  languages:
+  - hcl
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-250: Execution with Unnecessary Privileges'
+    subcategory:
+    - audit
+    confidence: HIGH
+    likelihood: MEDIUM
+    impact: LOW
+    technology:
+    - nomad
+    references:
+    - https://developer.hashicorp.com/nomad/docs/job-specification/task#user
+    - https://developer.hashicorp.com/nomad/docs/configuration/client#user-denylist
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Improper Authorization
+    source: https://semgrep.dev/r/trailofbits.hcl.nomad.root-user.root-user
+    shortlink: https://sg.run/DbOnP
+    semgrep.dev:
+      rule:
+        r_id: 150296
+        rv_id: 943190
+        rule_id: WAUW4XK
+        version_id: 0bT17rJ
+        url: https://semgrep.dev/playground/r/0bT17rJ/trailofbits.hcl.nomad.root-user.root-user
+        origin: community
+  patterns:
+  - pattern-inside: task "..." { ... }
+  - pattern-either:
+    - pattern: user = "root"
+    - pattern: user = "Administrator"
+- id: trailofbits.python.numpy-load-library.numpy-load-library
+  message: Loading custom operator libraries can result in arbitrary code execution
+  languages:
+  - python
+  severity: ERROR
+  metadata:
+    category: security
+    cwe: 'CWE-676: Use of Potentially Dangerous Function'
+    subcategory:
+    - audit
+    confidence: MEDIUM
+    likelihood: MEDIUM
+    impact: HIGH
+    technology:
+    - numpy
+    description: Potential arbitrary code execution from `NumPy` library loading
+    references:
+    - https://numpy.org/doc/stable/reference/routines.ctypeslib.html#numpy.ctypeslib.load_library
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Dangerous Method or Function
+    source: https://semgrep.dev/r/trailofbits.python.numpy-load-library.numpy-load-library
+    shortlink: https://sg.run/NXkL
+    semgrep.dev:
+      rule:
+        r_id: 43927
+        rv_id: 833296
+        rule_id: AbUxDq
+        version_id: GxTDEBO
+        url: https://semgrep.dev/playground/r/GxTDEBO/trailofbits.python.numpy-load-library.numpy-load-library
+        origin: community
+  patterns:
+  - pattern: numpy.ctypeslib.load_library(...)
+  - pattern-not: numpy.ctypeslib.load_library("...", "...")
+- id: trailofbits.go.racy-append-to-slice.racy-append-to-slice
+  message: Appending `$SLICE` from multiple goroutines is not concurrency safe
+  languages:
+  - go
+  severity: ERROR
+  metadata:
+    category: security
+    cwe: 'CWE-362: Concurrent Execution using Shared Resource with Improper Synchronization
+      (''Race Condition'')'
+    subcategory:
+    - vuln
+    confidence: MEDIUM
+    likelihood: HIGH
+    impact: MEDIUM
+    technology:
+    - --no-technology--
+    description: Concurrent calls to `append` from multiple goroutines
+    references:
+    - https://go.dev/blog/maps#concurrency
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Other
+    source: https://semgrep.dev/r/trailofbits.go.racy-append-to-slice.racy-append-to-slice
+    shortlink: https://sg.run/jkNY
+    semgrep.dev:
+      rule:
+        r_id: 11865
+        rv_id: 833270
+        rule_id: ReUoP7
+        version_id: 1QTPL3x
+        url: https://semgrep.dev/playground/r/1QTPL3x/trailofbits.go.racy-append-to-slice.racy-append-to-slice
+        origin: community
+  patterns:
+  - pattern: |
+      $SLICE = append($SLICE, $ITEM)
+  - pattern-either:
+    - pattern-inside: |
+        var $SLICE []$TYPE
+        ...
+        for ... {
+          ...
+          go func(...) {
+            ...
+            $SLICE = append($SLICE, ...)
+            ...
+          }(...)
+          ...
+        }
+    - pattern-inside: |
+        $SLICE := make([]$TYPE, ...)
+        ...
+        for ... {
+          ...
+          go func(...) {
+            ...
+            $SLICE = append($SLICE, ...)
+            ...
+          }(...)
+          ...
+        }
+  - pattern-not-inside: |
+      $MUTEX.Lock()
+      ...
+      $MUTEX.Unlock()
+  - pattern-not-inside: |
+      $MUTEX.Lock()
+      ...
+      defer $MUTEX.Unlock()
+      ...
+- id: trailofbits.hcl.nomad.tls-hostname-verification-disabled.tls-hostname-verification-disabled
+  message: |
+    Found Nomad `tls` block with server hostname verification disabled
+  languages:
+  - hcl
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-295: Improper Certificate Validation'
+    subcategory:
+    - audit
+    confidence: HIGH
+    likelihood: HIGH
+    impact: HIGH
+    technology:
+    - terraform
+    references:
+    - https://developer.hashicorp.com/nomad/docs/configuration/tls
+    - https://github.com/hashicorp/nomad/blob/v1.8.0/nomad/structs/config/tls.go#L25-L31
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Improper Authentication
+    source: https://semgrep.dev/r/trailofbits.hcl.nomad.tls-hostname-verification-disabled.tls-hostname-verification-disabled
+    shortlink: https://sg.run/WAzn2
+    semgrep.dev:
+      rule:
+        r_id: 150297
+        rv_id: 943191
+        rule_id: 0oULP8X
+        version_id: K3TJz57
+        url: https://semgrep.dev/playground/r/K3TJz57/trailofbits.hcl.nomad.tls-hostname-verification-disabled.tls-hostname-verification-disabled
+        origin: community
+  patterns:
+  - pattern-inside: |
+      tls {
+        ...
+        ca_file = ...
+        ...
+      }
+  - pattern-inside: |
+      tls {
+        ...
+        cert_file = ...
+        ...
+      }
+  - pattern-inside: |
+      tls {
+        ...
+        key_file = ...
+        ...
+      }
+  - pattern-either:
+    - patterns:
+      - pattern-inside: tls { ... }
+      - pattern: verify_server_hostname = false
+    - patterns:
+      - pattern: tls { ... }
+      - pattern-not: |
+          tls {
+            ...
+            verify_server_hostname = $ANY
+            ...
+          }
+- id: trailofbits.python.onnx-session-options.onnx-session-options
+  message: Loading custom operator libraries can result in arbitrary code execution
+  languages:
+  - python
+  severity: ERROR
+  metadata:
+    category: security
+    cwe: 'CWE-676: Use of Potentially Dangerous Function'
+    subcategory:
+    - audit
+    confidence: MEDIUM
+    likelihood: MEDIUM
+    impact: HIGH
+    technology:
+    - onnx
+    description: Potential arbitrary code execution from `ONNX` library loading
+    references:
+    - https://onnxruntime.ai/docs/reference/operators/add-custom-op.html
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Dangerous Method or Function
+    source: https://semgrep.dev/r/trailofbits.python.onnx-session-options.onnx-session-options
+    shortlink: https://sg.run/kRd1
+    semgrep.dev:
+      rule:
+        r_id: 43928
+        rv_id: 833297
+        rule_id: BYUoqy
+        version_id: RGTKG9Y
+        url: https://semgrep.dev/playground/r/RGTKG9Y/trailofbits.python.onnx-session-options.onnx-session-options
+        origin: community
+  patterns:
+  - pattern-inside: |
+      $SESSION = onnxruntime.SessionOptions(...)
+      ...
+  - pattern: $SESSION.register_custom_ops_library(...)
+  - pattern-not: $SESSION.register_custom_ops_library("...")
+- id: trailofbits.ruby.active-record-hardcoded-encryption-key.active-record-hardcoded-encryption-key
+  message: |
+    Found hardcoded ActiveRecord encryption key
+  languages:
+  - ruby
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-798: Use of Hard-coded Credentials'
+    subcategory:
+    - audit
+    confidence: HIGH
+    likelihood: HIGH
+    impact: HIGH
+    technology:
+    - rails
+    - activerecord
+    references:
+    - https://guides.rubyonrails.org/active_record_encryption.html#supported-types
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Hard-coded Secrets
+    source: https://semgrep.dev/r/trailofbits.ruby.active-record-hardcoded-encryption-key.active-record-hardcoded-encryption-key
+    shortlink: https://sg.run/ReqRe
+    semgrep.dev:
+      rule:
+        r_id: 150305
+        rv_id: 943199
+        rule_id: pKU1781
+        version_id: 2KTYQLp
+        url: https://semgrep.dev/playground/r/2KTYQLp/trailofbits.ruby.active-record-hardcoded-encryption-key.active-record-hardcoded-encryption-key
+        origin: community
+  pattern-either:
+  - pattern: config.active_record.encryption.primary_key = "..."
+  - pattern: config.active_record.encryption.primary_key = [..., "...", ...]
+  - pattern: config.active_record.encryption.deterministic_key = "..."
+  - pattern: config.active_record.encryption.deterministic_key = [..., "...", ...]
+- id: trailofbits.python.pickles-in-tensorflow.pickles-in-tensorflow
+  message: Tensorflow's low-level load function may result in arbitrary code execution.
+  languages:
+  - python
+  severity: ERROR
+  metadata:
+    category: security
+    cwe: 'CWE-502: Deserialization of Untrusted Data'
+    subcategory:
+    - vuln
+    confidence: MEDIUM
+    likelihood: MEDIUM
+    impact: HIGH
+    technology:
+    - keras
+    description: Potential arbitrary code execution from tensorflow's load function
+    references:
+    - https://blog.trailofbits.com/2021/03/15/never-a-dill-moment-exploiting-machine-learning-pickle-files/
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - 'Insecure Deserialization '
+    source: https://semgrep.dev/r/trailofbits.python.pickles-in-tensorflow.pickles-in-tensorflow
+    shortlink: https://sg.run/wd5jn
+    semgrep.dev:
+      rule:
+        r_id: 124729
+        rv_id: 833305
+        rule_id: DbU6e7r
+        version_id: l4TyO1n
+        url: https://semgrep.dev/playground/r/l4TyO1n/trailofbits.python.pickles-in-tensorflow.pickles-in-tensorflow
+        origin: community
+  patterns:
+  - pattern: tensorflow.saved_model.load(...)
+  - pattern-not: tensorflow.saved_model.load("...", ...)
+- id: trailofbits.python.pickles-in-numpy.pickles-in-numpy
+  message: Functions reliant on pickle can result in arbitrary code execution.  Consider
+    using fickling or switching to a safer serialization method
+  languages:
+  - python
+  severity: ERROR
+  metadata:
+    category: security
+    cwe: 'CWE-502: Deserialization of Untrusted Data'
+    subcategory:
+    - vuln
+    confidence: MEDIUM
+    likelihood: MEDIUM
+    impact: HIGH
+    technology:
+    - numpy
+    description: Potential arbitrary code execution from `NumPy` functions reliant
+      on pickling
+    references:
+    - https://blog.trailofbits.com/2021/03/15/never-a-dill-moment-exploiting-machine-learning-pickle-files/
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - 'Insecure Deserialization '
+    source: https://semgrep.dev/r/trailofbits.python.pickles-in-numpy.pickles-in-numpy
+    shortlink: https://sg.run/ryKe
+    semgrep.dev:
+      rule:
+        r_id: 17169
+        rv_id: 833301
+        rule_id: lBUWjy
+        version_id: WrTdpJ9
+        url: https://semgrep.dev/playground/r/WrTdpJ9/trailofbits.python.pickles-in-numpy.pickles-in-numpy
+        origin: community
+  patterns:
+  - pattern: numpy.load(..., allow_pickle=$VALUE, ...)
+  - pattern-not: numpy.load("...", ...)
+  - pattern-not: numpy.load(..., file="...", ...)
+  - metavariable-pattern:
+      metavariable: $VALUE
+      patterns:
+      - pattern-not: |
+          False
+      - pattern-not: |
+          []
+      - pattern-not: |
+          None
+      - pattern-not: |
+          ""
+- id: trailofbits.ruby.faraday-disable-verification.faraday-disable-verification
+  message: |
+    Found Faraday HTTP request disabling SSL/TLS verification.
+  languages:
+  - ruby
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-295: Improper Certificate Validation'
+    subcategory:
+    - audit
+    confidence: HIGH
+    likelihood: HIGH
+    impact: HIGH
+    technology:
+    - faraday
+    references:
+    - https://lostisland.github.io/faraday/#/customization/ssl-options
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Improper Authentication
+    source: https://semgrep.dev/r/trailofbits.ruby.faraday-disable-verification.faraday-disable-verification
+    shortlink: https://sg.run/Abko8
+    semgrep.dev:
+      rule:
+        r_id: 150306
+        rv_id: 943200
+        rule_id: 2ZUzJZG
+        version_id: X0TLwgY
+        url: https://semgrep.dev/playground/r/X0TLwgY/trailofbits.ruby.faraday-disable-verification.faraday-disable-verification
+        origin: community
+  pattern-either:
+  - pattern: 'Faraday.new(..., ssl: { ..., verify: false, ... }, ...)'
+  - pattern: 'Faraday.new(..., ssl: { ..., verify_hostname: false, ... }, ...)'
+  - pattern: 'Faraday.new(..., ssl: { ..., verify_mode: OpenSSL::SSL::VERIFY_NONE,
+      ... }, ...)'
+- id: trailofbits.hcl.terraform.aws-oidc-role-policy-duplicate-condition.aws-oidc-role-policy-duplicate-condition
+  message: |
+    Found AWS role policy for GitHub Actions with duplicate condition.
+    This overrides previous conditions, and the last condition with the
+    duplicated key "wins." This likely breaks access controls and allows
+    unauthorized access.
+  languages:
+  - hcl
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-284: Improper Access Control'
+    subcategory:
+    - audit
+    confidence: HIGH
+    likelihood: HIGH
+    impact: HIGH
+    technology:
+    - terraform
+    - aws
+    references:
+    - https://securitylabs.datadoghq.com/articles/exploring-github-to-aws-keyless-authentication-flaws/
+    - https://www.rezonate.io/blog/github-misconfigurations-put-gcp-aws-in-account-takeover-risk
+    - https://github.com/Rezonate-io/github-oidc-checker/
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Improper Authorization
+    source: https://semgrep.dev/r/trailofbits.hcl.terraform.aws-oidc-role-policy-duplicate-condition.aws-oidc-role-policy-duplicate-condition
+    shortlink: https://sg.run/0oKDj
+    semgrep.dev:
+      rule:
+        r_id: 150298
+        rv_id: 943192
+        rule_id: KxUvWD0
+        version_id: qkT41WW
+        url: https://semgrep.dev/playground/r/qkT41WW/trailofbits.hcl.terraform.aws-oidc-role-policy-duplicate-condition.aws-oidc-role-policy-duplicate-condition
+        origin: community
+  patterns:
+  - pattern-inside: |
+      {
+        ...
+        Statement = [...]
+        ...
+      }
+  - pattern-inside: |
+      {
+        ...,
+        "Action": "sts:AssumeRoleWithWebIdentity",
+        ...
+      }
+  - pattern-either:
+    - pattern: |
+        {
+          ...
+          "Condition": {
+              ...
+              "$KEY": {...}
+              ...
+              "$KEY": {...}
+              ...
+          }
+          ...
+        }
+    - pattern: |
+        {
+          ...
+          "Condition": {
+              ...
+              "StringEquals": {
+                  ...
+                  "$KEY": ...,
+                  ...
+                  "$KEY": ...,
+                  ...
+              }
+              ...
+          }
+          ...
+        }
+    - pattern: |
+        {
+          ...
+          "Condition": {
+              ...
+              "StringLike": {
+                  ...
+                  "$KEY": ...,
+                  ...
+                  "$KEY": ...,
+                  ...
+              }
+              ...
+          }
+          ...
+        }
+- id: trailofbits.javascript.apollo-graphql.v3-cors.v3-bad-cors
+  languages:
+  - js
+  - ts
+  message: The Apollo GraphQL server is setup with a CORS policy that reflects any
+    origin, or with a regex that has known flaws.
+  severity: ERROR
+  metadata:
+    category: security
+    cwe: 'CWE-942: Permissive Cross-domain Policy with Untrusted Domains'
+    subcategory:
+    - vuln
+    confidence: MEDIUM
+    likelihood: HIGH
+    impact: HIGH
+    technology:
+    - graphql
+    - apollo-graphql-server
+    description: Bad CORS policy
+    references:
+    - https://www.apollographql.com/docs/apollo-server/v3/security/cors#configuring-cors-options-for-apollo-server
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Improper Validation
+    source: https://semgrep.dev/r/trailofbits.javascript.apollo-graphql.v3-cors.v3-bad-cors
+    shortlink: https://sg.run/Zo3x
+    semgrep.dev:
+      rule:
+        r_id: 60579
+        rv_id: 833284
+        rule_id: EwUZNW
+        version_id: nWTy4kP
+        url: https://semgrep.dev/playground/r/nWTy4kP/trailofbits.javascript.apollo-graphql.v3-cors.v3-bad-cors
+        origin: community
+  mode: taint
+  pattern-sources:
+  - patterns:
+    - pattern-inside: |
+        { origin: $BAD_CORS_ORIGIN }
+    - metavariable-pattern:
+        metavariable: $BAD_CORS_ORIGIN
+        pattern-either:
+        - pattern: |
+            true
+        - patterns:
+          - pattern-either:
+            - pattern: |
+                $CORS_SINGLE_ORIGIN
+            - pattern: |
+                [..., $CORS_SINGLE_ORIGIN, ...]
+          - metavariable-pattern:
+              metavariable: $CORS_SINGLE_ORIGIN
+              pattern-either:
+              - pattern-regex: ^/.*[^\\]\..*/$
+              - pattern-regex: ^/.*[^$]/$
+              - pattern: |
+                  'null'
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - pattern-inside: |
+          $X = require('apollo-server');
+          ...
+      - pattern-inside: |
+          import 'apollo-server';
+          ...
+    - pattern: |
+        new ApolloServer({..., cors: $CORS_ORIGIN, ...})
+    - focus-metavariable: $CORS_ORIGIN
+- id: trailofbits.python.pickles-in-pandas.pickles-in-pandas
+  message: Functions reliant on pickle can result in arbitrary code execution. Consider
+    using fickling or switching to a safer serialization method
+  languages:
+  - python
+  severity: ERROR
+  metadata:
+    category: security
+    cwe: 'CWE-502: Deserialization of Untrusted Data'
+    subcategory:
+    - vuln
+    confidence: MEDIUM
+    likelihood: MEDIUM
+    impact: HIGH
+    technology:
+    - pandas
+    description: Potential arbitrary code execution from `Pandas` functions reliant
+      on pickling
+    references:
+    - https://blog.trailofbits.com/2021/03/15/never-a-dill-moment-exploiting-machine-learning-pickle-files/
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - 'Insecure Deserialization '
+    source: https://semgrep.dev/r/trailofbits.python.pickles-in-pandas.pickles-in-pandas
+    shortlink: https://sg.run/bXQW
+    semgrep.dev:
+      rule:
+        r_id: 17170
+        rv_id: 833302
+        rule_id: PeU06j
+        version_id: 0bTwbqN
+        url: https://semgrep.dev/playground/r/0bTwbqN/trailofbits.python.pickles-in-pandas.pickles-in-pandas
+        origin: community
+  patterns:
+  - pattern-either:
+    - pattern: pandas.read_pickle(...)
+    - pattern: pandas.to_pickle(...)
+    - patterns:
+      - pattern-inside: |
+          import pandas
+          ...
+      - pattern: $SMTH.to_pickle(...)
+  - pattern-not: pandas.read_pickle("...")
+  - pattern-not: pandas.to_pickle(..., "...")
+  - pattern-not: $SMTH.to_pickle("...")
+- id: trailofbits.generic.container-privileged.container-privileged
+  message: Found container command (docker, podman) with extended privileges
+  languages:
+  - generic
+  severity: WARNING
+  metadata:
+    category: security
+    subcategory:
+    - audit
+    technology:
+    - shell
+    cwe: 'CWE-250: Execution with Unnecessary Privileges'
+    confidence: MEDIUM
+    likelihood: MEDIUM
+    impact: HIGH
+    references:
+    - https://docs.docker.com/engine/reference/commandline/run/
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Improper Authorization
+    source: https://semgrep.dev/r/trailofbits.generic.container-privileged.container-privileged
+    shortlink: https://sg.run/qNLGR
+    semgrep.dev:
+      rule:
+        r_id: 113212
+        rv_id: 833251
+        rule_id: ReUD0BO
+        version_id: 5PTyDrK
+        url: https://semgrep.dev/playground/r/5PTyDrK/trailofbits.generic.container-privileged.container-privileged
+        origin: community
+  pattern-either:
+  - pattern: docker ... --privileged
+  - pattern: docker ... --cap-add=ALL
+  - pattern: docker ... --cap-add=SYS_ADMIN
+  - pattern: docker ... --cap-add=SYS_MODULE
+  - pattern: docker ... --net=host
+  - pattern: docker ... --userns=host
+  - pattern: docker ... --pid=host
+  - pattern: docker ... --ipc=host
+  - pattern: docker ... --security-opt seccomp=unconfined
+  - pattern: docker ... --security-opt apparmor=unconfined
+  - pattern: podman ... --privileged
+  - pattern: podman ... --cap-add=ALL
+  - pattern: podman ... --cap-add=SYS_ADMIN
+  - pattern: podman ... --cap-add=SYS_MODULE
+  - pattern: podman ... --net=host
+  - pattern: podman ... --userns=host
+  - pattern: podman ... --pid=host
+  - pattern: podman ... --ipc=host
+  - pattern: podman ... --security-opt seccomp=unconfined
+  - pattern: podman ... --security-opt apparmor=unconfined
+- id: trailofbits.javascript.apollo-graphql.v3-cors-express.v3-express-no-cors
+  languages:
+  - js
+  - ts
+  message: The Apollo GraphQL server lacks a CORS policy. By default, the server uses
+    the Access-Control-Allow-Origin HTTP header with the wildcard value (*).
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-942: Permissive Cross-domain Policy with Untrusted Domains'
+    subcategory:
+    - vuln
+    confidence: HIGH
+    likelihood: LOW
+    impact: LOW
+    technology:
+    - graphql
+    - apollo-graphql-server
+    - apollo-graphql-server-v3
+    description: Lack of CORS policy
+    references:
+    - https://www.apollographql.com/docs/apollo-server/v3/security/cors#configuring-cors-options-for-apollo-server
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Improper Validation
+    source: https://semgrep.dev/r/trailofbits.javascript.apollo-graphql.v3-cors-express.v3-express-no-cors
+    shortlink: https://sg.run/eNE0
+    semgrep.dev:
+      rule:
+        r_id: 60576
+        rv_id: 833281
+        rule_id: d8UYAJ
+        version_id: vdTOzdO
+        url: https://semgrep.dev/playground/r/vdTOzdO/trailofbits.javascript.apollo-graphql.v3-cors-express.v3-express-no-cors
+        origin: community
+  patterns:
+  - pattern-either:
+    - pattern-inside: |
+        $X = require('apollo-server-express');
+        ...
+    - pattern-inside: |
+        import 'apollo-server-express';
+        ...
+  - pattern: |
+      $X = new ApolloServer({...})
+  - pattern-not-inside: |
+      $X = new ApolloServer({...})
+      ...
+      $X.applyMiddleware({..., cors: ..., ...})
+- id: trailofbits.python.pickles-in-pytorch-distributed.pickles-in-pytorch-distributed
+  message: Functions reliant on pickle can result in arbitrary code execution
+  languages:
+  - python
+  severity: ERROR
+  metadata:
+    category: security
+    cwe: 'CWE-502: Deserialization of Untrusted Data'
+    subcategory:
+    - vuln
+    confidence: MEDIUM
+    likelihood: MEDIUM
+    impact: HIGH
+    technology:
+    - pytorch
+    description: Potential arbitrary code execution from `PyTorch.Distributed` functions
+      reliant on pickling
+    references:
+    - https://blog.trailofbits.com/2021/03/15/never-a-dill-moment-exploiting-machine-learning-pickle-files/
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - 'Insecure Deserialization '
+    source: https://semgrep.dev/r/trailofbits.python.pickles-in-pytorch-distributed.pickles-in-pytorch-distributed
+    shortlink: https://sg.run/ZZxW
+    semgrep.dev:
+      rule:
+        r_id: 44135
+        rv_id: 833303
+        rule_id: qNUrw1
+        version_id: K3Trq3x
+        url: https://semgrep.dev/playground/r/K3Trq3x/trailofbits.python.pickles-in-pytorch-distributed.pickles-in-pytorch-distributed
+        origin: community
+  patterns:
+  - pattern-either:
+    - pattern: torch.distributed.broadcast_object_list(...)
+    - pattern: torch.distributed.all_gather_object(...)
+    - pattern: torch.distributed.gather_object(...)
+    - pattern: torch.distributed.scatter_object_list(...)
+- id: trailofbits.generic.redis-unencrypted-transport.redis-unencrypted-transport
+  message: |
+    Found unencrypted Redis connection, prefer TLS encrypted `rediss://` transport
+  languages:
+  - generic
+  severity: WARNING
+  metadata:
+    category: security
+    subcategory:
+    - audit
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    confidence: HIGH
+    likelihood: HIGH
+    impact: HIGH
+    technology:
+    - redis
+    references:
+    - https://redis.io/docs/latest/develop/connect/cli/#host-port-password-and-database
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/trailofbits.generic.redis-unencrypted-transport.redis-unencrypted-transport
+    shortlink: https://sg.run/GdP8q
+    semgrep.dev:
+      rule:
+        r_id: 150292
+        rv_id: 943186
+        rule_id: ReUD46j
+        version_id: A8TJrek
+        url: https://semgrep.dev/playground/r/A8TJrek/trailofbits.generic.redis-unencrypted-transport.redis-unencrypted-transport
+        origin: community
+  options:
+    generic_ellipsis_max_span: 0
+  pattern: redis://...
+- id: trailofbits.go.eth-rpc-tracetransaction.eth-rpc-tracetransaction
+  message: 'Using built-in transaction tracers can be dangerous if measures are not
+    taken to filter out reverted call frames.  Review the related code to ensure the
+    following properties:  1. Reverted call frames and their associated subtraces
+    are filtered out from any analysis.   2. The transaction being traced is from
+    a finalized block.'
+  severity: WARNING
+  languages:
+  - go
+  metadata:
+    category: security
+    technology:
+    - ethereum
+    - blockchain
+    - geth
+    subcategory:
+    - audit
+    cwe: 'CWE-1284: Improper Validation of Specified Quantity in Input'
+    confidence: LOW
+    impact: HIGH
+    likelihood: MEDIUM
+    description: Detects attempts to extract trace information from an EVM transaction
+      or block. In exchange or bridge applications, extra logic must be implemented
+      encapsulating these endpoints to prevent the values transferred during reverted
+      call frames from being counted.
+    references:
+    - https://blog.trailofbits.com/2023/08/23/the-engineers-guide-to-blockchain-finality/
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Other
+    source: https://semgrep.dev/r/trailofbits.go.eth-rpc-tracetransaction.eth-rpc-tracetransaction
+    shortlink: https://sg.run/r6XzP
+    semgrep.dev:
+      rule:
+        r_id: 137469
+        rv_id: 833262
+        rule_id: WAUWXz3
+        version_id: YDTl0k0
+        url: https://semgrep.dev/playground/r/YDTl0k0/trailofbits.go.eth-rpc-tracetransaction.eth-rpc-tracetransaction
+        origin: community
+  pattern-either:
+  - pattern: $RECEIVER.TraceTransaction($CTX, $FILTER, $TRACECONF)
+  - pattern: $RECEIVER.TraceBlockByNumber($CTX, $FILTER, $TRACECONF)
+  - pattern: $RECEIVER.TraceBlockByHash($CTX, $FILTER, $TRACECONF)
+  - pattern: $RECEIVER.TraceBlock($CTX, $FILTER, $TRACECONF)
+  - pattern: $RECEIVER.TraceChain($CTX, ...)
+  - pattern-regex: .*debug_traceBlock.*
+  - pattern-regex: .*debug_traceTransaction.*
+  - pattern-regex: .*debug_traceCall.*
+  - pattern-regex: .*debug_traceBlockByNumber.*
+  - pattern-regex: .*debug_traceBlockByHash.*
+  - pattern-regex: .*trace_block.*
+  - pattern-regex: .*trace_transaction.*
+  - pattern-regex: .*trace_replayBlockTransactions.*
+  - pattern-regex: .*trace_replayTransaction.*
+  - pattern-regex: .*trace_filter.*
+  - pattern-regex: .*trace_call.*
+  - pattern-regex: .*trace_callMany.*
+  - pattern-regex: .*trace_get.*
+- id: trailofbits.generic.openssl-insecure-flags.openssl-insecure-flags
+  message: Found `openssl` command using insecure flags
+  languages:
+  - generic
+  severity: WARNING
+  metadata:
+    category: security
+    subcategory:
+    - audit
+    technology:
+    - shell
+    cwe: 'CWE-295: Improper Certificate Validation'
+    confidence: MEDIUM
+    likelihood: MEDIUM
+    impact: HIGH
+    references:
+    - https://www.openssl.org/docs/manmaster/man1/
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Improper Authentication
+    source: https://semgrep.dev/r/trailofbits.generic.openssl-insecure-flags.openssl-insecure-flags
+    shortlink: https://sg.run/pKL5k
+    semgrep.dev:
+      rule:
+        r_id: 113218
+        rv_id: 833257
+        rule_id: KxUvKPY
+        version_id: WrTdpG9
+        url: https://semgrep.dev/playground/r/WrTdpG9/trailofbits.generic.openssl-insecure-flags.openssl-insecure-flags
+        origin: community
+  pattern-either:
+  - pattern: 'openssl ... -pass pass:'
+  - pattern: 'openssl ... -passin pass:'
+  - pattern: 'openssl ... -passout pass:'
+  - pattern: 'openssl ... -nodes '
+  - pattern: 'openssl ... -noenc '
+  - pattern: 'openssl ... -sha1 '
+- id: trailofbits.generic.node-disable-certificate-validation.node-disable-certificate-validation
+  message: |
+    Setting this environment variable disables TLS certificate validation.
+    This makes TLS, and HTTPS by extension, insecure. The use of this
+    environment variable is strongly discouraged.
+  languages:
+  - generic
+  severity: WARNING
+  metadata:
+    category: security
+    subcategory:
+    - audit
+    cwe: 'CWE-295: Improper Certificate Validation'
+    confidence: HIGH
+    likelihood: HIGH
+    impact: HIGH
+    technology:
+    - nodejs
+    references:
+    - https://nodejs.org/api/cli.html#node_tls_reject_unauthorizedvalue
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Improper Authentication
+    source: https://semgrep.dev/r/trailofbits.generic.node-disable-certificate-validation.node-disable-certificate-validation
+    shortlink: https://sg.run/JDGny
+    semgrep.dev:
+      rule:
+        r_id: 150290
+        rv_id: 943184
+        rule_id: 5rUdgRW
+        version_id: GxTPxzL
+        url: https://semgrep.dev/playground/r/GxTPxzL/trailofbits.generic.node-disable-certificate-validation.node-disable-certificate-validation
+        origin: community
+  pattern-either:
+  - pattern: NODE_TLS_REJECT_UNAUTHORIZED=0
+  - pattern: NODE_TLS_REJECT_UNAUTHORIZED='0'
+  - pattern: NODE_TLS_REJECT_UNAUTHORIZED="0"
+- id: trailofbits.generic.wget-no-check-certificate.wget-no-check-certificate
+  message: Found `wget` command disabling SSL verification
+  languages:
+  - generic
+  severity: WARNING
+  metadata:
+    category: security
+    subcategory:
+    - audit
+    technology:
+    - shell
+    cwe: 'CWE-295: Improper Certificate Validation'
+    confidence: MEDIUM
+    likelihood: MEDIUM
+    impact: HIGH
+    references:
+    - https://linux.die.net/man/1/wget
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Improper Authentication
+    source: https://semgrep.dev/r/trailofbits.generic.wget-no-check-certificate.wget-no-check-certificate
+    shortlink: https://sg.run/j2WyD
+    semgrep.dev:
+      rule:
+        r_id: 113221
+        rv_id: 833260
+        rule_id: PeUJREx
+        version_id: qkTQnL3
+        url: https://semgrep.dev/playground/r/qkTQnL3/trailofbits.generic.wget-no-check-certificate.wget-no-check-certificate
+        origin: community
+  pattern-either:
+  - pattern: wget ... --no-check-certificate
+  - pattern: wget ... --no-hsts
+- id: trailofbits.generic.mongodb-insecure-transport.mongodb-insecure-transport
+  message: |
+    Found insecure MongoDB connection, prefer TLS encrypted transport by
+    setting the `tls=true` connection option and ensuring proper verification
+  languages:
+  - regex
+  severity: WARNING
+  metadata:
+    category: security
+    subcategory:
+    - audit
+    cwe: 'CWE-295: Improper Certificate Validation'
+    confidence: HIGH
+    likelihood: HIGH
+    impact: HIGH
+    technology:
+    - mongodb
+    references:
+    - https://www.mongodb.com/docs/manual/reference/connection-string/#connection-options
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Improper Authentication
+    source: https://semgrep.dev/r/trailofbits.generic.mongodb-insecure-transport.mongodb-insecure-transport
+    shortlink: https://sg.run/4b6q5
+    semgrep.dev:
+      rule:
+        r_id: 150288
+        rv_id: 943182
+        rule_id: PeUJPl9
+        version_id: JdTD3Lg
+        url: https://semgrep.dev/playground/r/JdTD3Lg/trailofbits.generic.mongodb-insecure-transport.mongodb-insecure-transport
+        origin: community
+  pattern-either:
+  - patterns:
+    - pattern-regex: (?i)mongodb://.+$
+    - pattern-not-regex: (?i)(?:(.)?)?mongodb://.+[?&]tls=true(?:\g{1}|$|&).*
+    - pattern-not-regex: (?i)(?:(.)?)?mongodb://.+[?&]ssl=true(?:\g{1}|$|&).*
+  - pattern-regex: (?i)mongodb://.+[?&]tlsAllowInvalidCertificates=true.*$
+  - pattern-regex: (?i)mongodb://.+[?&]tlsAllowInvalidHostnames=true.*$
+  - pattern-regex: (?i)mongodb://.+[?&]tlsInsecure=true.*$
+- id: trailofbits.generic.curl-unencrypted-url.curl-unencrypted-url
+  message: Found `curl` command with unencrypted URL (e.g. HTTP, FTP, etc.)
+  languages:
+  - generic
+  severity: WARNING
+  metadata:
+    category: security
+    subcategory:
+    - audit
+    technology:
+    - shell
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    confidence: MEDIUM
+    likelihood: MEDIUM
+    impact: HIGH
+    references:
+    - https://curl.se/docs/manpage.html
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/trailofbits.generic.curl-unencrypted-url.curl-unencrypted-url
+    shortlink: https://sg.run/6JldW
+    semgrep.dev:
+      rule:
+        r_id: 113215
+        rv_id: 975175
+        rule_id: DbU6R39
+        version_id: 1QTokGb
+        url: https://semgrep.dev/playground/r/1QTokGb/trailofbits.generic.curl-unencrypted-url.curl-unencrypted-url
+        origin: community
+  patterns:
+  - pattern-either:
+    - pattern: curl ... http://
+    - pattern: curl ... ftp://
+  - pattern-not-inside: curl ... http://127.0.0.1
+  - pattern-not-inside: curl ... http://localhost
+  - pattern-not-inside: curl ... http://169.254.169.254
+  - pattern-not-inside: curl ... http://[fd00:ec2::254]
+  - pattern-not-inside: curl ... http://metadata.google.internal
+- id: trailofbits.generic.mysql-insecure-sslmode.mysql-insecure-sslmode
+  message: |
+    Found MySQL connection string disabling SSL verification
+  languages:
+  - regex
+  severity: WARNING
+  metadata:
+    category: security
+    subcategory:
+    - audit
+    cwe: 'CWE-295: Improper Certificate Validation'
+    confidence: MEDIUM
+    likelihood: HIGH
+    impact: HIGH
+    technology:
+    - mysql
+    references:
+    - https://dev.mysql.com/doc/connector-net/en/connector-net-8-0-connection-options.html
+    - https://dev.mysql.com/doc/connector-j/en/connector-j-connp-props-security.html
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Improper Authentication
+    source: https://semgrep.dev/r/trailofbits.generic.mysql-insecure-sslmode.mysql-insecure-sslmode
+    shortlink: https://sg.run/Pe0nz
+    semgrep.dev:
+      rule:
+        r_id: 150289
+        rv_id: 943183
+        rule_id: JDUN9Bb
+        version_id: 5PT9PLn
+        url: https://semgrep.dev/playground/r/5PT9PLn/trailofbits.generic.mysql-insecure-sslmode.mysql-insecure-sslmode
+        origin: community
+  pattern-either:
+  - pattern-regex: (?i)Ssl[ -]?Mode=(Disabled|None|Preferred)
+  - pattern-regex: (?i)sslMode=(DISABLED|PREFERRED)
+  - pattern-regex: (?i)useSSL=false
+- id: trailofbits.generic.postgres-insecure-sslmode.postgres-insecure-sslmode
+  message: |
+    Found PostgreSQL connection string disabling SSL verification
+  languages:
+  - regex
+  severity: WARNING
+  metadata:
+    category: security
+    subcategory:
+    - audit
+    cwe: 'CWE-295: Improper Certificate Validation'
+    confidence: HIGH
+    likelihood: HIGH
+    impact: HIGH
+    technology:
+    - postgresql
+    references:
+    - https://www.postgresql.org/docs/current/libpq-connect.html
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Improper Authentication
+    source: https://semgrep.dev/r/trailofbits.generic.postgres-insecure-sslmode.postgres-insecure-sslmode
+    shortlink: https://sg.run/5rol0
+    semgrep.dev:
+      rule:
+        r_id: 150291
+        rv_id: 943185
+        rule_id: GdUvdn1
+        version_id: RGTAQqD
+        url: https://semgrep.dev/playground/r/RGTAQqD/trailofbits.generic.postgres-insecure-sslmode.postgres-insecure-sslmode
+        origin: community
+  pattern-either:
+  - pattern-regex: (?i)postgresql://.+[?&]sslmode=(disable|allow|prefer).*$
+  - pattern-regex: (?i)postgresql://.+[?&]requiressl=0.*$
+  - pattern-regex: (?i)postgresql://.+[?&]ssl=false.*$
+  - pattern-regex: (?i)postgres://.+[?&]sslmode=(disable|allow|prefer).*$
+  - pattern-regex: (?i)postgres://.+[?&]requiressl=0.*$
+  - pattern-regex: (?i)postgres://.+[?&]ssl=false.*$
+- id: trailofbits.generic.installer-allow-untrusted.installer-allow-untrusted
+  message: Found `installer` command allowing untrusted installations
+  languages:
+  - generic
+  severity: WARNING
+  metadata:
+    category: security
+    subcategory:
+    - audit
+    technology:
+    - shell
+    cwe: 'CWE-494: Download of Code Without Integrity Check'
+    confidence: HIGH
+    likelihood: HIGH
+    impact: HIGH
+    references:
+    - https://ss64.com/mac/installer.html
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Cryptographic Issues
+    source: https://semgrep.dev/r/trailofbits.generic.installer-allow-untrusted.installer-allow-untrusted
+    shortlink: https://sg.run/zdLlk
+    semgrep.dev:
+      rule:
+        r_id: 113217
+        rv_id: 833256
+        rule_id: 0oULKQE
+        version_id: DkTG0Xg
+        url: https://semgrep.dev/playground/r/DkTG0Xg/trailofbits.generic.installer-allow-untrusted.installer-allow-untrusted
+        origin: community
+  pattern: installer ... -allowUntrusted
+- id: trailofbits.generic.ssh-disable-host-key-checking.ssh-disable-host-key-checking
+  message: Found `ssh` command disabling host key checking
+  languages:
+  - generic
+  severity: WARNING
+  metadata:
+    category: security
+    subcategory:
+    - audit
+    technology:
+    - shell
+    cwe: 'CWE-295: Improper Certificate Validation'
+    confidence: MEDIUM
+    likelihood: MEDIUM
+    impact: HIGH
+    references:
+    - https://man7.org/linux/man-pages/man1/ssh.1.html
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Improper Authentication
+    source: https://semgrep.dev/r/trailofbits.generic.ssh-disable-host-key-checking.ssh-disable-host-key-checking
+    shortlink: https://sg.run/2ZWd8
+    semgrep.dev:
+      rule:
+        r_id: 113219
+        rv_id: 833258
+        rule_id: qNU2R9X
+        version_id: 0bTwbgN
+        url: https://semgrep.dev/playground/r/0bTwbgN/trailofbits.generic.ssh-disable-host-key-checking.ssh-disable-host-key-checking
+        origin: community
+  pattern: ssh ... StrictHostKeyChecking=no
+- id: trailofbits.generic.amqp-unencrypted-transport.amqp-unencrypted-transport
+  message: |
+    Found unencrypted AMQP connection, prefer TLS encrypted `amqps://` transport
+  languages:
+  - generic
+  severity: WARNING
+  metadata:
+    category: security
+    subcategory:
+    - audit
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    confidence: HIGH
+    likelihood: HIGH
+    impact: HIGH
+    technology:
+    - amqp
+    - rabbitmq
+    references:
+    - https://www.rabbitmq.com/docs/uri-spec#the-amqps-uri-scheme
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/trailofbits.generic.amqp-unencrypted-transport.amqp-unencrypted-transport
+    shortlink: https://sg.run/3qYKK
+    semgrep.dev:
+      rule:
+        r_id: 150287
+        rv_id: 943181
+        rule_id: lBU4nKK
+        version_id: PkTQWoY
+        url: https://semgrep.dev/playground/r/PkTQWoY/trailofbits.generic.amqp-unencrypted-transport.amqp-unencrypted-transport
+        origin: community
+  options:
+    generic_ellipsis_max_span: 0
+  pattern: amqp://...
+- id: trailofbits.go.eth-txreceipt-status.eth-txreceipt-status
+  message: 'A transaction receipt''s status is inspected using `$RECEIVER.Status()`.
+    For bridges and exchanges, this is a high-risk pattern because even though the
+    transaction was successful, calls within the transaction may have failed. Review
+    the related code to ensure the following properties:  1. The receipt''s success
+    is not being used as a verification measure. 2. The transaction being inspected
+    is from a finalized block.'
+  severity: WARNING
+  languages:
+  - go
+  metadata:
+    category: security
+    confidence: LOW
+    impact: HIGH
+    likelihood: MEDIUM
+    technology:
+    - ethereum
+    - blockchain
+    - geth
+    subcategory:
+    - audit
+    cwe: 'CWE-437: Incomplete Model of Endpoint Features'
+    description: Detects when a transaction receipt's status is read
+    references:
+    - https://blog.trailofbits.com/2023/08/23/the-engineers-guide-to-blockchain-finality/
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Other
+    source: https://semgrep.dev/r/trailofbits.go.eth-txreceipt-status.eth-txreceipt-status
+    shortlink: https://sg.run/bwGlP
+    semgrep.dev:
+      rule:
+        r_id: 137470
+        rv_id: 833263
+        rule_id: 0oUL8xK
+        version_id: 6xTDgGX
+        url: https://semgrep.dev/playground/r/6xTDgGX/trailofbits.go.eth-txreceipt-status.eth-txreceipt-status
+        origin: community
+  patterns:
+  - pattern-inside: |
+      import "github.com/ethereum/go-ethereum/core/types"
+      ...
+  - pattern: |
+      ($RECEIVER : Receipt).Status
+- id: trailofbits.generic.tar-insecure-flags.tar-insecure-flags
+  message: Found `tar` command using insecure flags
+  languages:
+  - generic
+  severity: WARNING
+  metadata:
+    category: security
+    subcategory:
+    - audit
+    technology:
+    - shell
+    cwe: 'CWE-73: External Control of File Name or Path'
+    confidence: MEDIUM
+    likelihood: MEDIUM
+    impact: HIGH
+    references:
+    - https://man7.org/linux/man-pages/man1/tar.1.html
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Path Traversal
+    source: https://semgrep.dev/r/trailofbits.generic.tar-insecure-flags.tar-insecure-flags
+    shortlink: https://sg.run/X5RyN
+    semgrep.dev:
+      rule:
+        r_id: 113220
+        rv_id: 833259
+        rule_id: lBU4JeW
+        version_id: K3Trq8x
+        url: https://semgrep.dev/playground/r/K3Trq8x/trailofbits.generic.tar-insecure-flags.tar-insecure-flags
+        origin: community
+  options:
+    generic_ellipsis_max_span: 0
+  pattern-either:
+  - pattern: 'tar ... -P '
+  - pattern: tar ... --absolute-paths
+  - pattern: tar ... --absolute-names
+  - pattern: 'tar ... --passphrase '
+- id: trailofbits.generic.wget-unencrypted-url.wget-unencrypted-url
+  message: Found `wget` command  with unencrypted URL (e.g. HTTP, FTP, etc.)
+  languages:
+  - generic
+  severity: WARNING
+  metadata:
+    category: security
+    subcategory:
+    - audit
+    technology:
+    - shell
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    confidence: MEDIUM
+    likelihood: MEDIUM
+    impact: HIGH
+    references:
+    - https://linux.die.net/man/1/wget
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/trailofbits.generic.wget-unencrypted-url.wget-unencrypted-url
+    shortlink: https://sg.run/10Ddk
+    semgrep.dev:
+      rule:
+        r_id: 113222
+        rv_id: 833261
+        rule_id: JDUNz2o
+        version_id: l4TyOon
+        url: https://semgrep.dev/playground/r/l4TyOon/trailofbits.generic.wget-unencrypted-url.wget-unencrypted-url
+        origin: community
+  pattern-either:
+  - pattern: wget ... http://
+  - pattern: wget ... ftp://
+- id: trailofbits.go.unmarshal_tag_is_omitempty.unmarshal-tag-is-omitempty
+  message: Struct field can be unmarshaled with the `omitempty` key. The developer
+    likely wanted to write ",omitempty" instead.
+  languages:
+  - go
+  severity: WARNING
+  metadata:
+    cwe: 'CWE-172: Encoding Error'
+    category: security
+    subcategory:
+    - vuln
+    confidence: HIGH
+    likelihood: MEDIUM
+    impact: LOW
+    technology:
+    - --no-technology--
+    references:
+    - https://blog.trailofbits.com/
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Other
+    source: https://semgrep.dev/r/trailofbits.go.unmarshal_tag_is_omitempty.unmarshal-tag-is-omitempty
+    shortlink: https://sg.run/Dkdoq
+    semgrep.dev:
+      rule:
+        r_id: 193796
+        rv_id: 1028641
+        rule_id: ZqU6N5y
+        version_id: 6xTJ52D
+        url: https://semgrep.dev/playground/r/6xTJ52D/trailofbits.go.unmarshal_tag_is_omitempty.unmarshal-tag-is-omitempty
+        origin: community
+  patterns:
+  - pattern: |
+      type $T1 struct {
+        ...
+        $X $T2 `$TAG`
+        ...
+      }
+  - focus-metavariable: $TAG
+  - metavariable-regex:
+      metavariable: $TAG
+      regex: .*(json|yaml|xml):"omitempty
+- id: trailofbits.generic.gpg-insecure-flags.gpg-insecure-flags
+  message: Found `gpg` command using insecure flags
+  languages:
+  - generic
+  severity: WARNING
+  metadata:
+    category: security
+    subcategory:
+    - audit
+    technology:
+    - shell
+    cwe: 'CWE-295: Improper Certificate Validation'
+    confidence: MEDIUM
+    likelihood: MEDIUM
+    impact: HIGH
+    references:
+    - https://www.gnupg.org/gph/de/manual/r1023.html
+    license: AGPL-3.0 license
+    vulnerability_class:
+    - Improper Authentication
+    source: https://semgrep.dev/r/trailofbits.generic.gpg-insecure-flags.gpg-insecure-flags
+    shortlink: https://sg.run/oqLJx
+    semgrep.dev:
+      rule:
+        r_id: 113216
+        rv_id: 833255
+        rule_id: WAUWqko
+        version_id: BjTe0Jg
+        url: https://semgrep.dev/playground/r/BjTe0Jg/trailofbits.generic.gpg-insecure-flags.gpg-insecure-flags
+        origin: community
+  pattern-either:
+  - pattern: gpg ... --allow-non-selfsigned-uid
+  - pattern: gpg ... --allow-freeform-uid
+  - pattern: gpg ... --allow-old-cipher-algos
+  - pattern: gpg ... --allow-weak-digest-algos
+  - pattern: gpg ... --allow-weak-key-signatures
+  - pattern: gpg ... --ignore-time-conflict
+  - pattern: gpg ... --ignore-valid-from
+  - pattern: gpg ... --ignore-crc-error
+  - pattern: gpg ... --ignore-mdc-error
+  - pattern: gpg ... --skip-verify
+  - pattern: gpg ... --no-require-cross-certification

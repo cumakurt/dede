@@ -1,0 +1,49 @@
+rules:
+- id: python.fastapi.security.wildcard-cors.wildcard-cors
+  languages:
+  - python
+  message: CORS policy allows any origin (using wildcard '*'). This is insecure and
+    should be avoided.
+  mode: taint
+  pattern-sources:
+  - pattern: '[..., "*", ...]'
+  pattern-sinks:
+  - patterns:
+    - pattern: |
+        $APP.add_middleware(
+          CORSMiddleware,
+          allow_origins=$ORIGIN,
+          ...);
+    - focus-metavariable: $ORIGIN
+  severity: WARNING
+  metadata:
+    cwe:
+    - 'CWE-942: Permissive Cross-domain Policy with Untrusted Domains'
+    owasp:
+    - A05:2021 - Security Misconfiguration
+    - A02:2025 - Security Misconfiguration
+    category: security
+    technology:
+    - python
+    - fastapi
+    references:
+    - https://owasp.org/Top10/A05_2021-Security_Misconfiguration
+    - https://cwe.mitre.org/data/definitions/942.html
+    likelihood: HIGH
+    impact: LOW
+    confidence: MEDIUM
+    vulnerability_class:
+    - Configuration
+    subcategory:
+    - vuln
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    source: https://semgrep.dev/r/python.fastapi.security.wildcard-cors.wildcard-cors
+    shortlink: https://sg.run/KxApY
+    semgrep.dev:
+      rule:
+        r_id: 112311
+        rv_id: 1263413
+        rule_id: lBU4JQ3
+        version_id: A8Tgd1R
+        url: https://semgrep.dev/playground/r/A8Tgd1R/python.fastapi.security.wildcard-cors.wildcard-cors
+        origin: community

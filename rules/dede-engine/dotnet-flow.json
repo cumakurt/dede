@@ -1,0 +1,379 @@
+{
+  "schema": 1,
+  "rules": [
+    {
+      "id": "dede.dotnet.flow.sql",
+      "message": "Request-derived input reaches a sql API; review the recorded local flow.",
+      "languages": [
+        "c#",
+        "razor"
+      ],
+      "severity": "HIGH",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "taint",
+      "taint_sink": "sql",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?:^|\\.)(?:SqlCommand|OleDbCommand|OdbcCommand|NpgsqlCommand|MySqlCommand|FromSqlRaw|ExecuteSqlRaw(?:Async)?|SqlQueryRaw|Query(?:First|Single|Multiple)?(?:OrDefault)?(?:Async)?|Execute(?:Scalar)?(?:Async)?|CommandText)$"
+        }
+      ],
+      "cwe": [
+        "CWE-89"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Use parameterized ADO.NET/Dapper queries or EF Core FromSql/FromSqlInterpolated. User input must be a bound parameter, never part of the SQL command text.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca3001",
+        "https://learn.microsoft.com/en-us/ef/core/querying/sql-queries"
+      ],
+      "standards": {
+        "microsoft-dotnet": [
+          "CA3001"
+        ]
+      },
+      "asvs": [
+        "v5.0.0-1.2.4"
+      ]
+    },
+    {
+      "id": "dede.dotnet.flow.command",
+      "message": "Request-derived input reaches a command API; review the recorded local flow.",
+      "languages": [
+        "c#",
+        "razor"
+      ],
+      "severity": "HIGH",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "taint",
+      "taint_sink": "command",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?:^|\\.)(?:Process\\.Start|ProcessStartInfo|FileName)$"
+        }
+      ],
+      "cwe": [
+        "CWE-78"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Use a fixed executable and structured ArgumentList values. Avoid shell interpreters and allowlist user choices before starting a process.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca3006"
+      ],
+      "standards": {
+        "microsoft-dotnet": [
+          "CA3006"
+        ]
+      },
+      "asvs": [
+        "v5.0.0-1.2.5"
+      ]
+    },
+    {
+      "id": "dede.dotnet.flow.arguments",
+      "message": "Request-derived input reaches a arguments API; review the recorded local flow.",
+      "languages": [
+        "c#",
+        "razor"
+      ],
+      "severity": "HIGH",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "taint",
+      "taint_sink": "arguments",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "^Arguments$"
+        }
+      ],
+      "cwe": [
+        "CWE-88"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Use ProcessStartInfo.ArgumentList with a fixed executable and validate each argument against the executable-specific allowlist.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca3006"
+      ],
+      "standards": {
+        "microsoft-dotnet": [
+          "CA3006"
+        ]
+      },
+      "asvs": [
+        "v5.0.0-1.2.5"
+      ]
+    },
+    {
+      "id": "dede.dotnet.flow.path",
+      "message": "Request-derived input reaches a path API; review the recorded local flow.",
+      "languages": [
+        "c#",
+        "razor"
+      ],
+      "severity": "HIGH",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "taint",
+      "taint_sink": "path",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?:^|\\.)(?:File\\.(?:ReadAllText|ReadAllBytes|ReadAllLines|WriteAllText|WriteAllBytes|Open|OpenRead|OpenWrite|Create|Delete|Copy|Move)(?:Async)?|Directory\\.(?:GetFiles|GetDirectories|Delete|CreateDirectory)|FileStream|StreamReader|StreamWriter)$"
+        }
+      ],
+      "cwe": [
+        "CWE-22"
+      ],
+      "owasp": [
+        "A01:2025"
+      ],
+      "recommendation": "Map user input to approved files or enforce canonical containment within an allowed directory. Path.Combine/GetFullPath alone do not establish containment.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca3003"
+      ],
+      "standards": {
+        "microsoft-dotnet": [
+          "CA3003"
+        ]
+      }
+    },
+    {
+      "id": "dede.dotnet.flow.ssrf",
+      "message": "Request-derived input reaches a ssrf API; review the recorded local flow.",
+      "languages": [
+        "c#",
+        "razor"
+      ],
+      "severity": "HIGH",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "taint",
+      "taint_sink": "ssrf",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "\\.(?:GetAsync|GetStringAsync|GetByteArrayAsync|GetStreamAsync|PostAsync|PutAsync|DeleteAsync|DownloadString|DownloadData|OpenRead)(?:Async)?$"
+        }
+      ],
+      "cwe": [
+        "CWE-918"
+      ],
+      "owasp": [
+        "A01:2025"
+      ],
+      "recommendation": "Allowlist destination schemes, hosts and ports; restrict redirects and block internal/link-local destinations with network controls.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/security-warnings"
+      ]
+    },
+    {
+      "id": "dede.dotnet.flow.xss",
+      "message": "Request-derived input reaches a xss API; review the recorded local flow.",
+      "languages": [
+        "c#",
+        "razor"
+      ],
+      "severity": "HIGH",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "taint",
+      "taint_sink": "xss",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?:^|\\.)(?:Html\\.Raw|HtmlString|MarkupString|Response\\.Write(?:Async)?)$"
+        }
+      ],
+      "cwe": [
+        "CWE-79"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Use contextual HTML encoding or normal Razor output. Sanitize intentionally allowed HTML before passing it to raw HTML APIs.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca3002"
+      ],
+      "standards": {
+        "microsoft-dotnet": [
+          "CA3002"
+        ]
+      }
+    },
+    {
+      "id": "dede.dotnet.flow.redirect",
+      "message": "Request-derived input reaches a redirect API; review the recorded local flow.",
+      "languages": [
+        "c#",
+        "razor"
+      ],
+      "severity": "HIGH",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "taint",
+      "taint_sink": "redirect",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?:^|\\.)(?:Redirect|RedirectPermanent|RedirectPreserveMethod|RedirectPermanentPreserveMethod)$"
+        }
+      ],
+      "cwe": [
+        "CWE-601"
+      ],
+      "owasp": [
+        "A01:2025"
+      ],
+      "recommendation": "Use LocalRedirect for local destinations, or validate external destinations against a strict allowlist.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca3007"
+      ],
+      "standards": {
+        "microsoft-dotnet": [
+          "CA3007"
+        ]
+      }
+    },
+    {
+      "id": "dede.dotnet.flow.xpath",
+      "message": "Request-derived input reaches a xpath API; review the recorded local flow.",
+      "languages": [
+        "c#",
+        "razor"
+      ],
+      "severity": "HIGH",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "taint",
+      "taint_sink": "xpath",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?:\\.(?:SelectSingleNode|SelectNodes|XPathSelectElement|XPathSelectElements)|(?:^|\\.)XPathExpression\\.Compile)$"
+        }
+      ],
+      "cwe": [
+        "CWE-643"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Use fixed XPath expressions with bound variables rather than concatenating untrusted text into expression syntax.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca3008"
+      ],
+      "standards": {
+        "microsoft-dotnet": [
+          "CA3008"
+        ]
+      }
+    },
+    {
+      "id": "dede.dotnet.flow.regex",
+      "message": "Request-derived input reaches a regex API; review the recorded local flow.",
+      "languages": [
+        "c#",
+        "razor"
+      ],
+      "severity": "HIGH",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "taint",
+      "taint_sink": "regex",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?:^|\\.)(?:Regex|Regex\\.(?:Match|Matches|IsMatch|Replace|Split))$"
+        }
+      ],
+      "cwe": [
+        "CWE-1333"
+      ],
+      "owasp": [
+        "A01:2025"
+      ],
+      "recommendation": "Use a fixed pattern or Regex.Escape for literal text; also configure a match timeout and bound input sizes.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca3012"
+      ],
+      "standards": {
+        "microsoft-dotnet": [
+          "CA3012"
+        ]
+      }
+    },
+    {
+      "id": "dede.dotnet.flow.ldap",
+      "message": "Request-derived input reaches a ldap API; review the recorded local flow.",
+      "languages": [
+        "c#",
+        "razor"
+      ],
+      "severity": "HIGH",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "taint",
+      "taint_sink": "ldap",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?:^|\\.)(?:DirectorySearcher|Filter)$"
+        }
+      ],
+      "cwe": [
+        "CWE-90"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Use fixed LDAP query structure and escape untrusted values according to the LDAP filter or DN context.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/security-warnings"
+      ]
+    },
+    {
+      "id": "dede.dotnet.flow.code",
+      "message": "Request-derived input reaches a code API; review the recorded local flow.",
+      "languages": [
+        "c#",
+        "razor"
+      ],
+      "severity": "HIGH",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "taint",
+      "taint_sink": "code",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?:^|\\.)(?:Assembly\\.(?:Load|LoadFrom|LoadFile)|CSharpScript\\.(?:EvaluateAsync|RunAsync)|XamlReader\\.(?:Load|Parse))$"
+        }
+      ],
+      "cwe": [
+        "CWE-94"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Do not evaluate or load code selected by untrusted requests. Map user choices to fixed approved operations or assemblies.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca3011"
+      ],
+      "standards": {
+        "microsoft-dotnet": [
+          "CA3011"
+        ]
+      }
+    }
+  ]
+}

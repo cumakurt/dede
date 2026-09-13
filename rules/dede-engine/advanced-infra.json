@@ -1,0 +1,467 @@
+{
+  "schema": 1,
+  "rules": [
+    {
+      "id": "dede.docker.add-instead-of-copy",
+      "message": "ADD used where COPY would suffice; ADD auto-extracts archives and fetches remote URLs, increasing attack surface.",
+      "severity": "LOW",
+      "category": "security",
+      "languages": [
+        "dockerfile"
+      ],
+      "when": [
+        {
+          "regex": "^\\s*ADD\\s+(?!.*\\.tar|\\.tgz|\\.gz|\\.bz2|\\.xz)\\S+\\s+\\S+",
+          "same_line": true
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-494"
+      ],
+      "owasp": [
+        "A08:2025"
+      ],
+      "asvs": [
+        "v5.0.0-14.2.3"
+      ],
+      "recommendation": "Use COPY instead of ADD when not explicitly needing archive extraction or remote URLs.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/494.html",
+        "https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#add-or-copy"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.docker.apt-no-version-pin",
+      "message": "apt-get install without pinned package versions; builds are not reproducible and may pull vulnerable packages.",
+      "severity": "MEDIUM",
+      "category": "security",
+      "languages": [
+        "dockerfile"
+      ],
+      "when": [
+        {
+          "regex": "(?i)apt-get\\s+install\\s+(?!-y\\s+--no-install-recommends\\s+\\S+=)[^\\n]+",
+          "same_line": true,
+          "not_regex": "(?i)(?:=|\\#\\ dede:\\ unpinned\\-ok)"
+        }
+      ],
+      "confidence": "LOW",
+      "cwe": [
+        "CWE-1357"
+      ],
+      "owasp": [
+        "A06:2025"
+      ],
+      "asvs": [
+        "v5.0.0-14.2.1"
+      ],
+      "recommendation": "Pin package versions (e.g. apt-get install -y package=1.2.3) in Dockerfiles for reproducible builds.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/1357.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.docker.expose-all-ports",
+      "message": "EXPOSE 0.0.0.0/all or a very broad range; minimize exposed container ports.",
+      "severity": "MEDIUM",
+      "category": "security",
+      "languages": [
+        "dockerfile"
+      ],
+      "when": [
+        {
+          "regex": "^\\s*EXPOSE\\s+(0|\\d{5}|\\d+-\\d{4,})",
+          "same_line": true
+        }
+      ],
+      "confidence": "LOW",
+      "cwe": [
+        "CWE-284"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "asvs": [
+        "v5.0.0-12.4.1"
+      ],
+      "recommendation": "EXPOSE only the specific ports the application needs; document each exposed port.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/284.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.k8s.no-resource-limits",
+      "message": "Kubernetes container without CPU/memory resource limits; a compromised container can exhaust node resources.",
+      "severity": "MEDIUM",
+      "category": "security",
+      "languages": [
+        "yaml"
+      ],
+      "when": [
+        {
+          "pattern": "containers:",
+          "same_line": true
+        }
+      ],
+      "if": [
+        {
+          "not_regex": "(?i)resources:\\s*\\n[\\s\\S]*?limits:"
+        }
+      ],
+      "confidence": "LOW",
+      "cwe": [
+        "CWE-400"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "asvs": [
+        "v5.0.0-14.2.2"
+      ],
+      "recommendation": "Set resources.limits.cpu and resources.limits.memory for every container.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/400.html",
+        "https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.k8s.automount-service-account",
+      "message": "Kubernetes pod without automountServiceAccountToken: false; all pods get a mountable API token by default.",
+      "severity": "MEDIUM",
+      "category": "security",
+      "languages": [
+        "yaml"
+      ],
+      "when": [
+        {
+          "pattern": "kind: Pod",
+          "same_line": true
+        }
+      ],
+      "if": [
+        {
+          "not_regex": "(?i)automountServiceAccountToken\\s*:\\s*false"
+        }
+      ],
+      "confidence": "LOW",
+      "cwe": [
+        "CWE-250"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "asvs": [
+        "v5.0.0-14.2.2"
+      ],
+      "recommendation": "Set automountServiceAccountToken: false unless the pod explicitly needs API access.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/250.html",
+        "https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/#opt-out-of-automounting-api-credentials-for-a-service-account"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.k8s.allow-privilege-escalation",
+      "message": "Container without allowPrivilegeEscalation: false; processes may gain additional privileges via setuid/sudo.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "yaml"
+      ],
+      "when": [
+        {
+          "pattern": "securityContext:",
+          "same_line": true
+        }
+      ],
+      "if": [
+        {
+          "not_regex": "(?i)allowPrivilegeEscalation\\s*:\\s*false"
+        }
+      ],
+      "confidence": "LOW",
+      "cwe": [
+        "CWE-250"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "asvs": [
+        "v5.0.0-14.2.2"
+      ],
+      "recommendation": "Set securityContext.allowPrivilegeEscalation: false in container specs.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/250.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.k8s.latest-image-tag",
+      "message": "Kubernetes workload references a container image with the :latest tag; unpredictable deployments.",
+      "severity": "MEDIUM",
+      "category": "security",
+      "languages": [
+        "yaml"
+      ],
+      "when": [
+        {
+          "regex": "image:\\s*\\S+:latest",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-1357"
+      ],
+      "owasp": [
+        "A06:2025"
+      ],
+      "asvs": [
+        "v5.0.0-14.2.1"
+      ],
+      "recommendation": "Pin container images to a specific digest or immutable version tag; never use :latest in production.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/1357.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.tf.s3-public-acl",
+      "message": "S3 bucket ACL set to public-read or public-read-write; data is exposed to the internet.",
+      "severity": "CRITICAL",
+      "category": "security",
+      "languages": [
+        "hcl",
+        "terraform"
+      ],
+      "when": [
+        {
+          "regex": "(?i)acl\\s*=\\s*\"public-(read|read-write)\"",
+          "same_line": true
+        }
+      ],
+      "if": [
+        {
+          "contains_any": [
+            "aws_s3_bucket"
+          ]
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-284"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "asvs": [
+        "v5.0.0-12.4.1"
+      ],
+      "recommendation": "Use private ACL; grant public access explicitly via bucket policies with tightly scoped conditions.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/284.html",
+        "https://docs.aws.amazon.com/AmazonS3/latest/userguide/acls.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.tf.encryption-at-rest-disabled",
+      "message": "Cloud resource created without encryption at rest; stored data is unencrypted.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "hcl",
+        "terraform"
+      ],
+      "when": [
+        {
+          "regex": "(?i)(aws_db_instance|aws_s3_bucket|aws_ebs_volume|aws_elasticache|aws_rds_cluster)\\s*\"",
+          "same_line": true
+        }
+      ],
+      "if": [
+        {
+          "not_regex": "(?i)(encrypted\\s*=\\s*true|kms_key_id|storage_encrypted)"
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-311"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "asvs": [
+        "v5.0.0-8.2.1"
+      ],
+      "recommendation": "Enable encryption at rest on all storage resources; specify a KMS key for additional control.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/311.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.tf.logging-disabled",
+      "message": "Terraform resource created without access logging; security events will not be auditable.",
+      "severity": "MEDIUM",
+      "category": "security",
+      "languages": [
+        "hcl",
+        "terraform"
+      ],
+      "when": [
+        {
+          "regex": "(?i)(aws_s3_bucket|aws_load_balancer|aws_cloudfront_distribution|aws_api_gateway)\\s*\"",
+          "same_line": true
+        }
+      ],
+      "if": [
+        {
+          "not_regex": "(?i)(logging|access_log|log_config|cloudwatch_logs)"
+        }
+      ],
+      "confidence": "LOW",
+      "cwe": [
+        "CWE-778"
+      ],
+      "owasp": [
+        "A09:2025"
+      ],
+      "asvs": [
+        "v5.0.0-7.2.1"
+      ],
+      "recommendation": "Enable access and audit logging on all infrastructure resources.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/778.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.ci.github-actions-secret-in-env",
+      "message": "GitHub Actions step uses secrets.* in an env variable that may be exposed in log output.",
+      "severity": "MEDIUM",
+      "category": "security",
+      "languages": [
+        "yaml"
+      ],
+      "when": [
+        {
+          "regex": "(?i)^\\s+\\w+:\\s*\\$\\{\\{\\s*secrets\\.",
+          "same_line": true
+        }
+      ],
+      "if": [
+        {
+          "contains": "env:"
+        },
+        {
+          "contains_any": [
+            "run:",
+            "echo",
+            "::set-output",
+            "::debug::"
+          ]
+        }
+      ],
+      "confidence": "LOW",
+      "cwe": [
+        "CWE-532"
+      ],
+      "owasp": [
+        "A09:2025"
+      ],
+      "asvs": [
+        "v5.0.0-7.1.1"
+      ],
+      "recommendation": "Pass secrets directly to the action input rather than expanding them into env vars; mask secrets with ::add-mask.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/532.html",
+        "https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.ci.workflow-write-all-permissions",
+      "message": "GitHub Actions workflow grants write permissions to all scopes; least-privilege is violated.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "yaml"
+      ],
+      "when": [
+        {
+          "regex": "permissions:\\s*write-all",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-269"
+      ],
+      "owasp": [
+        "A01:2025"
+      ],
+      "asvs": [
+        "v5.0.0-4.1.2"
+      ],
+      "recommendation": "Declare explicit, minimal permissions per job (e.g. contents: read, pull-requests: write).",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/269.html",
+        "https://docs.github.com/en/actions/security-guides/automatic-token-authentication#permissions-for-the-github_token"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.tf.sg-all-tcp-egress",
+      "message": "Security group allows all outbound TCP traffic (0.0.0.0/0); egress should be restricted.",
+      "severity": "MEDIUM",
+      "category": "security",
+      "languages": [
+        "hcl",
+        "terraform"
+      ],
+      "when": [
+        {
+          "pattern": "egress",
+          "same_line": true
+        },
+        {
+          "regex": "(?i)from_port\\s*=\\s*0",
+          "same_line": true
+        },
+        {
+          "regex": "(?i)to_port\\s*=\\s*0",
+          "same_line": true
+        }
+      ],
+      "if": [
+        {
+          "contains_any": [
+            "0.0.0.0/0",
+            "::/0"
+          ]
+        }
+      ],
+      "confidence": "LOW",
+      "cwe": [
+        "CWE-284"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "asvs": [
+        "v5.0.0-12.4.1"
+      ],
+      "recommendation": "Restrict egress rules to specific ports and destinations; avoid 0.0.0.0/0 on all-ports egress.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/284.html"
+      ],
+      "exclude_comments": true
+    }
+  ]
+}

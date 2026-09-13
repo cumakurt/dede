@@ -1,0 +1,310 @@
+rules:
+- id: dockerfile.security.last-user-is-root.last-user-is-root
+  patterns:
+  - pattern: USER root
+  - pattern-not-inside:
+      patterns:
+      - pattern: |
+          USER root
+          ...
+          USER $X
+      - metavariable-pattern:
+          metavariable: $X
+          patterns:
+          - pattern-not: root
+  message: The last user in the container is 'root'. This is a security hazard because
+    if an attacker gains control of the container they will have root access. Switch
+    back to another user after running commands as 'root'.
+  severity: ERROR
+  languages:
+  - dockerfile
+  metadata:
+    cwe:
+    - 'CWE-269: Improper Privilege Management'
+    source-rule-url: https://github.com/hadolint/hadolint/wiki/DL3002
+    references:
+    - https://github.com/hadolint/hadolint/wiki/DL3002
+    category: security
+    technology:
+    - dockerfile
+    confidence: MEDIUM
+    owasp:
+    - A04:2021 - Insecure Design
+    - A06:2025 - Insecure Design
+    subcategory:
+    - audit
+    likelihood: MEDIUM
+    impact: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Improper Authorization
+    source: https://semgrep.dev/r/dockerfile.security.last-user-is-root.last-user-is-root
+    shortlink: https://sg.run/5Z43
+    semgrep.dev:
+      rule:
+        r_id: 20147
+        rv_id: 1262658
+        rule_id: ReU2n5
+        version_id: 6xT29Eg
+        url: https://semgrep.dev/playground/r/6xT29Eg/dockerfile.security.last-user-is-root.last-user-is-root
+        origin: community
+- id: dockerfile.audit.dockerfile-pip-extra-index-url.dockerfile-pip-extra-index-url
+  patterns:
+  - pattern: |
+      RUN ... $PIP install ... --extra-index-url ...
+  - metavariable-regex:
+      metavariable: $PIP
+      regex: pip|pip3
+  message: 'When `--extra-index-url` is used in a `pip install` command, this is usually
+    meant to  install a package from a package index other than the public one.  However,
+    if a package is added with the same name to the public PyPi repository, and if
+    the version number is high enough, this package will be installed when building
+    this docker image. This package may be a malicious dependency. Such an attack
+    is called a dependency confusion attack. If using a private package index, prefer
+    to use `--index-url` if possible. '
+  languages:
+  - dockerfile
+  severity: INFO
+  metadata:
+    references:
+    - https://pip.pypa.io/en/stable/cli/pip_install/#cmdoption-extra-index-url
+    - https://github.com/semgrep/semgrep-rules/issues/3032
+    category: security
+    subcategory:
+    - audit
+    confidence: MEDIUM
+    impact: HIGH
+    likelihood: LOW
+    technology:
+    - docker
+    cwe:
+    - 'CWE-427: Uncontrolled Search Path Element'
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Other
+    source: https://semgrep.dev/r/dockerfile.audit.dockerfile-pip-extra-index-url.dockerfile-pip-extra-index-url
+    shortlink: https://sg.run/qk4p8
+    semgrep.dev:
+      rule:
+        r_id: 197112
+        rv_id: 1039209
+        rule_id: pKUkLD3
+        version_id: 1QTY5L3
+        url: https://semgrep.dev/playground/r/1QTY5L3/dockerfile.audit.dockerfile-pip-extra-index-url.dockerfile-pip-extra-index-url
+        origin: community
+- id: generic.dockerfile.missing-zypper-no-confirm-switch.missing-zypper-no-confirm-switch
+  severity: WARNING
+  languages:
+  - dockerfile
+  patterns:
+  - pattern: |
+      RUN ... zypper install ...
+  - pattern-not: |
+      RUN ... zypper install ... -y ...
+  - pattern-not: |
+      RUN ... zypper install ... --no-confirm ...
+  message: This 'zypper install' is missing the '-y' switch. This might stall builds
+    because it requires human intervention. Add the '-y' switch.
+  metadata:
+    source-rule-url: https://github.com/hadolint/hadolint/wiki/DL3034
+    references:
+    - https://github.com/hadolint/hadolint/wiki/DL3034
+    category: best-practice
+    technology:
+    - dockerfile
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    source: https://semgrep.dev/r/generic.dockerfile.missing-zypper-no-confirm-switch.missing-zypper-no-confirm-switch
+    shortlink: https://sg.run/R5vK
+    semgrep.dev:
+      rule:
+        r_id: 20149
+        rv_id: 945287
+        rule_id: BYUKJE
+        version_id: xyTqnqr
+        url: https://semgrep.dev/playground/r/xyTqnqr/generic.dockerfile.missing-zypper-no-confirm-switch.missing-zypper-no-confirm-switch
+        origin: community
+  paths:
+    include:
+    - '*dockerfile*'
+    - '*Dockerfile*'
+- id: dockerfile.security.dockerd-socket-mount.dockerfile-dockerd-socket-mount
+  message: The Dockerfile(image) mounts docker.sock to the container which may allow
+    an attacker already inside of the container to escape container and execute arbitrary
+    commands on the host machine.
+  languages:
+  - dockerfile
+  - yaml
+  severity: ERROR
+  metadata:
+    cwe:
+    - 'CWE-862: Missing Authorization'
+    - 'CWE-269: Improper Privilege Management'
+    confidence: HIGH
+    likelihood: MEDIUM
+    impact: HIGH
+    subcategory:
+    - audit
+    technology:
+    - dockerfile
+    category: security
+    references:
+    - https://cheatsheetseries.owasp.org/cheatsheets/Docker_Security_Cheat_Sheet.html
+    - https://redfoxsec.com/blog/insecure-volume-mounts-in-docker/
+    - https://blog.quarkslab.com/why-is-exposing-the-docker-socket-a-really-bad-idea.html
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Improper Authorization
+    source: https://semgrep.dev/r/dockerfile.security.dockerd-socket-mount.dockerfile-dockerd-socket-mount
+    shortlink: https://sg.run/10AAQ
+    semgrep.dev:
+      rule:
+        r_id: 146566
+        rv_id: 945266
+        rule_id: oqUgAAk
+        version_id: WrTEoEq
+        url: https://semgrep.dev/playground/r/WrTEoEq/dockerfile.security.dockerd-socket-mount.dockerfile-dockerd-socket-mount
+        origin: community
+  pattern-either:
+  - patterns:
+    - pattern: VOLUME $X
+    - metavariable-regex:
+        metavariable: $X
+        regex: /var/run/docker.sock
+  - patterns:
+    - pattern-regex: '- "/var/run/docker.sock:.*"'
+    - pattern-inside: |
+        volumes:
+          ...
+- id: dockerfile.security.no-sudo-in-dockerfile.no-sudo-in-dockerfile
+  patterns:
+  - pattern: |
+      RUN sudo ...
+  message: Avoid using sudo in Dockerfiles. Running processes as a non-root user can
+    help  reduce the potential impact of configuration errors and security vulnerabilities.
+  metadata:
+    category: security
+    technology:
+    - dockerfile
+    cwe:
+    - 'CWE-250: Execution with Unnecessary Privileges'
+    owasp:
+    - A05:2021 - Security Misconfiguration
+    - A02:2025 - Security Misconfiguration
+    references:
+    - https://cwe.mitre.org/data/definitions/250.html
+    - https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#user
+    subcategory:
+    - audit
+    likelihood: LOW
+    impact: LOW
+    confidence: HIGH
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Improper Authorization
+    source: https://semgrep.dev/r/dockerfile.security.no-sudo-in-dockerfile.no-sudo-in-dockerfile
+    shortlink: https://sg.run/80Q7
+    semgrep.dev:
+      rule:
+        r_id: 66384
+        rv_id: 1262661
+        rule_id: kxUlx1
+        version_id: pZT03zY
+        url: https://semgrep.dev/playground/r/pZT03zY/dockerfile.security.no-sudo-in-dockerfile.no-sudo-in-dockerfile
+        origin: community
+  languages:
+  - dockerfile
+  severity: WARNING
+- id: dockerfile.security.missing-user-entrypoint.missing-user-entrypoint
+  patterns:
+  - pattern: |
+      ENTRYPOINT $...VARS
+  - pattern-not-inside: |
+      USER $USER
+      ...
+  fix: |
+    USER non-root
+    ENTRYPOINT $...VARS
+  message: By not specifying a USER, a program in the container may run as 'root'.
+    This is a security hazard. If an attacker can control a process running as root,
+    they may have control over the container. Ensure that the last USER in a Dockerfile
+    is a USER other than 'root'.
+  severity: ERROR
+  languages:
+  - dockerfile
+  metadata:
+    cwe:
+    - 'CWE-269: Improper Privilege Management'
+    category: security
+    technology:
+    - dockerfile
+    confidence: MEDIUM
+    owasp:
+    - A04:2021 - Insecure Design
+    - A06:2025 - Insecure Design
+    references:
+    - https://owasp.org/Top10/A04_2021-Insecure_Design
+    subcategory:
+    - audit
+    likelihood: LOW
+    impact: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Improper Authorization
+    source: https://semgrep.dev/r/dockerfile.security.missing-user-entrypoint.missing-user-entrypoint
+    shortlink: https://sg.run/k281
+    semgrep.dev:
+      rule:
+        r_id: 47272
+        rv_id: 1262659
+        rule_id: ReUW9E
+        version_id: o5TbD21
+        url: https://semgrep.dev/playground/r/o5TbD21/dockerfile.security.missing-user-entrypoint.missing-user-entrypoint
+        origin: community
+- id: dockerfile.security.missing-user.missing-user
+  patterns:
+  - pattern: |
+      CMD $...VARS
+  - pattern-not-inside: |
+      USER $USER
+      ...
+  - pattern-not-inside: |
+      HEALTHCHECK ... CMD ...
+  fix: |
+    USER non-root
+    CMD $...VARS
+  message: By not specifying a USER, a program in the container may run as 'root'.
+    This is a security hazard. If an attacker can control a process running as root,
+    they may have control over the container. Ensure that the last USER in a Dockerfile
+    is a USER other than 'root'.
+  severity: ERROR
+  languages:
+  - dockerfile
+  metadata:
+    cwe:
+    - 'CWE-250: Execution with Unnecessary Privileges'
+    category: security
+    technology:
+    - dockerfile
+    confidence: MEDIUM
+    owasp:
+    - A04:2021 - Insecure Design
+    - A06:2025 - Insecure Design
+    references:
+    - https://owasp.org/Top10/A04_2021-Insecure_Design
+    subcategory:
+    - audit
+    likelihood: LOW
+    impact: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Improper Authorization
+    source: https://semgrep.dev/r/dockerfile.security.missing-user.missing-user
+    shortlink: https://sg.run/Gbvn
+    semgrep.dev:
+      rule:
+        r_id: 20148
+        rv_id: 1262660
+        rule_id: AbUN06
+        version_id: zyTb2n2
+        url: https://semgrep.dev/playground/r/zyTb2n2/dockerfile.security.missing-user.missing-user
+        origin: community

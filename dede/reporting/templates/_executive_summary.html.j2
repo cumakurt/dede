@@ -1,0 +1,116 @@
+{% from "_macros.html.j2" import page_chrome, source_tag with context %}
+{{ page_chrome('01 / Executive Summary') }}
+<section class="section" id="executive-summary">
+  <p class="section-kicker">01 / Executive Summary</p>
+  <h2>Security posture at a glance</h2>
+
+  <div class="narrative lead">
+    {% for sentence in executive_narrative %}
+    <p>{{ sentence }}</p>
+    {% endfor %}
+  </div>
+
+  {% if pdf %}
+  <table class="kpi-row" role="presentation">
+    <tr>
+      <td><span class="kpi-label">Critical</span><span class="kpi-value CRITICAL">{{ critical_count }}</span><span class="kpi-hint">Immediate action</span></td>
+      <td><span class="kpi-label">High</span><span class="kpi-value HIGH">{{ high_count }}</span><span class="kpi-hint">Near-term fix</span></td>
+      <td><span class="kpi-label">Medium</span><span class="kpi-value MEDIUM">{{ medium_count }}</span><span class="kpi-hint">Scheduled</span></td>
+      <td><span class="kpi-label">Low</span><span class="kpi-value LOW">{{ low_count }}</span><span class="kpi-hint">Hardening</span></td>
+      <td><span class="kpi-label">Info</span><span class="kpi-value INFO">{{ info_count }}</span><span class="kpi-hint">Review</span></td>
+    </tr>
+  </table>
+  {% else %}
+  <div class="kpi-row">
+    <div class="kpi-card"><span class="kpi-label">Critical</span><span class="kpi-value CRITICAL">{{ critical_count }}</span><span class="kpi-hint">Immediate action</span></div>
+    <div class="kpi-card"><span class="kpi-label">High</span><span class="kpi-value HIGH">{{ high_count }}</span><span class="kpi-hint">Near-term fix</span></div>
+    <div class="kpi-card"><span class="kpi-label">Medium</span><span class="kpi-value MEDIUM">{{ medium_count }}</span><span class="kpi-hint">Scheduled</span></div>
+    <div class="kpi-card"><span class="kpi-label">Low</span><span class="kpi-value LOW">{{ low_count }}</span><span class="kpi-hint">Hardening</span></div>
+    <div class="kpi-card"><span class="kpi-label">Info</span><span class="kpi-value INFO">{{ info_count }}</span><span class="kpi-hint">Review</span></div>
+  </div>
+  {% endif %}
+
+  {% if pdf %}
+  <table class="panel-grid" role="presentation">
+    <tr>
+      <td class="cell">
+        <p class="panel-title">Overall Security Risk</p>
+        <p style="margin:0;font-size:14pt;font-weight:700;">{{ security_score_label if security_score is not none else 'n/a' }}</p>
+        <p class="muted">{{ overall_risk_label }}</p>
+        <p class="muted">Confidence summary: {{ confidence_summary }}</p>
+      </td>
+      <td class="cell">
+        <p class="panel-title">Scan Scope</p>
+        <p><strong>{{ files_scanned }}</strong> files analyzed</p>
+        <p><strong>{{ lines_scanned }}</strong> lines of code</p>
+        <p>{{ primary_language }}{% if primary_language_pct is not none %} {{ primary_language_pct }}%{% endif %} primary language</p>
+        {% if coverage_pct is not none %}<p>{{ coverage_pct }}% analyzer completion</p>{% endif %}
+      </td>
+      <td class="cell">
+        <p class="panel-title">Security Score</p>
+        {% if security_score is not none %}
+        <div class="score-hero">{{ security_score }}<span>OF 100</span></div>
+        {% else %}
+        <p class="muted">n/a</p>
+        {% endif %}
+      </td>
+    </tr>
+  </table>
+  {% else %}
+  <div class="panel-grid">
+    <div class="panel-card">
+      <p class="panel-title">Overall Security Risk</p>
+      <p style="margin:0;font-size:1.35rem;font-weight:700;">{{ security_score_label if security_score is not none else 'n/a' }}</p>
+      <p class="muted">{{ overall_risk_label }}</p>
+      <p class="muted">Confidence summary: {{ confidence_summary }}</p>
+    </div>
+    <div class="panel-card">
+      <p class="panel-title">Scan Scope</p>
+      <p><strong>{{ files_scanned }}</strong> files analyzed</p>
+      <p><strong>{{ lines_scanned }}</strong> lines of code</p>
+      <p>{{ primary_language }}{% if primary_language_pct is not none %} {{ primary_language_pct }}%{% endif %} primary language</p>
+      {% if coverage_pct is not none %}<p>{{ coverage_pct }}% analyzer completion</p>{% endif %}
+    </div>
+    <div class="panel-card">
+      <p class="panel-title">Security Score</p>
+      {% if security_score is not none %}
+      <div class="score-hero">{{ security_score }}<span>OF 100</span></div>
+      {% else %}
+      <p class="muted">n/a</p>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="callout">
+    <strong>Release decision.</strong> {{ release_decision }}
+  </div>
+
+  <div class="two-col">
+    <div class="col panel-card" style="{% if pdf %}{% else %}background:var(--panel-soft);border:1px solid var(--border);border-radius:6px;padding:0.9rem 1rem;{% endif %}">
+      <p class="panel-title">Primary Risk</p>
+      {% if primary_risk %}
+      <p><span class="badge {{ primary_risk.severity }}">{{ primary_risk.severity }}</span> {{ primary_risk.class }}</p>
+      <p><strong class="break-text">{{ primary_risk.id }}</strong> — {{ source_tag(primary_risk.title_origin) }} <span class="break-text">{{ primary_risk.title }}</span></p>
+      <p class="muted mono break-text">{{ primary_risk.file }}</p>
+      {% else %}
+      <p class="muted">No primary risk identified.</p>
+      {% endif %}
+    </div>
+    <div class="col panel-card" style="{% if pdf %}{% else %}background:var(--panel-soft);border:1px solid var(--border);border-radius:6px;padding:0.9rem 1rem;{% endif %}">
+      <p class="panel-title">Secondary Risk</p>
+      {% if secondary_risk %}
+      <p><span class="badge {{ secondary_risk.severity }}">{{ secondary_risk.severity }}</span> {{ secondary_risk.class }}</p>
+      <p><strong class="break-text">{{ secondary_risk.id }}</strong> — {{ source_tag(secondary_risk.title_origin) }} <span class="break-text">{{ secondary_risk.title }}</span></p>
+      <p class="muted mono break-text">{{ secondary_risk.file }}</p>
+      {% else %}
+      <p class="muted">No secondary risk identified.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if quick_wins %}
+  <h3>Quick Win</h3>
+  <p>{{ source_tag(quick_wins[0].action_origin) }} {{ quick_wins[0].action }} <span class="muted mono">({{ quick_wins[0].id }} · {{ quick_wins[0].file }})</span></p>
+  {% endif %}
+</section>

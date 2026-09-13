@@ -1,0 +1,242 @@
+rules:
+  - id: dede.javascript.web.nosql-injection
+    languages: [javascript, typescript]
+    mode: taint
+    severity: ERROR
+    message: Request-controlled data reaches a document query filter; reject client-controlled query operators.
+    metadata:
+      category: security
+      cwe: [CWE-943]
+      confidence: MEDIUM
+      analysis: taint
+      recommendation: Validate filter field types and construct an allowlisted query structure on the server.
+      references: [https://cwe.mitre.org/data/definitions/943.html]
+    pattern-sources:
+      - pattern-either:
+          - pattern: $REQ.query
+          - pattern: $REQ.body
+          - pattern: $REQ.params
+          - pattern: $REQ.query.$KEY
+          - pattern: $REQ.query[$KEY]
+          - pattern: $REQ.body.$KEY
+          - pattern: $REQ.body[$KEY]
+          - pattern: $REQ.params.$KEY
+          - pattern: $REQ.params[$KEY]
+        exact: true
+    pattern-sinks:
+      - patterns:
+          - pattern-either:
+              - pattern: $MODEL.findOne($FILTER, ...)
+              - pattern: $MODEL.findOneAndUpdate($FILTER, ...)
+              - pattern: $DB.collection(...).find($FILTER, ...)
+          - focus-metavariable: $FILTER
+    pattern-sanitizers:
+      - pattern: String(...)
+        exact: true
+
+  - id: dede.javascript.web.prototype-pollution
+    languages: [javascript, typescript]
+    mode: taint
+    severity: ERROR
+    message: Request input controls a nested object property key; prototype properties may be reachable.
+    metadata:
+      category: security
+      cwe: [CWE-1321]
+      confidence: MEDIUM
+      analysis: taint
+      recommendation: Allowlist property names and reject prototype-related keys at every path component.
+      references: [https://cwe.mitre.org/data/definitions/1321.html]
+    pattern-sources:
+      - pattern-either:
+          - pattern: $REQ.query
+          - pattern: $REQ.body
+          - pattern: $REQ.params
+          - pattern: $REQ.query.$KEY
+          - pattern: $REQ.query[$KEY]
+          - pattern: $REQ.body.$KEY
+          - pattern: $REQ.body[$KEY]
+          - pattern: $REQ.params.$KEY
+          - pattern: $REQ.params[$KEY]
+        exact: true
+    pattern-sinks:
+      - patterns:
+          - pattern: $TARGET[$KEY][$SUBKEY] = $VALUE
+          - focus-metavariable: $KEY
+
+  - id: dede.javascript.web.code-injection
+    languages: [javascript, typescript]
+    mode: taint
+    severity: ERROR
+    message: Request input reaches dynamic JavaScript evaluation.
+    metadata:
+      category: security
+      cwe: [CWE-95]
+      confidence: HIGH
+      analysis: taint
+      recommendation: Replace evaluation with fixed operations over validated data; vm contexts are not a security boundary.
+      references: [https://cwe.mitre.org/data/definitions/95.html]
+    pattern-sources:
+      - pattern-either:
+          - pattern: $REQ.query
+          - pattern: $REQ.body
+          - pattern: $REQ.params
+          - pattern: $REQ.query.$KEY
+          - pattern: $REQ.query[$KEY]
+          - pattern: $REQ.body.$KEY
+          - pattern: $REQ.body[$KEY]
+          - pattern: $REQ.params.$KEY
+          - pattern: $REQ.params[$KEY]
+        exact: true
+    pattern-sinks:
+      - patterns:
+          - pattern-either:
+              - pattern: eval($CODE)
+              - pattern: new Function(..., $CODE)
+              - pattern: vm.runInNewContext($CODE, ...)
+              - pattern: vm.runInThisContext($CODE, ...)
+          - focus-metavariable: $CODE
+
+  - id: dede.javascript.web.open-redirect
+    languages: [javascript, typescript]
+    mode: taint
+    severity: WARNING
+    message: Request input controls an HTTP redirect destination.
+    metadata:
+      category: security
+      cwe: [CWE-601]
+      confidence: MEDIUM
+      analysis: taint
+      recommendation: Map allowed destination identifiers to fixed local routes.
+      references: [https://cwe.mitre.org/data/definitions/601.html]
+    pattern-sources:
+      - pattern-either:
+          - pattern: $REQ.query
+          - pattern: $REQ.body
+          - pattern: $REQ.params
+          - pattern: $REQ.query.$KEY
+          - pattern: $REQ.query[$KEY]
+          - pattern: $REQ.body.$KEY
+          - pattern: $REQ.body[$KEY]
+          - pattern: $REQ.params.$KEY
+          - pattern: $REQ.params[$KEY]
+        exact: true
+    pattern-sinks:
+      - patterns:
+          - pattern-either:
+              - pattern: $RES.redirect($URL)
+              - pattern: $RES.redirect($STATUS, $URL)
+          - focus-metavariable: $URL
+
+  - id: dede.javascript.web.template-injection
+    languages: [javascript, typescript]
+    mode: taint
+    severity: ERROR
+    message: Request input controls executable template source.
+    metadata:
+      category: security
+      cwe: [CWE-1336]
+      confidence: HIGH
+      analysis: taint
+      recommendation: Keep template source trusted and pass user input only as template data.
+      references: [https://cwe.mitre.org/data/definitions/1336.html]
+    pattern-sources:
+      - pattern-either:
+          - pattern: $REQ.query
+          - pattern: $REQ.body
+          - pattern: $REQ.params
+          - pattern: $REQ.query.$KEY
+          - pattern: $REQ.query[$KEY]
+          - pattern: $REQ.body.$KEY
+          - pattern: $REQ.body[$KEY]
+          - pattern: $REQ.params.$KEY
+          - pattern: $REQ.params[$KEY]
+        exact: true
+    pattern-sinks:
+      - patterns:
+          - pattern-either:
+              - pattern: ejs.render($TEMPLATE, ...)
+              - pattern: pug.render($TEMPLATE, ...)
+              - pattern: handlebars.compile($TEMPLATE, ...)
+          - focus-metavariable: $TEMPLATE
+
+  - id: dede.javascript.web.unsafe-deserialization
+    languages: [javascript, typescript]
+    mode: taint
+    severity: ERROR
+    message: Request input reaches node-serialize object deserialization.
+    metadata:
+      category: security
+      cwe: [CWE-502]
+      confidence: HIGH
+      analysis: taint
+      recommendation: Use JSON.parse with schema validation instead of executable object deserialization.
+      references: [https://cwe.mitre.org/data/definitions/502.html]
+    pattern-sources:
+      - pattern-either:
+          - pattern: $REQ.query
+          - pattern: $REQ.body
+          - pattern: $REQ.params
+          - pattern: $REQ.query.$KEY
+          - pattern: $REQ.query[$KEY]
+          - pattern: $REQ.body.$KEY
+          - pattern: $REQ.body[$KEY]
+          - pattern: $REQ.params.$KEY
+          - pattern: $REQ.params[$KEY]
+        exact: true
+    pattern-sinks:
+      - patterns:
+          - pattern-either:
+              - pattern: require('node-serialize').unserialize($DATA, ...)
+              - patterns:
+                  - pattern-either:
+                      - pattern-inside: |
+                          $SER = require('node-serialize');
+                          ...
+                      - pattern-inside: |
+                          import $SER from 'node-serialize';
+                          ...
+                      - pattern-inside: |
+                          import * as $SER from 'node-serialize';
+                          ...
+                  - pattern: $SER.unserialize($DATA, ...)
+          - focus-metavariable: $DATA
+
+  - id: dede.javascript.web.jwt-none-algorithm
+    languages: [javascript, typescript]
+    severity: ERROR
+    message: JWT verification explicitly allows unsigned tokens using the none algorithm.
+    metadata:
+      category: security
+      cwe: [CWE-347]
+      confidence: HIGH
+      recommendation: Use a fixed allowlist of signed algorithms and verify with a trusted key.
+      references: [https://cwe.mitre.org/data/definitions/347.html]
+    pattern-either:
+      - pattern: 'require("jsonwebtoken").verify($TOKEN, $KEY, { ..., algorithms: [..., "none", ...], ... }, ...)'
+      - patterns:
+          - pattern-either:
+              - pattern-inside: |
+                  $JWT = require('jsonwebtoken');
+                  ...
+              - pattern-inside: |
+                  import $JWT from 'jsonwebtoken';
+                  ...
+              - pattern-inside: |
+                  import * as $JWT from 'jsonwebtoken';
+                  ...
+          - pattern: '$JWT.verify($TOKEN, $KEY, { ..., algorithms: [..., "none", ...], ... }, ...)'
+
+  - id: dede.javascript.web.tls-verification-disabled
+    languages: [javascript, typescript]
+    severity: ERROR
+    message: TLS certificate verification is explicitly disabled.
+    metadata:
+      category: security
+      cwe: [CWE-295]
+      confidence: HIGH
+      recommendation: Keep rejectUnauthorized enabled and provide the correct CA certificates.
+      references: [https://cwe.mitre.org/data/definitions/295.html]
+    pattern-either:
+      - pattern: 'new https.Agent({ ..., rejectUnauthorized: false, ... })'
+      - pattern: 'https.request({ ..., rejectUnauthorized: false, ... }, ...)'
+      - pattern: 'tls.connect({ ..., rejectUnauthorized: false, ... }, ...)'

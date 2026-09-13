@@ -1,0 +1,570 @@
+rules:
+- id: yaml.kubernetes.security.allow-privilege-escalation.allow-privilege-escalation
+  patterns:
+  - pattern-inside: |
+      containers:
+        ...
+  - pattern-inside: |
+      - name: $CONTAINER
+        ...
+  - pattern: |
+      image: ...
+      ...
+  - pattern-inside: |
+      image: ...
+      ...
+      $SC:
+        ...
+  - metavariable-regex:
+      metavariable: $SC
+      regex: ^(securityContext)$
+  - pattern-not-inside: |
+      image: ...
+      ...
+      securityContext:
+        ...
+        allowPrivilegeEscalation: $VAL
+  - focus-metavariable: $SC
+  fix: |
+    securityContext:
+      allowPrivilegeEscalation: false #
+  message: In Kubernetes, each pod runs in its own isolated environment with its own
+    set of security policies. However, certain container images may contain `setuid`
+    or `setgid` binaries that could allow an attacker to perform privilege escalation
+    and gain access to sensitive resources. To mitigate this risk, it's recommended
+    to add a `securityContext` to the container in the pod, with the parameter `allowPrivilegeEscalation`
+    set to `false`. This will prevent the container from running any privileged processes
+    and limit the impact of any potential attacks. By adding the `allowPrivilegeEscalation`
+    parameter to your the `securityContext`, you can help to ensure that your containerized
+    applications are more secure and less vulnerable to privilege escalation attacks.
+  metadata:
+    cwe:
+    - 'CWE-732: Incorrect Permission Assignment for Critical Resource'
+    owasp:
+    - A05:2021 - Security Misconfiguration
+    - A06:2017 - Security Misconfiguration
+    - A02:2025 - Security Misconfiguration
+    references:
+    - https://kubernetes.io/docs/concepts/policy/pod-security-policy/#privilege-escalation
+    - https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+    - https://www.kernel.org/doc/Documentation/prctl/no_new_privs.txt
+    - https://cheatsheetseries.owasp.org/cheatsheets/Docker_Security_Cheat_Sheet.html#rule-4-add-no-new-privileges-flag
+    category: security
+    technology:
+    - kubernetes
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Improper Authorization
+    source: https://semgrep.dev/r/yaml.kubernetes.security.allow-privilege-escalation.allow-privilege-escalation
+    shortlink: https://sg.run/ljp6
+    semgrep.dev:
+      rule:
+        r_id: 10057
+        rv_id: 1263933
+        rule_id: 6JUqEO
+        version_id: jQTn527
+        url: https://semgrep.dev/playground/r/jQTn527/yaml.kubernetes.security.allow-privilege-escalation.allow-privilege-escalation
+        origin: community
+  languages:
+  - yaml
+  severity: WARNING
+- id: yaml.kubernetes.security.exposing-docker-socket-hostpath.exposing-docker-socket-hostpath
+  patterns:
+  - pattern-inside: |
+      volumes:
+        ...
+  - pattern: |
+      hostPath:
+        ...
+        path: /var/run/docker.sock
+  message: Exposing host's Docker socket to containers via a volume. The owner of
+    this socket is root. Giving someone access to it is equivalent to giving unrestricted
+    root access to your host. Remove 'docker.sock' from hostpath to prevent this.
+  metadata:
+    cwe:
+    - 'CWE-250: Execution with Unnecessary Privileges'
+    references:
+    - https://kubernetes.io/docs/concepts/storage/volumes/#hostpath
+    - https://kubernetes.io/docs/concepts/policy/pod-security-policy/#volumes-and-file-systems
+    - https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+    - https://cheatsheetseries.owasp.org/cheatsheets/Docker_Security_Cheat_Sheet.html#rule-1-do-not-expose-the-docker-daemon-socket-even-to-the-containers
+    category: security
+    technology:
+    - kubernetes
+    subcategory:
+    - vuln
+    likelihood: LOW
+    impact: HIGH
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Improper Authorization
+    source: https://semgrep.dev/r/yaml.kubernetes.security.exposing-docker-socket-hostpath.exposing-docker-socket-hostpath
+    shortlink: https://sg.run/v0pR
+    semgrep.dev:
+      rule:
+        r_id: 10133
+        rv_id: 947054
+        rule_id: d8Uz6v
+        version_id: nWTpYZe
+        url: https://semgrep.dev/playground/r/nWTpYZe/yaml.kubernetes.security.exposing-docker-socket-hostpath.exposing-docker-socket-hostpath
+        origin: community
+  languages:
+  - yaml
+  severity: WARNING
+- id: yaml.kubernetes.security.privileged-container.privileged-container
+  pattern-either:
+  - patterns:
+    - pattern-inside: |
+        containers:
+          ...
+    - pattern-inside: |
+        image: ...
+        ...
+        securityContext:
+          ...
+    - pattern: |
+        privileged: true
+  - patterns:
+    - pattern-inside: |
+        spec:
+          ...
+    - pattern-not-inside: |
+        image: ...
+        ...
+    - pattern: |
+        privileged: true
+  message: Container or pod is running in privileged mode. This grants the container
+    the equivalent of root capabilities on the host machine. This can lead to container
+    escapes, privilege escalation, and other security concerns. Remove the 'privileged'
+    key to disable this capability.
+  metadata:
+    cwe:
+    - 'CWE-250: Execution with Unnecessary Privileges'
+    references:
+    - https://kubernetes.io/docs/concepts/policy/pod-security-policy/#privileged
+    - https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+    - https://cheatsheetseries.owasp.org/cheatsheets/Docker_Security_Cheat_Sheet.html
+    category: security
+    technology:
+    - kubernetes
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Improper Authorization
+    source: https://semgrep.dev/r/yaml.kubernetes.security.privileged-container.privileged-container
+    shortlink: https://sg.run/Ygr5
+    semgrep.dev:
+      rule:
+        r_id: 10058
+        rv_id: 1501845
+        rule_id: oqUz2p
+        version_id: d6T70JW
+        url: https://semgrep.dev/playground/r/d6T70JW/yaml.kubernetes.security.privileged-container.privileged-container
+        origin: community
+  languages:
+  - yaml
+  severity: WARNING
+- id: yaml.kubernetes.security.run-as-non-root.run-as-non-root
+  patterns:
+  - pattern-inside: |
+      $SPEC:
+        ...
+        containers:
+          ...
+        ...
+  - metavariable-regex:
+      metavariable: $SPEC
+      regex: ^(spec)$
+  - pattern-not-inside: |
+      spec:
+        ...
+        securityContext:
+          ...
+        ...
+  - pattern-inside: |
+      $SPEC:
+        ...
+        containers:
+          ...
+  - pattern-not-inside: |
+      $SPEC:
+        ...
+        containers:
+          ...
+          - name: $NAME
+            image: ...
+            ...
+            securityContext:
+              ...
+              runAsNonRoot: $VALUE
+  - focus-metavariable: $SPEC
+  fix: |
+    $SPEC:
+      securityContext:
+        runAsNonRoot: true #
+  message: When running containers in Kubernetes, it's important to ensure that they  are
+    properly secured to prevent privilege escalation attacks.  One potential vulnerability
+    is when a container is allowed to run  applications as the root user, which could
+    allow an attacker to gain  access to sensitive resources. To mitigate this risk,
+    it's recommended to  add a `securityContext` to the container, with the parameter
+    `runAsNonRoot`  set to `true`. This will ensure that the container runs as a non-root
+    user,  limiting the damage that could be caused by any potential attacks. By  adding
+    a `securityContext` to the container in your Kubernetes pod, you can  help to
+    ensure that your containerized applications are more secure and  less vulnerable
+    to privilege escalation attacks.
+  metadata:
+    references:
+    - https://kubernetes.io/blog/2016/08/security-best-practices-kubernetes-deployment/
+    - https://kubernetes.io/docs/concepts/policy/pod-security-policy/
+    - https://cheatsheetseries.owasp.org/cheatsheets/Docker_Security_Cheat_Sheet.html#rule-2-set-a-user
+    category: security
+    cwe:
+    - 'CWE-250: Execution with Unnecessary Privileges'
+    owasp:
+    - A05:2021 - Security Misconfiguration
+    - A06:2017 - Security Misconfiguration
+    - A02:2025 - Security Misconfiguration
+    technology:
+    - kubernetes
+    subcategory:
+    - audit
+    likelihood: LOW
+    impact: LOW
+    confidence: LOW
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Improper Authorization
+    source: https://semgrep.dev/r/yaml.kubernetes.security.run-as-non-root.run-as-non-root
+    shortlink: https://sg.run/dgP5
+    semgrep.dev:
+      rule:
+        r_id: 10134
+        rv_id: 1263940
+        rule_id: ZqUqeK
+        version_id: kbTzGbo
+        url: https://semgrep.dev/playground/r/kbTzGbo/yaml.kubernetes.security.run-as-non-root.run-as-non-root
+        origin: community
+  languages:
+  - yaml
+  severity: INFO
+- id: yaml.kubernetes.security.seccomp-confinement-disabled.seccomp-confinement-disabled
+  patterns:
+  - pattern-inside: |
+      containers:
+        ...
+  - pattern: |
+      image: ...
+      ...
+      securityContext:
+        ...
+        seccompProfile: unconfined
+  message: 'Container is explicitly disabling seccomp confinement. This runs the service
+    in an unrestricted state. Remove ''seccompProfile: unconfined'' to prevent this.'
+  metadata:
+    cwe:
+    - 'CWE-284: Improper Access Control'
+    references:
+    - https://kubernetes.io/docs/concepts/policy/pod-security-policy/#seccomp
+    - https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+    category: security
+    technology:
+    - kubernetes
+    owasp:
+    - A05:2017 - Broken Access Control
+    - A01:2021 - Broken Access Control
+    - A01:2025 - Broken Access Control
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Improper Authorization
+    source: https://semgrep.dev/r/yaml.kubernetes.security.seccomp-confinement-disabled.seccomp-confinement-disabled
+    shortlink: https://sg.run/6rgY
+    semgrep.dev:
+      rule:
+        r_id: 10059
+        rv_id: 1263941
+        rule_id: zdUynw
+        version_id: w8TRoL3
+        url: https://semgrep.dev/playground/r/w8TRoL3/yaml.kubernetes.security.seccomp-confinement-disabled.seccomp-confinement-disabled
+        origin: community
+  languages:
+  - yaml
+  severity: WARNING
+- id: yaml.kubernetes.security.skip-tls-verify-cluster.skip-tls-verify-cluster
+  pattern: |
+    cluster:
+      ...
+      insecure-skip-tls-verify: true
+  message: 'Cluster is disabling TLS certificate verification when communicating with
+    the server. This makes your HTTPS connections insecure. Remove the ''insecure-skip-tls-verify:
+    true'' key to secure communication.'
+  metadata:
+    cwe:
+    - 'CWE-319: Cleartext Transmission of Sensitive Information'
+    references:
+    - https://kubernetes.io/docs/reference/config-api/client-authentication.v1beta1/#client-authentication-k8s-io-v1beta1-Cluster
+    category: security
+    technology:
+    - kubernetes
+    owasp:
+    - A03:2017 - Sensitive Data Exposure
+    - A02:2021 - Cryptographic Failures
+    - A04:2025 - Cryptographic Failures
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/yaml.kubernetes.security.skip-tls-verify-cluster.skip-tls-verify-cluster
+    shortlink: https://sg.run/okyn
+    semgrep.dev:
+      rule:
+        r_id: 10116
+        rv_id: 1263943
+        rule_id: zdUyWx
+        version_id: O9Tpxbo
+        url: https://semgrep.dev/playground/r/O9Tpxbo/yaml.kubernetes.security.skip-tls-verify-cluster.skip-tls-verify-cluster
+        origin: community
+  languages:
+  - yaml
+  severity: WARNING
+- id: yaml.kubernetes.security.skip-tls-verify-service.skip-tls-verify-service
+  pattern: |
+    spec:
+      ...
+      insecureSkipTLSVerify: true
+  message: 'Service is disabling TLS certificate verification when communicating with
+    the server. This makes your HTTPS connections insecure. Remove the ''insecureSkipTLSVerify:
+    true'' key to secure communication.'
+  metadata:
+    cwe:
+    - 'CWE-319: Cleartext Transmission of Sensitive Information'
+    references:
+    - https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.20/#apiservice-v1-apiregistration-k8s-io
+    category: security
+    technology:
+    - kubernetes
+    owasp:
+    - A03:2017 - Sensitive Data Exposure
+    - A02:2021 - Cryptographic Failures
+    - A04:2025 - Cryptographic Failures
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/yaml.kubernetes.security.skip-tls-verify-service.skip-tls-verify-service
+    shortlink: https://sg.run/zk10
+    semgrep.dev:
+      rule:
+        r_id: 10117
+        rv_id: 1263944
+        rule_id: pKUGXr
+        version_id: e1TyjnR
+        url: https://semgrep.dev/playground/r/e1TyjnR/yaml.kubernetes.security.skip-tls-verify-service.skip-tls-verify-service
+        origin: community
+  languages:
+  - yaml
+  severity: WARNING
+- id: yaml.kubernetes.security.writable-filesystem-container.writable-filesystem-container
+  patterns:
+  - pattern-inside: |
+      containers:
+        ...
+  - pattern-inside: |
+      - name: $CONTAINER
+        ...
+  - pattern: |
+      image: ...
+      ...
+  - pattern-not: |
+      image: ...
+      ...
+      securityContext:
+        ...
+        readOnlyRootFilesystem: true
+  - focus-metavariable: $CONTAINER
+  message: 'Container $CONTAINER is running with a writable root filesystem. This
+    may allow malicious applications to download and run additional payloads, or modify
+    container files. If an application inside a container has to save something temporarily
+    consider using a tmpfs. Add ''readOnlyRootFilesystem: true'' to this container
+    to prevent this.'
+  metadata:
+    cwe:
+    - 'CWE-732: Incorrect Permission Assignment for Critical Resource'
+    owasp:
+    - A05:2021 - Security Misconfiguration
+    - A06:2017 - Security Misconfiguration
+    - A02:2025 - Security Misconfiguration
+    references:
+    - https://kubernetes.io/docs/concepts/policy/pod-security-policy/#volumes-and-file-systems
+    - https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+    - https://blog.atomist.com/security-of-docker-kubernetes/
+    - https://cheatsheetseries.owasp.org/cheatsheets/Docker_Security_Cheat_Sheet.html#rule-8-set-filesystem-and-volumes-to-read-only
+    category: security
+    technology:
+    - kubernetes
+    cwe2021-top25: true
+    subcategory:
+    - audit
+    likelihood: LOW
+    impact: MEDIUM
+    confidence: LOW
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Improper Authorization
+    source: https://semgrep.dev/r/yaml.kubernetes.security.writable-filesystem-container.writable-filesystem-container
+    shortlink: https://sg.run/ZePL
+    semgrep.dev:
+      rule:
+        r_id: 10135
+        rv_id: 1263945
+        rule_id: nJUYn9
+        version_id: vdT06PY
+        url: https://semgrep.dev/playground/r/vdT06PY/yaml.kubernetes.security.writable-filesystem-container.writable-filesystem-container
+        origin: community
+  languages:
+  - yaml
+  severity: WARNING
+- id: yaml.kubernetes.security.hostipc-pod.hostipc-pod
+  patterns:
+  - pattern-inside: |
+      spec:
+        ...
+  - pattern: |
+      hostIPC: true
+  message: Pod is sharing the host IPC namespace. This allows container processes
+    to communicate with processes on the host which reduces isolation and bypasses
+    container protection models. Remove the 'hostIPC' key to disable this functionality.
+  metadata:
+    cwe:
+    - 'CWE-693: Protection Mechanism Failure'
+    references:
+    - https://kubernetes.io/docs/concepts/policy/pod-security-policy/#host-namespaces
+    category: security
+    technology:
+    - kubernetes
+    subcategory:
+    - audit
+    likelihood: LOW
+    impact: MEDIUM
+    confidence: LOW
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Improper Authorization
+    source: https://semgrep.dev/r/yaml.kubernetes.security.hostipc-pod.hostipc-pod
+    shortlink: https://sg.run/nqGO
+    semgrep.dev:
+      rule:
+        r_id: 10236
+        rv_id: 947055
+        rule_id: nJUYPE
+        version_id: ExTg4KB
+        url: https://semgrep.dev/playground/r/ExTg4KB/yaml.kubernetes.security.hostipc-pod.hostipc-pod
+        origin: community
+  languages:
+  - yaml
+  severity: WARNING
+- id: yaml.kubernetes.security.hostnetwork-pod.hostnetwork-pod
+  patterns:
+  - pattern-inside: |
+      spec:
+        ...
+  - pattern: |
+      hostNetwork: true
+  message: Pod may use the node network namespace. This gives the pod access to the
+    loopback device, services listening on localhost, and could be used to snoop on
+    network activity of other pods on the same node. Remove the 'hostNetwork' key
+    to disable this functionality.
+  metadata:
+    cwe:
+    - 'CWE-406: Insufficient Control of Network Message Volume (Network Amplification)'
+    references:
+    - https://kubernetes.io/docs/concepts/policy/pod-security-policy/#host-namespaces
+    category: security
+    technology:
+    - kubernetes
+    subcategory:
+    - audit
+    likelihood: LOW
+    impact: MEDIUM
+    confidence: LOW
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Other
+    source: https://semgrep.dev/r/yaml.kubernetes.security.hostnetwork-pod.hostnetwork-pod
+    shortlink: https://sg.run/E51A
+    semgrep.dev:
+      rule:
+        r_id: 10237
+        rv_id: 947056
+        rule_id: EwU4NO
+        version_id: 7ZTreWz
+        url: https://semgrep.dev/playground/r/7ZTreWz/yaml.kubernetes.security.hostnetwork-pod.hostnetwork-pod
+        origin: community
+  languages:
+  - yaml
+  severity: WARNING
+- id: yaml.kubernetes.security.hostpid-pod.hostpid-pod
+  patterns:
+  - pattern-inside: |
+      spec:
+        ...
+  - pattern: |
+      hostPID: true
+  message: Pod is sharing the host process ID namespace. When paired with ptrace this
+    can be used to escalate privileges outside of the container. Remove the 'hostPID'
+    key to disable this functionality.
+  metadata:
+    cwe:
+    - 'CWE-269: Improper Privilege Management'
+    references:
+    - https://kubernetes.io/docs/concepts/policy/pod-security-policy/#host-namespaces
+    category: security
+    technology:
+    - kubernetes
+    owasp:
+    - A04:2021 - Insecure Design
+    - A06:2025 - Insecure Design
+    subcategory:
+    - audit
+    likelihood: LOW
+    impact: MEDIUM
+    confidence: LOW
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Improper Authorization
+    source: https://semgrep.dev/r/yaml.kubernetes.security.hostpid-pod.hostpid-pod
+    shortlink: https://sg.run/708R
+    semgrep.dev:
+      rule:
+        r_id: 10238
+        rv_id: 1263934
+        rule_id: 7KUeo0
+        version_id: 1QTypvL
+        url: https://semgrep.dev/playground/r/1QTypvL/yaml.kubernetes.security.hostpid-pod.hostpid-pod
+        origin: community
+  languages:
+  - yaml
+  severity: WARNING

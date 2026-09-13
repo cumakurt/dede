@@ -1,0 +1,344 @@
+rules:
+- id: dede.java.advanced.spel-injection
+  languages:
+  - java
+  severity: ERROR
+  message: Request-controlled input reaches Spring Expression Language evaluation.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-917
+    owasp:
+    - A03:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-1.3.2
+    recommendation: Treat SpEL sources as code; evaluate only literal expressions and pass input as evaluation context variables.
+    references:
+    - https://cwe.mitre.org/data/definitions/917.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+    analysis: taint
+  mode: taint
+  pattern-sources:
+  - pattern-either:
+    - pattern: $REQ.getParameter(...)
+    - pattern: $REQ.getHeader(...)
+    - pattern: $REQ.getQueryString()
+    - pattern: $REQ.getInputStream()
+    exact: true
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - pattern: $PARSER.parseExpression($EXPR, ...)
+      - pattern: $PARSER.parseRaw($EXPR, ...)
+    - focus-metavariable: $EXPR
+- id: dede.go.advanced.weak-crypto-rand
+  languages:
+  - go
+  severity: ERROR
+  message: Cryptographic material is generated with the deterministic math/rand PRNG.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-338
+    owasp:
+    - A04:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-6.2.1
+      - v5.0.0-6.2.2
+    recommendation: Use crypto/rand for keys, nonces, tokens and password-reset material.
+    references:
+    - https://cwe.mitre.org/data/definitions/338.html
+    - https://pkg.go.dev/crypto/rand
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+  patterns:
+  - pattern-either:
+    - pattern: |
+        import $RAND "$MATH"
+    - pattern: |
+        import "$MATH"
+  - metavariable-regex:
+      metavariable: $MATH
+      regex: ^(math/rand(/v[0-9]+)*)$
+  - pattern-either:
+    - pattern-inside: |
+        ...
+        rand.$FUNC(...)
+    - pattern-inside: |
+        ...
+        $RAND.$FUNC(...)
+  - focus-metavariable:
+    - $MATH
+- id: dede.python.advanced.db-driver-sql-injection
+  languages:
+  - python
+  severity: ERROR
+  message: Request-controlled input reaches driver-level SQL through a cursor or pandas read_sql API.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-89
+    owasp:
+    - A03:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-1.2.4
+    recommendation: Bind values as driver parameters or use SQLAlchemy bound parameters; never concatenate request data into SQL text.
+    references:
+    - https://cwe.mitre.org/data/definitions/89.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+    analysis: taint
+  mode: taint
+  pattern-sources:
+  - pattern-either:
+    - pattern: flask.request.args.get(...)
+    - pattern: flask.request.args[...]
+    - pattern: flask.request.form.get(...)
+    - pattern: flask.request.form[...]
+    - pattern: flask.request.values.get(...)
+    - pattern: flask.request.get_json(...)
+    - pattern: flask.request.data
+    - pattern: $REQ.GET.get(...)
+    - pattern: $REQ.GET[...]
+    - pattern: $REQ.POST.get(...)
+    - pattern: $REQ.POST[...]
+    - pattern: input(...)
+    exact: true
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - pattern: $CUR.execute($QUERY, ...)
+      - pattern: $CUR.executemany($QUERY, ...)
+    - focus-metavariable: $QUERY
+  - patterns:
+    - pattern-either:
+      - pattern: pd.read_sql($QUERY, $CON, ...)
+      - pattern: pandas.read_sql($QUERY, $CON, ...)
+      - pattern: pandas.read_sql_query($QUERY, $CON, ...)
+    - focus-metavariable: $QUERY
+- id: dede.python.advanced.ssl-disabled-db-connect
+  languages:
+  - python
+  severity: ERROR
+  message: Database connection explicitly disables or downgrades TLS.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-319
+    owasp:
+    - A02:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-12.1.1
+    recommendation: Require TLS on database connections that leave the host boundary; use server certificate verification.
+    references:
+    - https://cwe.mitre.org/data/definitions/319.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+  pattern-either:
+  - pattern: mysql.connector.connect(..., ssl_disabled=True, ...)
+  - pattern: mysql.connector.connect(..., ssl_disabled=1, ...)
+  - pattern: psycopg2.connect(..., sslmode="disable", ...)
+  - pattern: psycopg2.connect(..., sslmode="allow", ...)
+  - pattern: psycopg2.connect(..., sslmode="prefer", ...)
+  - pattern: 'create_async_engine(..., connect_args={..., ssl: False, ...}, ...)'
+- id: dede.python.advanced.pymongo-tls-disabled
+  languages:
+  - python
+  severity: ERROR
+  message: MongoClient explicitly disables TLS.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-319
+    owasp:
+    - A02:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-12.1.1
+    recommendation: Keep TLS enabled (the default) and configure tlsCAFile or tlsCertificateKeyFile for a private PKI.
+    references:
+    - https://cwe.mitre.org/data/definitions/319.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+  pattern: pymongo.MongoClient(..., tls=False, ...)
+- id: dede.java.advanced.jndi-lookup-untrusted
+  languages:
+  - java
+  severity: ERROR
+  message: Request-controlled input reaches a JNDI naming lookup.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-74
+    owasp:
+    - A03:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-1.3.2
+    recommendation: Never pass request data into JNDI lookup text; allowlist naming contexts and literal names.
+    references:
+    - https://cwe.mitre.org/data/definitions/74.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+    analysis: taint
+  mode: taint
+  pattern-sources:
+  - pattern-either:
+    - pattern: $REQ.getParameter(...)
+    - pattern: $REQ.getHeader(...)
+    - pattern: $REQ.getQueryString()
+    - pattern: $REQ.getInputStream()
+    exact: true
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - pattern: $CTX.lookup($NAME, ...)
+      - pattern: new InitialContext().lookup($NAME)
+      - pattern: new javax.naming.InitialContext().lookup($NAME)
+    - focus-metavariable: $NAME
+- id: dede.java.advanced.mysql-sslmode-weak
+  languages:
+  - java
+  severity: ERROR
+  message: JDBC MySQL URL uses a weak MySQL Connector/J TLS mode.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-319
+    owasp:
+    - A02:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-12.1.1
+    recommendation: Set sslMode=REQUIRED or stronger in JDBC MySQL URLs; Connector/J does not enforce verification by default.
+    references:
+    - https://cwe.mitre.org/data/definitions/319.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+  pattern-regex: (?i)jdbc:mysql://[^\s"']*sslMode=(DISABLED|PREFERRED)
+- id: dede.kotlin.advanced.webview-js-bridge
+  languages:
+  - kotlin
+  severity: WARNING
+  message: WebView JavaScript bridge is exposed without a visible SDK version guard.
+  metadata:
+    category: security
+    confidence: MEDIUM
+    cwe:
+    - CWE-749
+    owasp:
+    - A02:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-3.5.4
+    recommendation: Guard addJavascriptInterface behind Build.VERSION.SDK_INT >= 18 and restrict loadUrl origins.
+    references:
+    - https://cwe.mitre.org/data/definitions/749.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+  pattern: $W.addJavascriptInterface($OBJ, $NAME)
+- id: dede.kotlin.advanced.webview-js-enabled
+  languages:
+  - kotlin
+  severity: WARNING
+  message: WebView JavaScript execution is explicitly enabled.
+  metadata:
+    category: security
+    confidence: MEDIUM
+    cwe:
+    - CWE-749
+    owasp:
+    - A02:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-3.5.4
+    recommendation: Keep JavaScript disabled unless the WebView content is trusted and origin-restricted.
+    references:
+    - https://cwe.mitre.org/data/definitions/749.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+  pattern: $S.setJavaScriptEnabled(true)
+- id: dede.swift.advanced.uiwebview-deprecated
+  languages:
+  - swift
+  severity: WARNING
+  message: Deprecated UIWebView usage detected; migrate to WKWebView.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-477
+    owasp:
+    - A05:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-14.1.1
+    recommendation: Replace UIWebView and UIWebViewDelegate with WKWebView equivalents.
+    references:
+    - https://cwe.mitre.org/data/definitions/477.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+  pattern: UIWebView(...)
+- id: dede.javascript.advanced.angular-bypass
+  languages:
+  - javascript
+  - typescript
+  severity: ERROR
+  message: Angular security sanitizer is explicitly bypassed.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-79
+    owasp:
+    - A03:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-50.2.1
+    recommendation: Sanitize the value server-side or render a pre-approved fixed template instead of bypassing the sanitizer.
+    references:
+    - https://cwe.mitre.org/data/definitions/79.html
+    - https://angular.io/guide/security
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+  pattern-either:
+  - pattern: $DOM.bypassSecurityTrustHtml($VALUE)
+  - pattern: $DOM.bypassSecurityTrustScript($VALUE)
+  - pattern: $DOM.bypassSecurityTrustUrl($VALUE)
+  - pattern: $DOM.bypassSecurityTrustResourceUrl($VALUE)
+- id: dede.php.advanced.mass-assignment
+  languages:
+  - php
+  severity: WARNING
+  message: Eloquent model is filled, updated or created from the entire request payload.
+  metadata:
+    category: security
+    confidence: MEDIUM
+    cwe:
+    - CWE-915
+    owasp:
+    - A01:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-15.3.3
+    recommendation: Allowlist fields with $request->safe()->only([...]) or an explicit field list before filling models.
+    references:
+    - https://cwe.mitre.org/data/definitions/915.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+  pattern-either:
+  - pattern: $MODEL::create($REQ->all())
+  - pattern: $MODEL->fill($REQ->all())
+  - pattern: $MODEL->update($REQ->all())

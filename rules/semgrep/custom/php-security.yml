@@ -1,0 +1,24 @@
+rules:
+  - id: dede.php.security.eval
+    message: "Detected eval() which can lead to code injection (CWE-95)."
+    languages: [php]
+    severity: ERROR
+    metadata:
+      cwe: ["CWE-95"]
+      owasp: ["A03:2021"]
+      category: security
+    pattern: eval(...)
+
+  - id: dede.php.security.shell-exec
+    message: "shell_exec / system / passthru / exec may allow command injection (CWE-78)."
+    languages: [php]
+    severity: ERROR
+    metadata:
+      cwe: ["CWE-78"]
+      owasp: ["A03:2021"]
+      category: security
+    pattern-either:
+      - pattern: shell_exec(...)
+      - pattern: system(...)
+      - pattern: passthru(...)
+      - pattern: exec(...)

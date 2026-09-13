@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "name": "dede/aspnet",
+  "version": "1.0.0",
+  "models": {
+    "csharp": {
+      "sources": [],
+      "sinks": [
+        {
+          "call": "Database.ExecuteSqlRaw",
+          "kind": "sql-execution",
+          "cwe": "CWE-89",
+          "severity": "HIGH"
+        }
+      ],
+      "sanitizers": []
+    }
+  },
+  "integrity": {
+    "sha256": "fc410db73d8f1f73c60106f77081ad569c4f2c2aefe7d5530792595492f2f22c"
+  }
+}

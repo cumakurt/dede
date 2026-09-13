@@ -1,0 +1,411 @@
+{
+  "schema": 1,
+  "rules": [
+    {
+      "id": "dede.go.race.channel-close-goroutine",
+      "message": "Channel closed inside a goroutine while other goroutines may still send; double-close / send-on-closed panic risk.",
+      "severity": "MEDIUM",
+      "category": "bug",
+      "languages": [
+        "go"
+      ],
+      "when": [
+        {
+          "pattern": "go func()",
+          "same_line": true
+        },
+        {
+          "pattern": "close(",
+          "same_line": true
+        }
+      ],
+      "confidence": "LOW",
+      "cwe": [
+        "CWE-362"
+      ],
+      "owasp": [
+        "A04:2025"
+      ],
+      "asvs": [
+        "v5.0.0-11.1.7"
+      ],
+      "recommendation": "Designate a single owner goroutine to close a channel; use sync.WaitGroup and close after all senders are done.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/362.html",
+        "https://go.dev/blog/pipelines"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.go.race.goroutine-shared-map",
+      "message": "Map written inside a goroutine without visible synchronisation; concurrent map write causes panic.",
+      "severity": "HIGH",
+      "category": "bug",
+      "languages": [
+        "go"
+      ],
+      "when": [
+        {
+          "pattern": "go func()",
+          "same_line": true
+        },
+        {
+          "regex": "\\b\\w+\\[\\w+\\]\\s*=",
+          "same_line": true,
+          "not_regex": "(?i)(?:sync\\.Mutex|sync\\.RWMutex|sync\\.Map|//\\ dede:\\ safe)"
+        }
+      ],
+      "confidence": "LOW",
+      "cwe": [
+        "CWE-362"
+      ],
+      "owasp": [
+        "A04:2025"
+      ],
+      "asvs": [
+        "v5.0.0-11.1.7"
+      ],
+      "recommendation": "Protect concurrent map access with sync.Mutex or use sync.Map.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/362.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.go.http.timeout-not-set",
+      "message": "http.Client or http.Server created without explicit Timeout; slow clients can exhaust goroutines.",
+      "severity": "MEDIUM",
+      "category": "security",
+      "languages": [
+        "go"
+      ],
+      "when": [
+        {
+          "regex": "&http\\.(Client|Server)\\{",
+          "same_line": true
+        }
+      ],
+      "if": [
+        {
+          "not_regex": "(?i)(Timeout:|ReadTimeout:|WriteTimeout:|IdleTimeout:)"
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-400"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "asvs": [
+        "v5.0.0-11.1.6"
+      ],
+      "recommendation": "Always set Timeout on http.Client and ReadTimeout/WriteTimeout on http.Server.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/400.html",
+        "https://blog.cloudflare.com/the-complete-guide-to-golang-net-http-timeouts/"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.go.http.default-client-usage",
+      "message": "http.DefaultClient or http.Get used without timeout; vulnerable to Slowloris-style attacks.",
+      "severity": "MEDIUM",
+      "category": "security",
+      "languages": [
+        "go"
+      ],
+      "when": [
+        {
+          "regex": "(?i)(http\\.DefaultClient|http\\.Get|http\\.Post|http\\.Head)\\s*\\(",
+          "same_line": true,
+          "not_regex": "(?i)(?:Timeout:|//\\ dede:\\ safe)"
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-400"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "asvs": [
+        "v5.0.0-11.1.6"
+      ],
+      "recommendation": "Create a dedicated http.Client with a Timeout set; never rely on http.DefaultClient in production.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/400.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.go.path.filepath-join-user",
+      "message": "filepath.Join built from user-controlled input without containment check; path traversal risk.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "go"
+      ],
+      "when": [
+        {
+          "pattern": "filepath.join(",
+          "same_line": true
+        },
+        {
+          "regex": "(?i)(r\\.URL\\.Query|r\\.FormValue|r\\.PathValue|r\\.URL\\.Path|chi\\.URLParam|vars\\[|c\\.Param|c\\.Query)",
+          "same_line": true,
+          "not_regex": "(?i)(?:strings\\.HasPrefix|filepath\\.Rel|//\\ dede:\\ safe)"
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-22"
+      ],
+      "owasp": [
+        "A01:2025"
+      ],
+      "asvs": [
+        "v5.0.0-12.3.1"
+      ],
+      "recommendation": "After filepath.Clean, verify with strings.HasPrefix(path, baseDir+\"/\") to prevent escaping the intended directory.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/22.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.go.fmt.errorf-ignored",
+      "message": "Error from goroutine deferred call discarded (defer + func() combo); errors silently lost.",
+      "severity": "LOW",
+      "category": "bug",
+      "languages": [
+        "go"
+      ],
+      "when": [
+        {
+          "regex": "defer\\s+\\w+\\.Close\\s*\\(\\s*\\)",
+          "same_line": true,
+          "not_regex": "(?i)(?://\\ dede:\\ safe|errCheck)"
+        }
+      ],
+      "confidence": "LOW",
+      "cwe": [
+        "CWE-703"
+      ],
+      "recommendation": "Capture the error from deferred Close calls and log or return it; wrap them in a helper if necessary.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/703.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.go.ssrf.http-request-user-url",
+      "message": "HTTP request URL built from user-controlled route or query parameter; SSRF risk.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "go"
+      ],
+      "when": [
+        {
+          "regex": "(?i)http\\.NewRequest|http\\.Get|client\\.Do",
+          "same_line": true
+        },
+        {
+          "regex": "(?i)(r\\.URL\\.Query|FormValue|PathValue|r\\.URL\\.Path|chi\\.URLParam|vars\\[)",
+          "same_line": true,
+          "not_regex": "(?i)(?:allowedHosts|validateURL|//\\ dede:\\ safe)"
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-918"
+      ],
+      "owasp": [
+        "A10:2025"
+      ],
+      "asvs": [
+        "v5.0.0-12.6.1"
+      ],
+      "recommendation": "Validate the destination URL host against an allowlist; reject requests to internal/loopback addresses.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/918.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.go.panic.nil-pointer-http-handler",
+      "message": "Potential nil pointer dereference in an HTTP handler without explicit nil check.",
+      "severity": "MEDIUM",
+      "category": "bug",
+      "languages": [
+        "go"
+      ],
+      "when": [
+        {
+          "regex": "func\\s+\\w+\\s*\\(w\\s+http\\.ResponseWriter,\\s*r\\s+\\*http\\.Request\\)",
+          "same_line": true
+        },
+        {
+          "regex": "\\w+\\.\\w+\\.\\w+",
+          "same_line": true,
+          "not_regex": "(?i)(?:if|!=\\ nil|//\\ dede:\\ safe)"
+        }
+      ],
+      "confidence": "LOW",
+      "cwe": [
+        "CWE-476"
+      ],
+      "owasp": [
+        "A04:2025"
+      ],
+      "recommendation": "Check request body/pointer fields for nil before dereferencing in HTTP handlers.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/476.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.go.tls.min-version-not-set",
+      "message": "TLS configuration without MinVersion; TLS 1.0/1.1 (deprecated, vulnerable) may be negotiated.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "go"
+      ],
+      "when": [
+        {
+          "regex": "&tls\\.Config\\{",
+          "same_line": true
+        }
+      ],
+      "if": [
+        {
+          "not_regex": "(?i)MinVersion\\s*:"
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-326"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "asvs": [
+        "v5.0.0-9.1.2"
+      ],
+      "recommendation": "Set MinVersion: tls.VersionTLS12 (or 13) in every tls.Config.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/326.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.go.jwt.hardcoded-secret",
+      "message": "JWT signed with a hardcoded string literal; token forgery risk.",
+      "severity": "CRITICAL",
+      "category": "secret",
+      "languages": [
+        "go"
+      ],
+      "when": [
+        {
+          "regex": "(?i)(jwt\\.New|jwt\\.SignedString|ParseWithClaims|\\.SignedString).*\\[\\]byte\\(\"[^\"]{4,}\"\\)",
+          "same_line": true,
+          "not_regex": "(?i)(?:os\\.Getenv|os\\.LookupEnv|//\\ dede:\\ safe)"
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-321"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "asvs": [
+        "v5.0.0-3.5.2"
+      ],
+      "recommendation": "Load JWT signing keys from environment variables or a secret store; never hardcode them.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/321.html"
+      ]
+    },
+    {
+      "id": "dede.go.sql.fmt-sprintf-query",
+      "message": "SQL query built with fmt.Sprintf and user input; SQL injection risk.",
+      "severity": "CRITICAL",
+      "category": "security",
+      "languages": [
+        "go"
+      ],
+      "when": [
+        {
+          "regex": "(?i)fmt\\.Sprintf\\s*\\(\\s*\"[^\"]*(?:SELECT|INSERT|UPDATE|DELETE|WHERE)[^\"]*%",
+          "same_line": true,
+          "not_regex": "(?i)(?://\\ dede:\\ safe)"
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-89"
+      ],
+      "owasp": [
+        "A03:2025"
+      ],
+      "asvs": [
+        "v5.0.0-5.3.4"
+      ],
+      "recommendation": "Use db.Query/Exec with parameterized placeholders ($1, ?) instead of fmt.Sprintf for SQL.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/89.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.go.crypto.rand-math",
+      "message": "math/rand used for security-sensitive value generation; cryptographically insecure.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "go"
+      ],
+      "when": [
+        {
+          "regex": "(?i)rand\\.(Intn|Int63n|Float64|Perm)\\s*\\(",
+          "same_line": true,
+          "not_regex": "(?i)(?:crypto/rand|//\\ dede:\\ safe)"
+        }
+      ],
+      "if": [
+        {
+          "contains_any": [
+            "token",
+            "password",
+            "secret",
+            "session",
+            "nonce",
+            "key",
+            "otp",
+            "salt",
+            "csrf"
+          ]
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-338"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "asvs": [
+        "v5.0.0-6.2.2"
+      ],
+      "recommendation": "Use crypto/rand for all security-sensitive random values.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/338.html"
+      ],
+      "exclude_comments": true
+    }
+  ]
+}

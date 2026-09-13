@@ -1,0 +1,23 @@
+rules:
+  - id: dede.rust.security.command-new
+    message: "std::process::Command may allow command injection if arguments are unsanitized (CWE-78)."
+    languages: [rust]
+    severity: WARNING
+    metadata:
+      cwe: ["CWE-78"]
+      owasp: ["A03:2021"]
+      category: security
+    pattern-either:
+      - pattern: Command::new("sh")
+      - pattern: Command::new("bash")
+      - pattern: std::process::Command::new("sh")
+      - pattern: std::process::Command::new("bash")
+
+  - id: dede.rust.security.unsafe-block
+    message: "unsafe block requires careful review for memory safety issues."
+    languages: [rust]
+    severity: INFO
+    metadata:
+      category: security
+      cwe: ["CWE-119"]
+    pattern: unsafe { ... }

@@ -1,0 +1,22 @@
+rules:
+  - id: dede.java.security.runtime-exec
+    message: "Runtime.exec / ProcessBuilder may allow command injection (CWE-78)."
+    languages: [java]
+    severity: ERROR
+    metadata:
+      cwe: ["CWE-78"]
+      owasp: ["A03:2021"]
+      category: security
+    pattern-either:
+      - pattern: Runtime.getRuntime().exec(...)
+      - pattern: (new ProcessBuilder(...)).start()
+
+  - id: dede.java.security.deserial-objectinputstream
+    message: "ObjectInputStream deserialization can lead to remote code execution (CWE-502)."
+    languages: [java]
+    severity: ERROR
+    metadata:
+      cwe: ["CWE-502"]
+      owasp: ["A08:2021"]
+      category: security
+    pattern: new ObjectInputStream(...)

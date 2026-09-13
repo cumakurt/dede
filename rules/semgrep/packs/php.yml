@@ -1,0 +1,1721 @@
+rules:
+- id: php.doctrine.security.audit.doctrine-orm-dangerous-query.doctrine-orm-dangerous-query
+  languages:
+  - php
+  message: '`$QUERY` Detected string concatenation with a non-literal variable in
+    a Doctrine QueryBuilder method. This could lead to SQL injection if the variable
+    is user-controlled and not properly sanitized. In order to prevent SQL injection,
+    use parameterized queries or prepared statements instead.'
+  metadata:
+    category: security
+    cwe:
+    - 'CWE-89: Improper Neutralization of Special Elements used in an SQL Command
+      (''SQL Injection'')'
+    owasp:
+    - A01:2017 - Injection
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    references:
+    - https://www.doctrine-project.org/projects/doctrine-dbal/en/current/reference/query-builder.html#security-safely-preventing-sql-injection
+    - https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html
+    technology:
+    - doctrine
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - SQL Injection
+    source: https://semgrep.dev/r/php.doctrine.security.audit.doctrine-orm-dangerous-query.doctrine-orm-dangerous-query
+    shortlink: https://sg.run/jwDJ
+    semgrep.dev:
+      rule:
+        r_id: 13965
+        rv_id: 1263271
+        rule_id: kxUw23
+        version_id: 1QTypnG
+        url: https://semgrep.dev/playground/r/1QTypnG/php.doctrine.security.audit.doctrine-orm-dangerous-query.doctrine-orm-dangerous-query
+        origin: community
+  mode: taint
+  pattern-sinks:
+  - patterns:
+    - focus-metavariable: $SINK
+    - pattern-either:
+      - pattern: $QUERY->add(...,$SINK,...)
+      - pattern: $QUERY->select(...,$SINK,...)
+      - pattern: $QUERY->addSelect(...,$SINK,...)
+      - pattern: $QUERY->delete(...,$SINK,...)
+      - pattern: $QUERY->update(...,$SINK,...)
+      - pattern: $QUERY->insert(...,$SINK,...)
+      - pattern: $QUERY->from(...,$SINK,...)
+      - pattern: $QUERY->join(...,$SINK,...)
+      - pattern: $QUERY->innerJoin(...,$SINK,...)
+      - pattern: $QUERY->leftJoin(...,$SINK,...)
+      - pattern: $QUERY->rightJoin(...,$SINK,...)
+      - pattern: $QUERY->where(...,$SINK,...)
+      - pattern: $QUERY->andWhere(...,$SINK,...)
+      - pattern: $QUERY->orWhere(...,$SINK,...)
+      - pattern: $QUERY->groupBy(...,$SINK,...)
+      - pattern: $QUERY->addGroupBy(...,$SINK,...)
+      - pattern: $QUERY->having(...,$SINK,...)
+      - pattern: $QUERY->andHaving(...,$SINK,...)
+      - pattern: $QUERY->orHaving(...,$SINK,...)
+      - pattern: $QUERY->orderBy(...,$SINK,...)
+      - pattern: $QUERY->addOrderBy(...,$SINK,...)
+      - pattern: $QUERY->set($SINK,...)
+      - pattern: $QUERY->setValue($SINK,...)
+    - pattern-either:
+      - pattern-inside: |
+          $Q = $X->createQueryBuilder();
+          ...
+      - pattern-inside: |
+          $Q = new QueryBuilder(...);
+          ...
+  pattern-sources:
+  - patterns:
+    - pattern-either:
+      - pattern: sprintf(...)
+      - pattern: |
+          "...".$SMTH
+  severity: WARNING
+- id: php.lang.security.assert-use.assert-use
+  mode: taint
+  pattern-sources:
+  - pattern-either:
+    - patterns:
+      - pattern-either:
+        - pattern: $_GET
+        - pattern: $_POST
+        - pattern: $_COOKIE
+        - pattern: $_REQUEST
+        - pattern: $_SERVER
+    - patterns:
+      - pattern: |
+          Route::$METHOD($ROUTENAME, function(..., $ARG, ...) { ... })
+      - focus-metavariable: $ARG
+  pattern-sinks:
+  - patterns:
+    - pattern: assert($SINK, ...);
+    - pattern-not: assert("...", ...);
+    - pattern: $SINK
+  message: Calling assert with user input is equivalent to eval'ing.
+  metadata:
+    owasp:
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    cwe:
+    - 'CWE-95: Improper Neutralization of Directives in Dynamically Evaluated Code
+      (''Eval Injection'')'
+    references:
+    - https://www.php.net/manual/en/function.assert
+    - https://github.com/FloeDesignTechnologies/phpcs-security-audit/blob/master/Security/Sniffs/BadFunctions/AssertsSniff.php
+    category: security
+    technology:
+    - php
+    confidence: HIGH
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Code Injection
+    source: https://semgrep.dev/r/php.lang.security.assert-use.assert-use
+    shortlink: https://sg.run/3xXW
+    semgrep.dev:
+      rule:
+        r_id: 9387
+        rv_id: 1263272
+        rule_id: DbUpjk
+        version_id: 9lT4bLx
+        url: https://semgrep.dev/playground/r/9lT4bLx/php.lang.security.assert-use.assert-use
+        origin: community
+  languages:
+  - php
+  severity: ERROR
+- id: php.lang.security.curl-ssl-verifypeer-off.curl-ssl-verifypeer-off
+  patterns:
+  - pattern-either:
+    - pattern: |
+        $ARG = $IS_VERIFIED;
+        ...
+        curl_setopt(..., CURLOPT_SSL_VERIFYPEER, $ARG);
+    - pattern: curl_setopt(..., CURLOPT_SSL_VERIFYPEER, $IS_VERIFIED)
+  - metavariable-regex:
+      metavariable: $IS_VERIFIED
+      regex: 0|false|null
+  message: SSL verification is disabled but should not be (currently CURLOPT_SSL_VERIFYPEER=
+    $IS_VERIFIED)
+  metadata:
+    cwe:
+    - 'CWE-319: Cleartext Transmission of Sensitive Information'
+    references:
+    - https://www.saotn.org/dont-turn-off-curlopt_ssl_verifypeer-fix-php-configuration/
+    category: security
+    technology:
+    - php
+    owasp:
+    - A03:2017 - Sensitive Data Exposure
+    - A02:2021 - Cryptographic Failures
+    - A04:2025 - Cryptographic Failures
+    subcategory:
+    - vuln
+    likelihood: LOW
+    impact: LOW
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/php.lang.security.curl-ssl-verifypeer-off.curl-ssl-verifypeer-off
+    shortlink: https://sg.run/PJqv
+    semgrep.dev:
+      rule:
+        r_id: 9389
+        rv_id: 1263277
+        rule_id: 0oU5Xg
+        version_id: kbTzG9b
+        url: https://semgrep.dev/playground/r/kbTzG9b/php.lang.security.curl-ssl-verifypeer-off.curl-ssl-verifypeer-off
+        origin: community
+  languages:
+  - php
+  severity: ERROR
+- id: php.lang.security.deserialization.extract-user-data
+  mode: taint
+  pattern-sources:
+  - pattern-either:
+    - pattern: $_GET[...]
+    - pattern: $_FILES[...]
+    - pattern: $_POST[...]
+  pattern-sinks:
+  - pattern: extract(...)
+  pattern-sanitizers:
+  - pattern: extract($VAR, EXTR_SKIP,...)
+  message: Do not call 'extract()' on user-controllable data. If you must, then you
+    must also provide the EXTR_SKIP flag to prevent overwriting existing variables.
+  languages:
+  - php
+  metadata:
+    category: security
+    cwe:
+    - 'CWE-502: Deserialization of Untrusted Data'
+    owasp:
+    - A08:2017 - Insecure Deserialization
+    - A08:2021 - Software and Data Integrity Failures
+    - A08:2025 - Software or Data Integrity Failures
+    technology:
+    - php
+    references:
+    - https://www.php.net/manual/en/function.extract.php#refsect1-function.extract-notes
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - 'Insecure Deserialization '
+    source: https://semgrep.dev/r/php.lang.security.deserialization.extract-user-data
+    shortlink: https://sg.run/6bv1
+    semgrep.dev:
+      rule:
+        r_id: 18259
+        rv_id: 1263278
+        rule_id: nJUykq
+        version_id: w8TRovw
+        url: https://semgrep.dev/playground/r/w8TRovw/php.lang.security.deserialization.extract-user-data
+        origin: community
+  severity: ERROR
+- id: php.lang.security.injection.echoed-request.echoed-request
+  mode: taint
+  message: '`Echo`ing user input risks cross-site scripting vulnerability. You should
+    use `htmlentities()` when showing data to users.'
+  languages:
+  - php
+  severity: ERROR
+  pattern-sources:
+  - pattern: $_REQUEST
+  - pattern: $_GET
+  - pattern: $_POST
+  pattern-sinks:
+  - pattern: echo $...VARS;
+  pattern-sanitizers:
+  - pattern: htmlentities(...)
+  - pattern: htmlspecialchars(...)
+  - pattern: strip_tags(...)
+  - pattern: isset(...)
+  - pattern: empty(...)
+  - pattern: esc_html(...)
+  - pattern: esc_attr(...)
+  - pattern: wp_kses(...)
+  - pattern: e(...)
+  - pattern: twig_escape_filter(...)
+  - pattern: xss_clean(...)
+  - pattern: html_escape(...)
+  - pattern: Html::escape(...)
+  - pattern: Xss::filter(...)
+  - pattern: escapeHtml(...)
+  - pattern: escapeHtml(...)
+  - pattern: escapeHtmlAttr(...)
+  fix: echo htmlentities($...VARS);
+  metadata:
+    technology:
+    - php
+    cwe:
+    - 'CWE-79: Improper Neutralization of Input During Web Page Generation (''Cross-site
+      Scripting'')'
+    owasp:
+    - A07:2017 - Cross-Site Scripting (XSS)
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    category: security
+    references:
+    - https://www.php.net/manual/en/function.htmlentities.php
+    - https://www.php.net/manual/en/reserved.variables.request.php
+    - https://www.php.net/manual/en/reserved.variables.post.php
+    - https://www.php.net/manual/en/reserved.variables.get.php
+    - https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Cross-Site-Scripting (XSS)
+    source: https://semgrep.dev/r/php.lang.security.injection.echoed-request.echoed-request
+    shortlink: https://sg.run/Bqqb
+    semgrep.dev:
+      rule:
+        r_id: 31707
+        rv_id: 1263283
+        rule_id: BYUyyg
+        version_id: d6TyxE9
+        url: https://semgrep.dev/playground/r/d6TyxE9/php.lang.security.injection.echoed-request.echoed-request
+        origin: community
+- id: php.lang.security.injection.tainted-filename.tainted-filename
+  severity: WARNING
+  message: File name based on user input risks server-side request forgery.
+  metadata:
+    technology:
+    - php
+    category: security
+    cwe:
+    - 'CWE-918: Server-Side Request Forgery (SSRF)'
+    owasp:
+    - A10:2021 - Server-Side Request Forgery (SSRF)
+    - A01:2025 - Broken Access Control
+    references:
+    - https://owasp.org/Top10/A10_2021-Server-Side_Request_Forgery_%28SSRF%29
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    impact: MEDIUM
+    likelihood: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Server-Side Request Forgery (SSRF)
+    source: https://semgrep.dev/r/php.lang.security.injection.tainted-filename.tainted-filename
+    shortlink: https://sg.run/Ayqp
+    semgrep.dev:
+      rule:
+        r_id: 16250
+        rv_id: 1263287
+        rule_id: 5rUpro
+        version_id: 7ZTE3J1
+        url: https://semgrep.dev/playground/r/7ZTE3J1/php.lang.security.injection.tainted-filename.tainted-filename
+        origin: community
+  languages:
+  - php
+  mode: taint
+  pattern-sources:
+  - patterns:
+    - pattern-either:
+      - pattern: $_GET
+      - pattern: $_POST
+      - pattern: $_COOKIE
+      - pattern: $_REQUEST
+      - pattern: $_SERVER
+  pattern-sanitizers:
+  - patterns:
+    - pattern-either:
+      - pattern-inside: basename($PATH, ...)
+      - pattern-inside: linkinfo($PATH, ...)
+      - pattern-inside: readlink($PATH, ...)
+      - pattern-inside: realpath($PATH, ...)
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - pattern-inside: opcache_compile_file($FILENAME, ...)
+      - pattern-inside: opcache_invalidate($FILENAME, ...)
+      - pattern-inside: opcache_is_script_cached($FILENAME, ...)
+      - pattern-inside: runkit7_import($FILENAME, ...)
+      - pattern-inside: readline_read_history($FILENAME, ...)
+      - pattern-inside: readline_write_history($FILENAME, ...)
+      - pattern-inside: rar_open($FILENAME, ...)
+      - pattern-inside: zip_open($FILENAME, ...)
+      - pattern-inside: gzfile($FILENAME, ...)
+      - pattern-inside: gzopen($FILENAME, ...)
+      - pattern-inside: readgzfile($FILENAME, ...)
+      - pattern-inside: hash_file($ALGO, $FILENAME, ...)
+      - pattern-inside: hash_update_file($CONTEXT, $FILENAME, ...)
+      - pattern-inside: pg_trace($FILENAME, ...)
+      - pattern-inside: dio_open($FILENAME, ...)
+      - pattern-inside: finfo_file($FINFO, $FILENAME, ...)
+      - pattern-inside: mime_content_type($FILENAME, ...)
+      - pattern-inside: chgrp($FILENAME, ...)
+      - pattern-inside: chmod($FILENAME, ...)
+      - pattern-inside: chown($FILENAME, ...)
+      - pattern-inside: clearstatcache($CLEAR_REALPATH_CACHE, $FILENAME, ...)
+      - pattern-inside: file_exists($FILENAME, ...)
+      - pattern-inside: file_get_contents($FILENAME, ...)
+      - pattern-inside: file_put_contents($FILENAME, ...)
+      - pattern-inside: file($FILENAME, ...)
+      - pattern-inside: fileatime($FILENAME, ...)
+      - pattern-inside: filectime($FILENAME, ...)
+      - pattern-inside: filegroup($FILENAME, ...)
+      - pattern-inside: fileinode($FILENAME, ...)
+      - pattern-inside: filemtime($FILENAME, ...)
+      - pattern-inside: fileowner($FILENAME, ...)
+      - pattern-inside: fileperms($FILENAME, ...)
+      - pattern-inside: filesize($FILENAME, ...)
+      - pattern-inside: filetype($FILENAME, ...)
+      - pattern-inside: fnmatch($PATTERN, $FILENAME, ...)
+      - pattern-inside: fopen($FILENAME, ...)
+      - pattern-inside: is_dir($FILENAME, ...)
+      - pattern-inside: is_executable($FILENAME, ...)
+      - pattern-inside: is_file($FILENAME, ...)
+      - pattern-inside: is_link($FILENAME, ...)
+      - pattern-inside: is_readable($FILENAME, ...)
+      - pattern-inside: is_uploaded_file($FILENAME, ...)
+      - pattern-inside: is_writable($FILENAME, ...)
+      - pattern-inside: lchgrp($FILENAME, ...)
+      - pattern-inside: lchown($FILENAME, ...)
+      - pattern-inside: lstat($FILENAME, ...)
+      - pattern-inside: parse_ini_file($FILENAME, ...)
+      - pattern-inside: readfile($FILENAME, ...)
+      - pattern-inside: stat($FILENAME, ...)
+      - pattern-inside: touch($FILENAME, ...)
+      - pattern-inside: unlink($FILENAME, ...)
+      - pattern-inside: xattr_get($FILENAME, ...)
+      - pattern-inside: xattr_list($FILENAME, ...)
+      - pattern-inside: xattr_remove($FILENAME, ...)
+      - pattern-inside: xattr_set($FILENAME, ...)
+      - pattern-inside: xattr_supported($FILENAME, ...)
+      - pattern-inside: enchant_broker_request_pwl_dict($BROKER, $FILENAME, ...)
+      - pattern-inside: pspell_config_personal($CONFIG, $FILENAME, ...)
+      - pattern-inside: pspell_config_repl($CONFIG, $FILENAME, ...)
+      - pattern-inside: pspell_new_personal($FILENAME, ...)
+      - pattern-inside: exif_imagetype($FILENAME, ...)
+      - pattern-inside: getimagesize($FILENAME, ...)
+      - pattern-inside: image2wbmp($IMAGE, $FILENAME, ...)
+      - pattern-inside: imagecreatefromavif($FILENAME, ...)
+      - pattern-inside: imagecreatefrombmp($FILENAME, ...)
+      - pattern-inside: imagecreatefromgd2($FILENAME, ...)
+      - pattern-inside: imagecreatefromgd2part($FILENAME, ...)
+      - pattern-inside: imagecreatefromgd($FILENAME, ...)
+      - pattern-inside: imagecreatefromgif($FILENAME, ...)
+      - pattern-inside: imagecreatefromjpeg($FILENAME, ...)
+      - pattern-inside: imagecreatefrompng($FILENAME, ...)
+      - pattern-inside: imagecreatefromtga($FILENAME, ...)
+      - pattern-inside: imagecreatefromwbmp($FILENAME, ...)
+      - pattern-inside: imagecreatefromwebp($FILENAME, ...)
+      - pattern-inside: imagecreatefromxbm($FILENAME, ...)
+      - pattern-inside: imagecreatefromxpm($FILENAME, ...)
+      - pattern-inside: imageloadfont($FILENAME, ...)
+      - pattern-inside: imagexbm($IMAGE, $FILENAME, ...)
+      - pattern-inside: iptcembed($IPTC_DATA, $FILENAME, ...)
+      - pattern-inside: mailparse_msg_extract_part_file($MIMEMAIL, $FILENAME, ...)
+      - pattern-inside: mailparse_msg_extract_whole_part_file($MIMEMAIL, $FILENAME,
+          ...)
+      - pattern-inside: mailparse_msg_parse_file($FILENAME, ...)
+      - pattern-inside: fdf_add_template($FDF_DOCUMENT, $NEWPAGE, $FILENAME, ...)
+      - pattern-inside: fdf_get_ap($FDF_DOCUMENT, $FIELD, $FACE, $FILENAME, ...)
+      - pattern-inside: fdf_open($FILENAME, ...)
+      - pattern-inside: fdf_save($FDF_DOCUMENT, $FILENAME, ...)
+      - pattern-inside: fdf_set_ap($FDF_DOCUMENT, $FIELD_NAME, $FACE, $FILENAME, ...)
+      - pattern-inside: ps_add_launchlink($PSDOC, $LLX, $LLY, $URX, $URY, $FILENAME,
+          ...)
+      - pattern-inside: ps_add_pdflink($PSDOC, $LLX, $LLY, $URX, $URY, $FILENAME,
+          ...)
+      - pattern-inside: ps_open_file($PSDOC, $FILENAME, ...)
+      - pattern-inside: ps_open_image_file($PSDOC, $TYPE, $FILENAME, ...)
+      - pattern-inside: posix_access($FILENAME, ...)
+      - pattern-inside: posix_mkfifo($FILENAME, ...)
+      - pattern-inside: posix_mknod($FILENAME, ...)
+      - pattern-inside: ftok($FILENAME, ...)
+      - pattern-inside: fann_cascadetrain_on_file($ANN, $FILENAME, ...)
+      - pattern-inside: fann_read_train_from_file($FILENAME, ...)
+      - pattern-inside: fann_train_on_file($ANN, $FILENAME, ...)
+      - pattern-inside: highlight_file($FILENAME, ...)
+      - pattern-inside: php_strip_whitespace($FILENAME, ...)
+      - pattern-inside: stream_resolve_include_path($FILENAME, ...)
+      - pattern-inside: swoole_async_read($FILENAME, ...)
+      - pattern-inside: swoole_async_readfile($FILENAME, ...)
+      - pattern-inside: swoole_async_write($FILENAME, ...)
+      - pattern-inside: swoole_async_writefile($FILENAME, ...)
+      - pattern-inside: swoole_load_module($FILENAME, ...)
+      - pattern-inside: tidy_parse_file($FILENAME, ...)
+      - pattern-inside: tidy_repair_file($FILENAME, ...)
+      - pattern-inside: get_meta_tags($FILENAME, ...)
+      - pattern-inside: yaml_emit_file($FILENAME, ...)
+      - pattern-inside: yaml_parse_file($FILENAME, ...)
+      - pattern-inside: curl_file_create($FILENAME, ...)
+      - pattern-inside: ftp_chmod($FTP, $PERMISSIONS, $FILENAME, ...)
+      - pattern-inside: ftp_delete($FTP, $FILENAME, ...)
+      - pattern-inside: ftp_mdtm($FTP, $FILENAME, ...)
+      - pattern-inside: ftp_size($FTP, $FILENAME, ...)
+      - pattern-inside: rrd_create($FILENAME, ...)
+      - pattern-inside: rrd_fetch($FILENAME, ...)
+      - pattern-inside: rrd_graph($FILENAME, ...)
+      - pattern-inside: rrd_info($FILENAME, ...)
+      - pattern-inside: rrd_last($FILENAME, ...)
+      - pattern-inside: rrd_lastupdate($FILENAME, ...)
+      - pattern-inside: rrd_tune($FILENAME, ...)
+      - pattern-inside: rrd_update($FILENAME, ...)
+      - pattern-inside: snmp_read_mib($FILENAME, ...)
+      - pattern-inside: ssh2_sftp_chmod($SFTP, $FILENAME, ...)
+      - pattern-inside: ssh2_sftp_realpath($SFTP, $FILENAME, ...)
+      - pattern-inside: ssh2_sftp_unlink($SFTP, $FILENAME, ...)
+      - pattern-inside: apache_lookup_uri($FILENAME, ...)
+      - pattern-inside: md5_file($FILENAME, ...)
+      - pattern-inside: sha1_file($FILENAME, ...)
+      - pattern-inside: simplexml_load_file($FILENAME, ...)
+    - pattern: $FILENAME
+- id: php.lang.security.injection.tainted-object-instantiation.tainted-object-instantiation
+  languages:
+  - php
+  severity: WARNING
+  message: <- A new object is created where the class name is based on user input.
+    This could lead to remote code execution, as it allows to instantiate any class
+    in the application.
+  metadata:
+    cwe:
+    - 'CWE-470: Use of Externally-Controlled Input to Select Classes or Code (''Unsafe
+      Reflection'')'
+    category: security
+    technology:
+    - php
+    owasp:
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    references:
+    - https://owasp.org/Top10/A03_2021-Injection
+    subcategory:
+    - vuln
+    impact: MEDIUM
+    likelihood: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Improper Authorization
+    source: https://semgrep.dev/r/php.lang.security.injection.tainted-object-instantiation.tainted-object-instantiation
+    shortlink: https://sg.run/7ndw
+    semgrep.dev:
+      rule:
+        r_id: 16438
+        rv_id: 1263288
+        rule_id: v8U4DA
+        version_id: LjTkgLy
+        url: https://semgrep.dev/playground/r/LjTkgLy/php.lang.security.injection.tainted-object-instantiation.tainted-object-instantiation
+        origin: community
+  mode: taint
+  pattern-sources:
+  - patterns:
+    - pattern-either:
+      - pattern: $_GET
+      - pattern: $_POST
+      - pattern: $_COOKIE
+      - pattern: $_REQUEST
+      - pattern: $_SERVER
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - pattern-inside: new $SINK(...)
+    - pattern: $SINK
+- id: php.lang.security.injection.tainted-sql-string.tainted-sql-string
+  languages:
+  - php
+  severity: ERROR
+  message: User data flows into this manually-constructed SQL string. User data can
+    be safely inserted into SQL strings using prepared statements or an object-relational
+    mapper (ORM). Manually-constructed SQL strings is a possible indicator of SQL
+    injection, which could let an attacker steal or manipulate data from the database.
+    Instead, use prepared statements (`$mysqli->prepare("INSERT INTO test(id, label)
+    VALUES (?, ?)");`) or a safe library.
+  metadata:
+    cwe:
+    - 'CWE-89: Improper Neutralization of Special Elements used in an SQL Command
+      (''SQL Injection'')'
+    owasp:
+    - A01:2017 - Injection
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    references:
+    - https://owasp.org/www-community/attacks/SQL_Injection
+    category: security
+    technology:
+    - php
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: HIGH
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - SQL Injection
+    source: https://semgrep.dev/r/php.lang.security.injection.tainted-sql-string.tainted-sql-string
+    shortlink: https://sg.run/lZYG
+    semgrep.dev:
+      rule:
+        r_id: 14757
+        rv_id: 1263290
+        rule_id: qNUXdL
+        version_id: gETB7vY
+        url: https://semgrep.dev/playground/r/gETB7vY/php.lang.security.injection.tainted-sql-string.tainted-sql-string
+        origin: community
+  mode: taint
+  pattern-sanitizers:
+  - pattern-either:
+    - pattern: mysqli_real_escape_string(...)
+    - pattern: real_escape_string(...)
+    - pattern: $MYSQLI->real_escape_string(...)
+  pattern-sources:
+  - patterns:
+    - pattern-either:
+      - pattern: $_GET
+      - pattern: $_POST
+      - pattern: $_COOKIE
+      - pattern: $_REQUEST
+  pattern-sinks:
+  - pattern-either:
+    - patterns:
+      - pattern: |
+          sprintf($SQLSTR, ...)
+      - metavariable-regex:
+          metavariable: $SQLSTR
+          regex: (?is).*\b(select|delete|insert|create|update|alter|drop)\b.*
+    - patterns:
+      - pattern: |
+          "...$EXPR..."
+      - metavariable-regex:
+          metavariable: $EXPR
+          regex: (?is).*\b(select|delete|insert|create|update|alter|drop)\b.*
+    - patterns:
+      - pattern: |
+          "$SQLSTR".$EXPR
+      - metavariable-regex:
+          metavariable: $SQLSTR
+          regex: (?is).*\b(select|delete|insert|create|update|alter|drop)\b.*
+- id: php.lang.security.injection.tainted-url-host.tainted-url-host
+  languages:
+  - php
+  severity: WARNING
+  message: User data flows into the host portion of this manually-constructed URL.
+    This could allow an attacker to send data to their own server, potentially exposing
+    sensitive data such as cookies or authorization information sent with this request.
+    They could also probe internal servers or other resources that the server running
+    this code can access. (This is called server-side request forgery, or SSRF.) Do
+    not allow arbitrary hosts. Instead, create an allowlist for approved hosts, or
+    hardcode the correct host.
+  metadata:
+    cwe:
+    - 'CWE-918: Server-Side Request Forgery (SSRF)'
+    owasp:
+    - A10:2021 - Server-Side Request Forgery (SSRF)
+    - A01:2025 - Broken Access Control
+    references:
+    - https://cheatsheetseries.owasp.org/cheatsheets/Server_Side_Request_Forgery_Prevention_Cheat_Sheet.html
+    category: security
+    technology:
+    - php
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    impact: MEDIUM
+    likelihood: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Server-Side Request Forgery (SSRF)
+    source: https://semgrep.dev/r/php.lang.security.injection.tainted-url-host.tainted-url-host
+    shortlink: https://sg.run/Y8no
+    semgrep.dev:
+      rule:
+        r_id: 14758
+        rv_id: 1263291
+        rule_id: lBU8K1
+        version_id: QkTGqRd
+        url: https://semgrep.dev/playground/r/QkTGqRd/php.lang.security.injection.tainted-url-host.tainted-url-host
+        origin: community
+  mode: taint
+  pattern-sources:
+  - patterns:
+    - pattern-either:
+      - pattern: $_GET
+      - pattern: $_POST
+      - pattern: $_COOKIE
+      - pattern: $_REQUEST
+  pattern-sinks:
+  - pattern-either:
+    - patterns:
+      - pattern: |
+          sprintf($URLSTR, ...)
+      - metavariable-pattern:
+          metavariable: $URLSTR
+          language: generic
+          pattern: $SCHEME://%s
+    - patterns:
+      - pattern: |
+          "...{$EXPR}..."
+      - pattern-regex: |
+          .*://\{.*
+    - patterns:
+      - pattern: |
+          "...$EXPR..."
+      - pattern-regex: |
+          .*://\$.*
+    - patterns:
+      - pattern: |
+          "...".$EXPR
+      - pattern-regex: |
+          .*://["'].*
+- id: php.lang.security.md5-used-as-password.md5-used-as-password
+  severity: WARNING
+  message: It looks like MD5 is used as a password hash. MD5 is not considered a secure
+    password hash because it can be cracked by an attacker in a short amount of time.
+    Use a suitable password hashing function such as bcrypt. You can use `password_hash($PASSWORD,
+    PASSWORD_BCRYPT, $OPTIONS);`.
+  languages:
+  - php
+  metadata:
+    cwe:
+    - 'CWE-327: Use of a Broken or Risky Cryptographic Algorithm'
+    owasp:
+    - A03:2017 - Sensitive Data Exposure
+    - A02:2021 - Cryptographic Failures
+    - A04:2025 - Cryptographic Failures
+    references:
+    - https://tools.ietf.org/html/rfc6151
+    - https://crypto.stackexchange.com/questions/44151/how-does-the-flame-malware-take-advantage-of-md5-collision
+    - https://security.stackexchange.com/questions/211/how-to-securely-hash-passwords
+    - https://github.com/returntocorp/semgrep-rules/issues/1609
+    - https://www.php.net/password_hash
+    category: security
+    technology:
+    - md5
+    subcategory:
+    - vuln
+    likelihood: HIGH
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Cryptographic Issues
+    source: https://semgrep.dev/r/php.lang.security.md5-used-as-password.md5-used-as-password
+    shortlink: https://sg.run/66YL
+    semgrep.dev:
+      rule:
+        r_id: 14759
+        rv_id: 1263294
+        rule_id: YGUD1O
+        version_id: PkTR37j
+        url: https://semgrep.dev/playground/r/PkTR37j/php.lang.security.md5-used-as-password.md5-used-as-password
+        origin: community
+  mode: taint
+  pattern-sources:
+  - patterns:
+    - pattern-either:
+      - pattern: md5(...)
+      - pattern: hash('md5', ...)
+  pattern-sinks:
+  - patterns:
+    - pattern: $FUNCTION(...)
+    - metavariable-regex:
+        metavariable: $FUNCTION
+        regex: (?i)(.*password.*)
+- id: php.lang.security.openssl-cbc-static-iv.openssl-cbc-static-iv
+  patterns:
+  - pattern-either:
+    - pattern: openssl_encrypt($D, $M, $K, $FLAGS, "...",...);
+    - pattern: openssl_decrypt($D, $M, $K, $FLAGS, "...",...);
+  - metavariable-comparison:
+      metavariable: $M
+      comparison: re.match(".*-CBC",$M)
+  message: Static IV used with AES in CBC mode. Static IVs enable chosen-plaintext
+    attacks against encrypted data.
+  languages:
+  - php
+  severity: ERROR
+  metadata:
+    cwe:
+    - 'CWE-329: Generation of Predictable IV with CBC Mode'
+    references:
+    - https://csrc.nist.gov/publications/detail/sp/800-38a/final
+    owasp:
+    - A02:2021 - Cryptographic Failures
+    - A04:2025 - Cryptographic Failures
+    technology:
+    - php
+    - openssl
+    category: security
+    subcategory:
+    - vuln
+    likelihood: HIGH
+    impact: MEDIUM
+    confidence: HIGH
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Cryptographic Issues
+    source: https://semgrep.dev/r/php.lang.security.openssl-cbc-static-iv.openssl-cbc-static-iv
+    shortlink: https://sg.run/LgWJ
+    semgrep.dev:
+      rule:
+        r_id: 19039
+        rv_id: 1263295
+        rule_id: DbUGbE
+        version_id: JdTzxOD
+        url: https://semgrep.dev/playground/r/JdTzxOD/php.lang.security.openssl-cbc-static-iv.openssl-cbc-static-iv
+        origin: community
+- id: php.lang.security.phpinfo-use.phpinfo-use
+  pattern: phpinfo(...);
+  message: The 'phpinfo' function may reveal sensitive information about your environment.
+  metadata:
+    cwe:
+    - 'CWE-200: Exposure of Sensitive Information to an Unauthorized Actor'
+    references:
+    - https://www.php.net/manual/en/function.phpinfo
+    - https://github.com/FloeDesignTechnologies/phpcs-security-audit/blob/master/Security/Sniffs/BadFunctions/PhpinfosSniff.php
+    category: security
+    technology:
+    - php
+    owasp:
+    - A01:2021 - Broken Access Control
+    - A01:2025 - Broken Access Control
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/php.lang.security.phpinfo-use.phpinfo-use
+    shortlink: https://sg.run/W82E
+    semgrep.dev:
+      rule:
+        r_id: 9397
+        rv_id: 1263298
+        rule_id: ReUglY
+        version_id: RGT0LN0
+        url: https://semgrep.dev/playground/r/RGT0LN0/php.lang.security.phpinfo-use.phpinfo-use
+        origin: community
+  languages:
+  - php
+  severity: ERROR
+- id: php.lang.security.redirect-to-request-uri.redirect-to-request-uri
+  patterns:
+  - pattern-either:
+    - pattern: |
+        header('$LOCATION' . $_SERVER['REQUEST_URI']);
+    - pattern: |
+        header('$LOCATION' . $_SERVER['REQUEST_URI'] . $MORE);
+  - metavariable-regex:
+      metavariable: $LOCATION
+      regex: ^(?i)location:\s*$
+  message: Redirecting to the current request URL may redirect to another domain,
+    if the current path starts with two slashes.  E.g. in https://www.example.com//attacker.com,
+    the value of REQUEST_URI is //attacker.com, and redirecting to it will redirect
+    to that domain.
+  metadata:
+    references:
+    - https://www.php.net/manual/en/reserved.variables.server.php
+    - https://owasp.org/www-project-top-ten/2017/A5_2017-Broken_Access_Control.html
+    category: security
+    technology:
+    - php
+    owasp:
+    - A05:2017 - Broken Access Control
+    - A01:2021 - Broken Access Control
+    - A01:2025 - Broken Access Control
+    cwe:
+    - 'CWE-601: URL Redirection to Untrusted Site (''Open Redirect'')'
+    likelihood: MEDIUM
+    impact: LOW
+    confidence: MEDIUM
+    subcategory:
+    - vuln
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Open Redirect
+    source: https://semgrep.dev/r/php.lang.security.redirect-to-request-uri.redirect-to-request-uri
+    shortlink: https://sg.run/RWl2
+    semgrep.dev:
+      rule:
+        r_id: 35493
+        rv_id: 1263299
+        rule_id: 3qUb4n
+        version_id: A8Tgdvq
+        url: https://semgrep.dev/playground/r/A8Tgdvq/php.lang.security.redirect-to-request-uri.redirect-to-request-uri
+        origin: community
+  languages:
+  - php
+  severity: WARNING
+- id: php.laravel.security.laravel-api-route-sql-injection.laravel-api-route-sql-injection
+  mode: taint
+  pattern-sources:
+  - patterns:
+    - focus-metavariable: $ARG
+    - pattern-inside: |
+        Route::$METHOD($ROUTE_NAME, function(...,$ARG,...){...})
+  pattern-sanitizers:
+  - patterns:
+    - pattern: |
+        DB::raw("...",[...])
+  pattern-sinks:
+  - patterns:
+    - pattern: |
+        DB::raw(...)
+  message: HTTP method [$METHOD] to Laravel route $ROUTE_NAME is vulnerable to SQL
+    injection via string concatenation or unsafe interpolation.
+  languages:
+  - php
+  severity: WARNING
+  metadata:
+    category: security
+    cwe:
+    - 'CWE-89: Improper Neutralization of Special Elements used in an SQL Command
+      (''SQL Injection'')'
+    owasp:
+    - A01:2017 - Injection
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    references:
+    - https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/Laravel_Cheat_Sheet.md
+    technology:
+    - php
+    - laravel
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: HIGH
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - SQL Injection
+    source: https://semgrep.dev/r/php.laravel.security.laravel-api-route-sql-injection.laravel-api-route-sql-injection
+    shortlink: https://sg.run/x94g
+    semgrep.dev:
+      rule:
+        r_id: 21674
+        rv_id: 1263305
+        rule_id: zdUln0
+        version_id: qkTR7A9
+        url: https://semgrep.dev/playground/r/qkTR7A9/php.laravel.security.laravel-api-route-sql-injection.laravel-api-route-sql-injection
+        origin: community
+- id: php.laravel.security.laravel-sql-injection.laravel-sql-injection
+  metadata:
+    owasp:
+    - A01:2017 - Injection
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    cwe:
+    - 'CWE-89: Improper Neutralization of Special Elements used in an SQL Command
+      (''SQL Injection'')'
+    category: security
+    technology:
+    - laravel
+    references:
+    - https://laravel.com/docs/8.x/queries
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: HIGH
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - SQL Injection
+    source: https://semgrep.dev/r/php.laravel.security.laravel-sql-injection.laravel-sql-injection
+    shortlink: https://sg.run/x40p
+    semgrep.dev:
+      rule:
+        r_id: 16830
+        rv_id: 1263313
+        rule_id: j2UQdp
+        version_id: BjTkZ45
+        url: https://semgrep.dev/playground/r/BjTkZ45/php.laravel.security.laravel-sql-injection.laravel-sql-injection
+        origin: community
+  severity: WARNING
+  message: Detected a SQL query based on user input. This could lead to SQL injection,
+    which could potentially result in sensitive data being exfiltrated by attackers.
+    Instead, use parameterized queries and prepared statements.
+  languages:
+  - php
+  mode: taint
+  pattern-sources:
+  - patterns:
+    - pattern-either:
+      - pattern: $_GET
+      - pattern: $_POST
+      - pattern: $_COOKIE
+      - pattern: $_REQUEST
+      - pattern: $_SERVER
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - patterns:
+        - pattern: $SQL
+        - pattern-either:
+          - pattern-inside: DB::table(...)->whereRaw($SQL, ...)
+          - pattern-inside: DB::table(...)->orWhereRaw($SQL, ...)
+          - pattern-inside: DB::table(...)->groupByRaw($SQL, ...)
+          - pattern-inside: DB::table(...)->havingRaw($SQL, ...)
+          - pattern-inside: DB::table(...)->orHavingRaw($SQL, ...)
+          - pattern-inside: DB::table(...)->orderByRaw($SQL, ...)
+      - patterns:
+        - pattern: $EXPRESSION
+        - pattern-either:
+          - pattern-inside: DB::table(...)->selectRaw($EXPRESSION, ...)
+          - pattern-inside: DB::table(...)->fromRaw($EXPRESSION, ...)
+      - patterns:
+        - pattern: $COLUMNS
+        - pattern-either:
+          - pattern-inside: DB::table(...)->whereNull($COLUMNS, ...)
+          - pattern-inside: DB::table(...)->orWhereNull($COLUMN)
+          - pattern-inside: DB::table(...)->whereNotNull($COLUMNS, ...)
+          - pattern-inside: DB::table(...)->whereRowValues($COLUMNS, ...)
+          - pattern-inside: DB::table(...)->orWhereRowValues($COLUMNS, ...)
+          - pattern-inside: DB::table(...)->find($ID, $COLUMNS)
+          - pattern-inside: DB::table(...)->paginate($PERPAGE, $COLUMNS, ...)
+          - pattern-inside: DB::table(...)->simplePaginate($PERPAGE, $COLUMNS, ...)
+          - pattern-inside: DB::table(...)->cursorPaginate($PERPAGE, $COLUMNS, ...)
+          - pattern-inside: DB::table(...)->getCountForPagination($COLUMNS)
+          - pattern-inside: DB::table(...)->aggregate($FUNCTION, $COLUMNS)
+          - pattern-inside: DB::table(...)->numericAggregate($FUNCTION, $COLUMNS)
+          - pattern-inside: DB::table(...)->insertUsing($COLUMNS, ...)
+          - pattern-inside: DB::table(...)->select($COLUMNS)
+          - pattern-inside: DB::table(...)->get($COLUMNS)
+          - pattern-inside: DB::table(...)->count($COLUMNS)
+      - patterns:
+        - pattern: $COLUMN
+        - pattern-either:
+          - pattern-inside: DB::table(...)->whereIn($COLUMN, ...)
+          - pattern-inside: DB::table(...)->orWhereIn($COLUMN, ...)
+          - pattern-inside: DB::table(...)->whereNotIn($COLUMN, ...)
+          - pattern-inside: DB::table(...)->orWhereNotIn($COLUMN, ...)
+          - pattern-inside: DB::table(...)->whereIntegerInRaw($COLUMN, ...)
+          - pattern-inside: DB::table(...)->orWhereIntegerInRaw($COLUMN, ...)
+          - pattern-inside: DB::table(...)->whereIntegerNotInRaw($COLUMN, ...)
+          - pattern-inside: DB::table(...)->orWhereIntegerNotInRaw($COLUMN, ...)
+          - pattern-inside: DB::table(...)->whereBetweenColumns($COLUMN, ...)
+          - pattern-inside: DB::table(...)->orWhereBetween($COLUMN, ...)
+          - pattern-inside: DB::table(...)->orWhereBetweenColumns($COLUMN, ...)
+          - pattern-inside: DB::table(...)->whereNotBetween($COLUMN, ...)
+          - pattern-inside: DB::table(...)->whereNotBetweenColumns($COLUMN, ...)
+          - pattern-inside: DB::table(...)->orWhereNotBetween($COLUMN, ...)
+          - pattern-inside: DB::table(...)->orWhereNotBetweenColumns($COLUMN, ...)
+          - pattern-inside: DB::table(...)->orWhereNotNull($COLUMN)
+          - pattern-inside: DB::table(...)->whereDate($COLUMN, ...)
+          - pattern-inside: DB::table(...)->orWhereDate($COLUMN, ...)
+          - pattern-inside: DB::table(...)->whereTime($COLUMN, ...)
+          - pattern-inside: DB::table(...)->orWhereTime($COLUMN, ...)
+          - pattern-inside: DB::table(...)->whereDay($COLUMN, ...)
+          - pattern-inside: DB::table(...)->orWhereDay($COLUMN, ...)
+          - pattern-inside: DB::table(...)->whereMonth($COLUMN, ...)
+          - pattern-inside: DB::table(...)->orWhereMonth($COLUMN, ...)
+          - pattern-inside: DB::table(...)->whereYear($COLUMN, ...)
+          - pattern-inside: DB::table(...)->orWhereYear($COLUMN, ...)
+          - pattern-inside: DB::table(...)->whereJsonContains($COLUMN, ...)
+          - pattern-inside: DB::table(...)->orWhereJsonContains($COLUMN, ...)
+          - pattern-inside: DB::table(...)->whereJsonDoesntContain($COLUMN, ...)
+          - pattern-inside: DB::table(...)->orWhereJsonDoesntContain($COLUMN, ...)
+          - pattern-inside: DB::table(...)->whereJsonLength($COLUMN, ...)
+          - pattern-inside: DB::table(...)->orWhereJsonLength($COLUMN, ...)
+          - pattern-inside: DB::table(...)->having($COLUMN, ...)
+          - pattern-inside: DB::table(...)->orHaving($COLUMN, ...)
+          - pattern-inside: DB::table(...)->havingBetween($COLUMN, ...)
+          - pattern-inside: DB::table(...)->orderBy($COLUMN, ...)
+          - pattern-inside: DB::table(...)->orderByDesc($COLUMN)
+          - pattern-inside: DB::table(...)->latest($COLUMN)
+          - pattern-inside: DB::table(...)->oldest($COLUMN)
+          - pattern-inside: DB::table(...)->forPageBeforeId($PERPAGE, $LASTID, $COLUMN)
+          - pattern-inside: DB::table(...)->forPageAfterId($PERPAGE, $LASTID, $COLUMN)
+          - pattern-inside: DB::table(...)->value($COLUMN)
+          - pattern-inside: DB::table(...)->pluck($COLUMN, ...)
+          - pattern-inside: DB::table(...)->implode($COLUMN, ...)
+          - pattern-inside: DB::table(...)->min($COLUMN)
+          - pattern-inside: DB::table(...)->max($COLUMN)
+          - pattern-inside: DB::table(...)->sum($COLUMN)
+          - pattern-inside: DB::table(...)->avg($COLUMN)
+          - pattern-inside: DB::table(...)->average($COLUMN)
+          - pattern-inside: DB::table(...)->increment($COLUMN, ...)
+          - pattern-inside: DB::table(...)->decrement($COLUMN, ...)
+          - pattern-inside: DB::table(...)->where($COLUMN, ...)
+          - pattern-inside: DB::table(...)->orWhere($COLUMN, ...)
+          - pattern-inside: DB::table(...)->addSelect($COLUMN)
+      - patterns:
+        - pattern: $QUERY
+        - pattern-inside: DB::unprepared($QUERY)
+- id: php.laravel.security.laravel-unsafe-validator.laravel-unsafe-validator
+  mode: taint
+  pattern-sources:
+  - patterns:
+    - pattern: |
+        public function $F(...,Request $R,...){...}
+    - focus-metavariable: $R
+  - patterns:
+    - pattern-either:
+      - pattern: |
+          $this->$PROPERTY
+      - pattern: |
+          $this->$PROPERTY->$GET
+    - metavariable-pattern:
+        metavariable: $PROPERTY
+        patterns:
+        - pattern-either:
+          - pattern: query
+          - pattern: request
+          - pattern: headers
+          - pattern: cookies
+          - pattern: cookie
+          - pattern: files
+          - pattern: file
+          - pattern: allFiles
+          - pattern: input
+          - pattern: all
+          - pattern: post
+          - pattern: json
+    - pattern-either:
+      - pattern-inside: |
+          class $CL extends Illuminate\Http\Request {...}
+      - pattern-inside: |
+          class $CL extends Illuminate\Foundation\Http\FormRequest {...}
+  pattern-sinks:
+  - patterns:
+    - pattern: |
+        Illuminate\Validation\Rule::unique(...)->ignore(...,$IGNORE,...)
+    - focus-metavariable: $IGNORE
+  message: Found a request argument passed to an `ignore()` definition in a Rule constraint.
+    This can lead to SQL injection.
+  languages:
+  - php
+  severity: ERROR
+  metadata:
+    category: security
+    cwe:
+    - 'CWE-89: Improper Neutralization of Special Elements used in an SQL Command
+      (''SQL Injection'')'
+    owasp:
+    - A01:2017 - Injection
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    technology:
+    - php
+    - laravel
+    references:
+    - https://laravel.com/docs/9.x/validation#rule-unique
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: HIGH
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - SQL Injection
+    source: https://semgrep.dev/r/php.laravel.security.laravel-unsafe-validator.laravel-unsafe-validator
+    shortlink: https://sg.run/vkeb
+    semgrep.dev:
+      rule:
+        r_id: 21677
+        rv_id: 1263314
+        rule_id: X5ULgE
+        version_id: DkTRbBl
+        url: https://semgrep.dev/playground/r/DkTRbBl/php.laravel.security.laravel-unsafe-validator.laravel-unsafe-validator
+        origin: community
+- id: php.lang.security.injection.tainted-callable.tainted-callable
+  severity: WARNING
+  message: Callable based on user input risks remote code execution.
+  metadata:
+    technology:
+    - php
+    category: security
+    cwe:
+    - 'CWE-94: Improper Control of Generation of Code (''Code Injection'')'
+    owasp:
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    references:
+    - https://www.php.net/manual/en/language.types.callable.php
+    subcategory:
+    - vuln
+    impact: HIGH
+    likelihood: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Code Injection
+    source: https://semgrep.dev/r/php.lang.security.injection.tainted-callable.tainted-callable
+    shortlink: https://sg.run/YGb33
+    semgrep.dev:
+      rule:
+        r_id: 141958
+        rv_id: 1263285
+        rule_id: 0oULBKK
+        version_id: nWT2L5x
+        url: https://semgrep.dev/playground/r/nWT2L5x/php.lang.security.injection.tainted-callable.tainted-callable
+        origin: community
+  languages:
+  - php
+  mode: taint
+  pattern-sources:
+  - patterns:
+    - pattern-either:
+      - pattern: $_GET
+      - pattern: $_POST
+      - pattern: $_COOKIE
+      - pattern: $_REQUEST
+      - pattern: file_get_contents('php://input')
+  pattern-sinks:
+  - patterns:
+    - pattern: $CALLABLE
+    - pattern-either:
+      - pattern-inside: $ARRAYITERATOR->uasort($CALLABLE)
+      - pattern-inside: $ARRAYITERATOR->uksort($CALLABLE)
+      - pattern-inside: $EVENTHTTP->setCallback($CALLABLE, ...)
+      - pattern-inside: $EVENTHTTPCONNECTION->setCloseCallback($CALLABLE, ...)
+      - pattern-inside: $EVLOOP->fork($CALLABLE, ...)
+      - pattern-inside: $EVLOOP->idle($CALLABLE, ...)
+      - pattern-inside: $EVLOOP->prepare($CALLABLE, ...)
+      - pattern-inside: $EVWATCHER->setCallback($CALLABLE)
+      - pattern-inside: $GEARMANCLIENT->setClientCallback($CALLABLE)
+      - pattern-inside: $GEARMANCLIENT->setCompleteCallback($CALLABLE)
+      - pattern-inside: $GEARMANCLIENT->setCreatedCallback($CALLABLE)
+      - pattern-inside: $GEARMANCLIENT->setDataCallback($CALLABLE)
+      - pattern-inside: $GEARMANCLIENT->setExceptionCallback($CALLABLE)
+      - pattern-inside: $GEARMANCLIENT->setFailCallback($CALLABLE)
+      - pattern-inside: $GEARMANCLIENT->setStatusCallback($CALLABLE)
+      - pattern-inside: $GEARMANCLIENT->setWarningCallback($CALLABLE)
+      - pattern-inside: $GEARMANCLIENT->setWorkloadCallback($CALLABLE)
+      - pattern-inside: $IMAGICK->setProgressMonitor($CALLABLE)
+      - pattern-inside: $OAUTHPROVIDER->consumerHandler($CALLABLE)
+      - pattern-inside: $OAUTHPROVIDER->tokenHandler($CALLABLE)
+      - pattern-inside: $PDO->sqliteCreateCollation($NAME, $CALLABLE)
+      - pattern-inside: $PDOSTATEMENT->fetchAll(PDO::FETCH_FUNC, $CALLABLE)
+      - pattern-inside: $SQLITE3->createCollation($NAME, $CALLABLE)
+      - pattern-inside: $SQLITE3->setAuthorizer($CALLABLE)
+      - pattern-inside: $ZIPARCHIVE->registerCancelCallback($CALLABLE)
+      - pattern-inside: $ZIPARCHIVE->registerProgressCallback($RATE, $CALLABLE)
+      - pattern-inside: $ZMQDEVICE->setIdleCallback($CALLABLE, ...)
+      - pattern-inside: $ZMQDEVICE->setTimerCallback($CALLABLE, ...)
+      - pattern-inside: apcu_entry($KEY, $CALLABLE, ...)
+      - pattern-inside: array_filter($ARRAY, $CALLABLE, ...)
+      - pattern-inside: array_map($CALLABLE, ...)
+      - pattern-inside: array_reduce($ARRAY, $CALLABLE, ...)
+      - pattern-inside: array_walk_recursive($ARRAY, $CALLABLE, ...)
+      - pattern-inside: array_walk($ARRAY, $CALLABLE, ...)
+      - pattern-inside: call_user_func_array($CALLABLE, ...)
+      - pattern-inside: call_user_func($CALLABLE, ...)
+      - pattern-inside: Closure::fromCallable($CALLABLE)
+      - pattern-inside: createCollation($NAME, $CALLABLE)
+      - pattern-inside: eio_grp($CALLABLE, ...)
+      - pattern-inside: eio_nop($PRI, $CALLABLE, ...)
+      - pattern-inside: eio_sync($PRI, $CALLABLE, ...)
+      - pattern-inside: EvPrepare::createStopped($CALLABLE, ...)
+      - pattern-inside: fann_set_callback($ANN, $CALLABLE)
+      - pattern-inside: fdf_enum_values($FDF_DOCUMENT, $CALLABLE, ...)
+      - pattern-inside: forward_static_call_array($CALLABLE, ...)
+      - pattern-inside: forward_static_call($CALLABLE, ...)
+      - pattern-inside: header_register_callback($CALLABLE)
+      - pattern-inside: ibase_set_event_handler($CALLABLE, ...)
+      - pattern-inside: IntlChar::enumCharTypes($CALLABLE)
+      - pattern-inside: iterator_apply($ITERATOR, $CALLABLE)
+      - pattern-inside: ldap_set_rebind_proc($LDAP, $CALLABLE)
+      - pattern-inside: libxml_set_external_entity_loader($CALLABLE, ...)
+      - pattern-inside: new CallbackFilterIterator($ITERATOR, $CALLABLE)
+      - pattern-inside: new EvCheck($CALLABLE, ...)
+      - pattern-inside: new EventHttpRequest($CALLABLE, ...)
+      - pattern-inside: new EvFork($CALLABLE, ...)
+      - pattern-inside: new EvIdle($CALLABLE, ...)
+      - pattern-inside: new Fiber($CALLABLE)
+      - pattern-inside: new Memcached($PERSISTENT_ID, $CALLABLE, ...)
+      - pattern-inside: new RecursiveCallbackFilterIterator($ITERATOR, $CALLABLE)
+      - pattern-inside: new Zookeeper($HOST, $CALLABLE, ...)
+      - pattern-inside: ob_start($CALLABLE, ...)
+      - pattern-inside: oci_register_taf_callback($CONNECTION, $CALLABLE)
+      - pattern-inside: readline_callback_handler_install($PROMPT, $CALLABLE)
+      - pattern-inside: readline_completion_function($CALLABLE)
+      - pattern-inside: register_shutdown_function($CALLABLE, ...)
+      - pattern-inside: register_tick_function($CALLABLE, ...)
+      - pattern-inside: rnp_ffi_set_pass_provider($FFI, $CALLABLE)
+      - pattern-inside: sapi_windows_set_ctrl_handler($CALLABLE, ...)
+      - pattern-inside: set_error_handler($CALLABLE, ...)
+      - pattern-inside: set_exception_handler($CALLABLE)
+      - pattern-inside: setAuthorizer($CALLABLE)
+      - pattern-inside: spl_autoload_register($CALLABLE, ...)
+      - pattern-inside: uasort($ARRAY, $CALLABLE)
+      - pattern-inside: uksort($ARRAY, $CALLABLE)
+      - pattern-inside: usort($ARRAY, $CALLABLE)
+      - pattern-inside: xml_set_character_data_handler($PARSER, $CALLABLE)
+      - pattern-inside: xml_set_default_handler($PARSER, $CALLABLE)
+      - pattern-inside: xml_set_element_handler($PARSER, $CALLABLE, $CALLABLE)
+      - pattern-inside: xml_set_notation_decl_handler($PARSER, $CALLABLE)
+      - pattern-inside: Yar_Concurrent_Client::loop($CALLABLE, ...)
+- id: php.lang.security.tainted-exec.tainted-exec
+  mode: taint
+  pattern-sources:
+  - pattern: $_REQUEST
+  - pattern: $_GET
+  - pattern: $_POST
+  - pattern: $_COOKIE
+  pattern-sinks:
+  - pattern: exec(...)
+  - pattern: system(...)
+  - pattern: popen(...)
+  - pattern: passthru(...)
+  - pattern: shell_exec(...)
+  - pattern: pcntl_exec(...)
+  - pattern: proc_open(...)
+  pattern-sanitizers:
+  - pattern: escapeshellarg(...)
+  message: Executing non-constant commands. This can lead to command injection. You
+    should use `escapeshellarg()` when using command.
+  metadata:
+    cwe:
+    - 'CWE-94: Improper Control of Generation of Code (''Code Injection'')'
+    references:
+    - https://www.stackhawk.com/blog/php-command-injection/
+    - https://brightsec.com/blog/code-injection-php/
+    - https://www.acunetix.com/websitesecurity/php-security-2/
+    category: security
+    technology:
+    - php
+    owasp:
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    cwe2022-top25: true
+    subcategory:
+    - vuln
+    likelihood: HIGH
+    impact: HIGH
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Code Injection
+    source: https://semgrep.dev/r/php.lang.security.tainted-exec.tainted-exec
+    shortlink: https://sg.run/JAkP
+    semgrep.dev:
+      rule:
+        r_id: 73146
+        rv_id: 1263300
+        rule_id: 9AUw06
+        version_id: BjTkZ4y
+        url: https://semgrep.dev/playground/r/BjTkZ4y/php.lang.security.tainted-exec.tainted-exec
+        origin: community
+  languages:
+  - php
+  severity: ERROR
+- id: php.lang.security.injection.tainted-session.tainted-session
+  severity: WARNING
+  message: Session key based on user input risks session poisoning. The user can determine
+    the key used for the session, and thus write any session variable. Session variables
+    are typically trusted to be set only by the application, and manipulating the
+    session can result in access control issues.
+  metadata:
+    technology:
+    - php
+    category: security
+    cwe:
+    - 'CWE-284: Improper Access Control'
+    owasp:
+    - A01:2021 - Broken Access Control
+    - A01:2025 - Broken Access Control
+    references:
+    - https://en.wikipedia.org/wiki/Session_poisoning
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    impact: MEDIUM
+    likelihood: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Improper Authorization
+    source: https://semgrep.dev/r/php.lang.security.injection.tainted-session.tainted-session
+    shortlink: https://sg.run/bxNp
+    semgrep.dev:
+      rule:
+        r_id: 73470
+        rv_id: 1263289
+        rule_id: 4bUdoP
+        version_id: 8KT5rPE
+        url: https://semgrep.dev/playground/r/8KT5rPE/php.lang.security.injection.tainted-session.tainted-session
+        origin: community
+  languages:
+  - php
+  mode: taint
+  pattern-sources:
+  - patterns:
+    - pattern-either:
+      - pattern: $_GET
+      - pattern: $_POST
+      - pattern: $_COOKIE
+      - pattern: $_REQUEST
+  pattern-sanitizers:
+  - patterns:
+    - pattern-either:
+      - pattern: $A . $B
+      - pattern: bin2hex(...)
+      - pattern: crc32(...)
+      - pattern: crypt(...)
+      - pattern: filter_input(...)
+      - pattern: filter_var(...)
+      - pattern: hash(...)
+      - pattern: md5(...)
+      - pattern: preg_filter(...)
+      - pattern: preg_grep(...)
+      - pattern: preg_match_all(...)
+      - pattern: sha1(...)
+      - pattern: sprintf(...)
+      - pattern: str_contains(...)
+      - pattern: str_ends_with(...)
+      - pattern: str_starts_with(...)
+      - pattern: strcasecmp(...)
+      - pattern: strchr(...)
+      - pattern: stripos(...)
+      - pattern: stristr(...)
+      - pattern: strnatcasecmp(...)
+      - pattern: strnatcmp(...)
+      - pattern: strncmp(...)
+      - pattern: strpbrk(...)
+      - pattern: strpos(...)
+      - pattern: strripos(...)
+      - pattern: strrpos(...)
+      - pattern: strspn(...)
+      - pattern: strstr(...)
+      - pattern: strtok(...)
+      - pattern: substr_compare(...)
+      - pattern: substr_count(...)
+      - pattern: vsprintf(...)
+  pattern-sinks:
+  - patterns:
+    - pattern-inside: $_SESSION[$KEY] = $VAL;
+    - pattern: $KEY
+- id: php.lang.security.base-convert-loses-precision.base-convert-loses-precision
+  message: The function base_convert uses 64-bit numbers internally, and does not
+    correctly convert large numbers. It is not suitable for random tokens such as
+    those used for session tokens or CSRF tokens.
+  metadata:
+    references:
+    - https://www.php.net/base_convert
+    - https://www.sjoerdlangkemper.nl/2017/03/15/dont-use-base-convert-on-random-tokens/
+    category: security
+    technology:
+    - php
+    cwe:
+    - 'CWE-190: Integer Overflow or Wraparound'
+    subcategory:
+    - audit
+    likelihood: LOW
+    impact: LOW
+    confidence: HIGH
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Other
+    source: https://semgrep.dev/r/php.lang.security.base-convert-loses-precision.base-convert-loses-precision
+    shortlink: https://sg.run/kxpGo
+    semgrep.dev:
+      rule:
+        r_id: 115928
+        rv_id: 945988
+        rule_id: 7KUgBAk
+        version_id: yeT0n4K
+        url: https://semgrep.dev/playground/r/yeT0n4K/php.lang.security.base-convert-loses-precision.base-convert-loses-precision
+        origin: community
+  languages:
+  - php
+  severity: WARNING
+  mode: taint
+  pattern-sources:
+  - pattern: hash(...)
+  - pattern: hash_hmac(...)
+  - pattern: sha1(...)
+  - pattern: md5(...)
+  - patterns:
+    - pattern: random_bytes($N)
+    - metavariable-comparison:
+        metavariable: $N
+        comparison: $N > 7
+  - patterns:
+    - pattern: openssl_random_pseudo_bytes($N)
+    - metavariable-comparison:
+        metavariable: $N
+        comparison: $N > 7
+  - patterns:
+    - pattern: $OBJ->get_random_bytes($N)
+    - metavariable-comparison:
+        metavariable: $N
+        comparison: $N > 7
+  pattern-sinks:
+  - pattern: base_convert(...)
+  pattern-sanitizers:
+  - patterns:
+    - pattern: substr(..., $LENGTH)
+    - metavariable-comparison:
+        metavariable: $LENGTH
+        comparison: $LENGTH <= 7
+- id: php.lang.security.injection.tainted-exec.tainted-exec
+  languages:
+  - php
+  severity: WARNING
+  message: User input is passed to a function that executes a shell command. This
+    can lead to remote code execution.
+  metadata:
+    cwe:
+    - 'CWE-78: Improper Neutralization of Special Elements used in an OS Command (''OS
+      Command Injection'')'
+    category: security
+    technology:
+    - php
+    owasp:
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    references:
+    - https://owasp.org/Top10/A03_2021-Injection
+    subcategory:
+    - vuln
+    impact: HIGH
+    likelihood: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Command Injection
+    source: https://semgrep.dev/r/php.lang.security.injection.tainted-exec.tainted-exec
+    shortlink: https://sg.run/kxEEz
+    semgrep.dev:
+      rule:
+        r_id: 146572
+        rv_id: 1263286
+        rule_id: 10UOGG5
+        version_id: ExTExyR
+        url: https://semgrep.dev/playground/r/ExTExyR/php.lang.security.injection.tainted-exec.tainted-exec
+        origin: community
+  mode: taint
+  pattern-sources:
+  - patterns:
+    - pattern-either:
+      - pattern: $_GET
+      - pattern: $_POST
+      - pattern: $_COOKIE
+      - pattern: $_REQUEST
+      - pattern: file_get_contents('php://input')
+  pattern-sanitizers:
+  - patterns:
+    - pattern-either:
+      - pattern: escapeshellcmd(...)
+      - pattern: escapeshellarg(...)
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - pattern: exec(...)
+      - pattern: system(...)
+      - pattern: passthru(...)
+      - patterns:
+        - pattern: proc_open(...)
+        - pattern-not: proc_open([...], ...)
+      - pattern: popen(...)
+      - pattern: expect_popen(...)
+      - pattern: shell_exec(...)
+      - pattern: |
+          `...`
+- id: php.lang.security.injection.printed-request.printed-request
+  mode: taint
+  message: '`Printing user input risks cross-site scripting vulnerability. You should
+    use `htmlentities()` when showing data to users.'
+  languages:
+  - php
+  severity: ERROR
+  pattern-sources:
+  - pattern: $_REQUEST
+  - pattern: $_GET
+  - pattern: $_POST
+  pattern-sinks:
+  - pattern: print($...VARS);
+  pattern-sanitizers:
+  - pattern: htmlentities(...)
+  - pattern: htmlspecialchars(...)
+  - pattern: strip_tags(...)
+  - pattern: isset(...)
+  - pattern: empty(...)
+  - pattern: esc_html(...)
+  - pattern: esc_attr(...)
+  - pattern: wp_kses(...)
+  - pattern: e(...)
+  - pattern: twig_escape_filter(...)
+  - pattern: xss_clean(...)
+  - pattern: html_escape(...)
+  - pattern: Html::escape(...)
+  - pattern: Xss::filter(...)
+  - pattern: escapeHtml(...)
+  - pattern: escapeHtml(...)
+  - pattern: escapeHtmlAttr(...)
+  fix: print(htmlentities($...VARS));
+  metadata:
+    technology:
+    - php
+    cwe:
+    - 'CWE-79: Improper Neutralization of Input During Web Page Generation (''Cross-site
+      Scripting'')'
+    owasp:
+    - A07:2017 - Cross-Site Scripting (XSS)
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    category: security
+    references:
+    - https://www.php.net/manual/en/function.htmlentities.php
+    - https://www.php.net/manual/en/reserved.variables.request.php
+    - https://www.php.net/manual/en/reserved.variables.post.php
+    - https://www.php.net/manual/en/reserved.variables.get.php
+    - https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Cross-Site-Scripting (XSS)
+    source: https://semgrep.dev/r/php.lang.security.injection.printed-request.printed-request
+    shortlink: https://sg.run/QrxEJ
+    semgrep.dev:
+      rule:
+        r_id: 128886
+        rv_id: 1263284
+        rule_id: KxUvRBw
+        version_id: ZRTKAk4
+        url: https://semgrep.dev/playground/r/ZRTKAk4/php.lang.security.injection.printed-request.printed-request
+        origin: community
+- id: php.lang.security.audit.sha224-hash.sha224-hash
+  pattern-either:
+  - pattern: hash('sha224', ...);
+  - pattern: hash('sha512/224', ...);
+  - pattern: hash('sha3-224', ...);
+  - pattern: hash_hmac('sha224', ...);
+  - pattern: hash_hmac('sha512/224', ...);
+  - pattern: hash_hmac('sha3-224', ...);
+  message: This code uses a 224-bit hash function, which is deprecated or disallowed
+    in some security policies. Consider updating to a stronger hash function such
+    as SHA-384 or higher to ensure compliance and security.
+  metadata:
+    cwe:
+    - 'CWE-328: Use of Weak Hash'
+    references:
+    - https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-131Ar3.ipd.pdf
+    - https://www.cyber.gov.au/resources-business-and-government/essential-cyber-security/ism/cyber-security-guidelines/guidelines-cryptography
+    category: security
+    technology:
+    - php
+    owasp:
+    - A03:2017 - Sensitive Data Exposure
+    - A02:2021 - Cryptographic Failures
+    - A04:2025 - Cryptographic Failures
+    subcategory:
+    - audit
+    likelihood: LOW
+    impact: LOW
+    confidence: HIGH
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Insecure Hashing Algorithm
+    source: https://semgrep.dev/r/php.lang.security.audit.sha224-hash.sha224-hash
+    shortlink: https://sg.run/BYXqv
+    semgrep.dev:
+      rule:
+        r_id: 151751
+        rv_id: 1263275
+        rule_id: AbU97EA
+        version_id: bZT53Jo
+        url: https://semgrep.dev/playground/r/bZT53Jo/php.lang.security.audit.sha224-hash.sha224-hash
+        origin: community
+  languages:
+  - php
+  severity: WARNING
+- id: php.wordpress-plugins.security.audit.wp-ssrf-audit.wp-ssrf-audit
+  languages:
+  - php
+  severity: WARNING
+  message: Detected usage of vulnerable functions with user input, which could lead
+    to SSRF vulnerabilities.
+  mode: taint
+  pattern-sources:
+  - patterns:
+    - pattern-either:
+      - pattern: $_GET[...]
+      - pattern: $_POST[...]
+      - pattern: $_REQUEST[...]
+      - pattern: get_option(...)
+      - pattern: get_user_meta(...)
+      - pattern: get_query_var(...)
+  pattern-sinks:
+  - patterns:
+    - focus-metavariable: $URL
+    - pattern-either:
+      - pattern: wp_remote_get($URL, ...)
+      - pattern: wp_safe_remote_get($URL, ...)
+      - pattern: wp_safe_remote_request($URL, ...)
+      - pattern: wp_safe_remote_head($URL, ...)
+      - pattern: wp_oembed_get($URL, ...)
+      - pattern: vip_safe_wp_remote_get($URL, ...)
+      - pattern: wp_safe_remote_post($URL, ...)
+  paths:
+    include:
+    - '**/wp-content/plugins/**/*.php'
+  metadata:
+    cwe: 'CWE-918: Server-Side Request Forgery (SSRF)'
+    owasp: A10:2021 - Server-Side Request Forgery (SSRF)
+    category: security
+    confidence: MEDIUM
+    likelihood: MEDIUM
+    impact: HIGH
+    subcategory:
+    - audit
+    technology:
+    - Wordpress Plugins
+    references:
+    - https://developer.wordpress.org/reference/functions/wp_safe_remote_get/
+    - https://developer.wordpress.org/reference/functions/wp_remote_get/
+    - https://patchstack.com/articles/exploring-the-unpatched-wordpress-ssrf/
+    vulnerability_class:
+    - Server-Side Request Forgery (SSRF)
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    source: https://semgrep.dev/r/php.wordpress-plugins.security.audit.wp-ssrf-audit.wp-ssrf-audit
+    shortlink: https://sg.run/K3y06
+    semgrep.dev:
+      rule:
+        r_id: 191611
+        rv_id: 1039233
+        rule_id: 6JUZyKX
+        version_id: JdTp6rq
+        url: https://semgrep.dev/playground/r/JdTp6rq/php.wordpress-plugins.security.audit.wp-ssrf-audit.wp-ssrf-audit
+        origin: community

@@ -1,0 +1,5512 @@
+rules:
+- id: python.django.security.injection.code.user-eval.user-eval
+  message: Found user data in a call to 'eval'. This is extremely dangerous because
+    it can enable an attacker to execute arbitrary remote code on the system. Instead,
+    refactor your code to not use 'eval' and instead use a safe library for the specific
+    functionality you need.
+  metadata:
+    cwe:
+    - 'CWE-95: Improper Neutralization of Directives in Dynamically Evaluated Code
+      (''Eval Injection'')'
+    owasp:
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    references:
+    - https://nedbatchelder.com/blog/201206/eval_really_is_dangerous.html
+    - https://owasp.org/www-community/attacks/Code_Injection
+    category: security
+    technology:
+    - django
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: HIGH
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Code Injection
+    source: https://semgrep.dev/r/python.django.security.injection.code.user-eval.user-eval
+    shortlink: https://sg.run/PJDW
+    semgrep.dev:
+      rule:
+        r_id: 9501
+        rv_id: 1263384
+        rule_id: DbUpDQ
+        version_id: d6Tyx2A
+        url: https://semgrep.dev/playground/r/d6Tyx2A/python.django.security.injection.code.user-eval.user-eval
+        origin: community
+  patterns:
+  - pattern-inside: |
+      def $F(...):
+        ...
+  - pattern-either:
+    - pattern: eval(..., request.$W.get(...), ...)
+    - pattern: |
+        $V = request.$W.get(...)
+        ...
+        eval(..., $V, ...)
+    - pattern: eval(..., request.$W(...), ...)
+    - pattern: |
+        $V = request.$W(...)
+        ...
+        eval(..., $V, ...)
+    - pattern: eval(..., request.$W[...], ...)
+    - pattern: |
+        $V = request.$W[...]
+        ...
+        eval(..., $V, ...)
+  languages:
+  - python
+  severity: WARNING
+- id: python.django.security.injection.code.user-eval-format-string.user-eval-format-string
+  message: Found user data in a call to 'eval'. This is extremely dangerous because
+    it can enable an attacker to execute remote code. See https://owasp.org/www-community/attacks/Code_Injection
+    for more information.
+  metadata:
+    cwe:
+    - 'CWE-95: Improper Neutralization of Directives in Dynamically Evaluated Code
+      (''Eval Injection'')'
+    owasp:
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    references:
+    - https://nedbatchelder.com/blog/201206/eval_really_is_dangerous.html
+    category: security
+    technology:
+    - django
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: HIGH
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Code Injection
+    source: https://semgrep.dev/r/python.django.security.injection.code.user-eval-format-string.user-eval-format-string
+    shortlink: https://sg.run/4x2z
+    semgrep.dev:
+      rule:
+        r_id: 9500
+        rv_id: 1263383
+        rule_id: BYUNw9
+        version_id: vdT06xG
+        url: https://semgrep.dev/playground/r/vdT06xG/python.django.security.injection.code.user-eval-format-string.user-eval-format-string
+        origin: community
+  patterns:
+  - pattern-inside: |
+      def $F(...):
+        ...
+  - pattern-either:
+    - pattern: eval(..., $STR % request.$W.get(...), ...)
+    - pattern: |
+        $V = request.$W.get(...)
+        ...
+        eval(..., $STR % $V, ...)
+    - pattern: |
+        $V = request.$W.get(...)
+        ...
+        $S = $STR % $V
+        ...
+        eval(..., $S, ...)
+    - pattern: eval(..., "..." % request.$W(...), ...)
+    - pattern: |
+        $V = request.$W(...)
+        ...
+        eval(..., $STR % $V, ...)
+    - pattern: |
+        $V = request.$W(...)
+        ...
+        $S = $STR % $V
+        ...
+        eval(..., $S, ...)
+    - pattern: eval(..., $STR % request.$W[...], ...)
+    - pattern: |
+        $V = request.$W[...]
+        ...
+        eval(..., $STR % $V, ...)
+    - pattern: |
+        $V = request.$W[...]
+        ...
+        $S = $STR % $V
+        ...
+        eval(..., $S, ...)
+    - pattern: eval(..., $STR.format(..., request.$W.get(...), ...), ...)
+    - pattern: |
+        $V = request.$W.get(...)
+        ...
+        eval(..., $STR.format(..., $V, ...), ...)
+    - pattern: |
+        $V = request.$W.get(...)
+        ...
+        $S = $STR.format(..., $V, ...)
+        ...
+        eval(..., $S, ...)
+    - pattern: eval(..., $STR.format(..., request.$W(...), ...), ...)
+    - pattern: |
+        $V = request.$W(...)
+        ...
+        eval(..., $STR.format(..., $V, ...), ...)
+    - pattern: |
+        $V = request.$W(...)
+        ...
+        $S = $STR.format(..., $V, ...)
+        ...
+        eval(..., $S, ...)
+    - pattern: eval(..., $STR.format(..., request.$W[...], ...), ...)
+    - pattern: |
+        $V = request.$W[...]
+        ...
+        eval(..., $STR.format(..., $V, ...), ...)
+    - pattern: |
+        $V = request.$W[...]
+        ...
+        $S = $STR.format(..., $V, ...)
+        ...
+        eval(..., $S, ...)
+    - pattern: |
+        $V = request.$W.get(...)
+        ...
+        eval(..., f"...{$V}...", ...)
+    - pattern: |
+        $V = request.$W.get(...)
+        ...
+        $S = f"...{$V}..."
+        ...
+        eval(..., $S, ...)
+    - pattern: |
+        $V = request.$W(...)
+        ...
+        eval(..., f"...{$V}...", ...)
+    - pattern: |
+        $V = request.$W(...)
+        ...
+        $S = f"...{$V}..."
+        ...
+        eval(..., $S, ...)
+    - pattern: |
+        $V = request.$W[...]
+        ...
+        eval(..., f"...{$V}...", ...)
+    - pattern: |
+        $V = request.$W[...]
+        ...
+        $S = f"...{$V}..."
+        ...
+        eval(..., $S, ...)
+  languages:
+  - python
+  severity: WARNING
+- id: python.django.security.audit.avoid-insecure-deserialization.avoid-insecure-deserialization
+  metadata:
+    owasp:
+    - A08:2017 - Insecure Deserialization
+    - A08:2021 - Software and Data Integrity Failures
+    - A08:2025 - Software or Data Integrity Failures
+    cwe:
+    - 'CWE-502: Deserialization of Untrusted Data'
+    references:
+    - https://docs.python.org/3/library/pickle.html
+    category: security
+    technology:
+    - django
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - 'Insecure Deserialization '
+    source: https://semgrep.dev/r/python.django.security.audit.avoid-insecure-deserialization.avoid-insecure-deserialization
+    shortlink: https://sg.run/9oyr
+    semgrep.dev:
+      rule:
+        r_id: 9467
+        rv_id: 1409400
+        rule_id: OrU3e6
+        version_id: GxTlb9e
+        url: https://semgrep.dev/playground/r/GxTlb9e/python.django.security.audit.avoid-insecure-deserialization.avoid-insecure-deserialization
+        origin: community
+  message: Avoid using insecure deserialization library, backed by `pickle`, `_pickle`,
+    `cpickle`, `dill`, `shelve`, or `yaml`, which are known to lead to remote code
+    execution vulnerabilities.
+  languages:
+  - python
+  severity: ERROR
+  mode: taint
+  pattern-sources:
+  - pattern-either:
+    - patterns:
+      - pattern-inside: |
+          def $INSIDE(..., $PARAM, ...):
+            ...
+      - pattern-either:
+        - pattern: request.$REQFUNC(...)
+        - pattern: request.$REQFUNC.get(...)
+        - pattern: request.$REQFUNC[...]
+  pattern-sinks:
+  - pattern-either:
+    - patterns:
+      - pattern-either:
+        - pattern: |
+            pickle.$PICKLEFUNC(...)
+        - pattern: |
+            _pickle.$PICKLEFUNC(...)
+        - pattern: |
+            cPickle.$PICKLEFUNC(...)
+        - pattern: |
+            shelve.$PICKLEFUNC(...)
+      - metavariable-regex:
+          metavariable: $PICKLEFUNC
+          regex: dumps|dump|load|loads
+    - patterns:
+      - pattern: dill.$DILLFUNC(...)
+      - metavariable-regex:
+          metavariable: $DILLFUNC
+          regex: dump|dump_session|dumps|load|load_session|loads
+    - patterns:
+      - pattern: yaml.$YAMLFUNC(...)
+      - pattern-not: yaml.$YAMLFUNC(..., Dumper=SafeDumper, ...)
+      - pattern-not: yaml.$YAMLFUNC(..., Dumper=yaml.SafeDumper, ...)
+      - pattern-not: yaml.$YAMLFUNC(..., Loader=SafeLoader, ...)
+      - pattern-not: yaml.$YAMLFUNC(..., Loader=yaml.SafeLoader, ...)
+      - metavariable-regex:
+          metavariable: $YAMLFUNC
+          regex: dump|dump_all|load|load_all
+- id: python.django.security.injection.code.user-exec-format-string.user-exec-format-string
+  message: Found user data in a call to 'exec'. This is extremely dangerous because
+    it can enable an attacker to execute arbitrary remote code on the system. Instead,
+    refactor your code to not use 'eval' and instead use a safe library for the specific
+    functionality you need.
+  metadata:
+    cwe:
+    - 'CWE-95: Improper Neutralization of Directives in Dynamically Evaluated Code
+      (''Eval Injection'')'
+    owasp:
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    category: security
+    technology:
+    - django
+    references:
+    - https://owasp.org/www-community/attacks/Code_Injection
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: HIGH
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Code Injection
+    source: https://semgrep.dev/r/python.django.security.injection.code.user-exec-format-string.user-exec-format-string
+    shortlink: https://sg.run/J9JW
+    semgrep.dev:
+      rule:
+        r_id: 9502
+        rv_id: 1263385
+        rule_id: WAUovx
+        version_id: ZRTKA1p
+        url: https://semgrep.dev/playground/r/ZRTKA1p/python.django.security.injection.code.user-exec-format-string.user-exec-format-string
+        origin: community
+  patterns:
+  - pattern-inside: |
+      def $F(...):
+        ...
+  - pattern-either:
+    - pattern: exec(..., $STR % request.$W.get(...), ...)
+    - pattern: |
+        $V = request.$W.get(...)
+        ...
+        exec(..., $STR % $V, ...)
+    - pattern: |
+        $V = request.$W.get(...)
+        ...
+        $S = $STR % $V
+        ...
+        exec(..., $S, ...)
+    - pattern: exec(..., "..." % request.$W(...), ...)
+    - pattern: |
+        $V = request.$W(...)
+        ...
+        exec(..., $STR % $V, ...)
+    - pattern: |
+        $V = request.$W(...)
+        ...
+        $S = $STR % $V
+        ...
+        exec(..., $S, ...)
+    - pattern: exec(..., $STR % request.$W[...], ...)
+    - pattern: |
+        $V = request.$W[...]
+        ...
+        exec(..., $STR % $V, ...)
+    - pattern: |
+        $V = request.$W[...]
+        ...
+        $S = $STR % $V
+        ...
+        exec(..., $S, ...)
+    - pattern: exec(..., $STR.format(..., request.$W.get(...), ...), ...)
+    - pattern: |
+        $V = request.$W.get(...)
+        ...
+        exec(..., $STR.format(..., $V, ...), ...)
+    - pattern: |
+        $V = request.$W.get(...)
+        ...
+        $S = $STR.format(..., $V, ...)
+        ...
+        exec(..., $S, ...)
+    - pattern: exec(..., $STR.format(..., request.$W(...), ...), ...)
+    - pattern: |
+        $V = request.$W(...)
+        ...
+        exec(..., $STR.format(..., $V, ...), ...)
+    - pattern: |
+        $V = request.$W(...)
+        ...
+        $S = $STR.format(..., $V, ...)
+        ...
+        exec(..., $S, ...)
+    - pattern: exec(..., $STR.format(..., request.$W[...], ...), ...)
+    - pattern: |
+        $V = request.$W[...]
+        ...
+        exec(..., $STR.format(..., $V, ...), ...)
+    - pattern: |
+        $V = request.$W[...]
+        ...
+        $S = $STR.format(..., $V, ...)
+        ...
+        exec(..., $S, ...)
+    - pattern: |
+        $V = request.$W.get(...)
+        ...
+        exec(..., f"...{$V}...", ...)
+    - pattern: |
+        $V = request.$W.get(...)
+        ...
+        $S = f"...{$V}..."
+        ...
+        exec(..., $S, ...)
+    - pattern: |
+        $V = request.$W(...)
+        ...
+        exec(..., f"...{$V}...", ...)
+    - pattern: |
+        $V = request.$W(...)
+        ...
+        $S = f"...{$V}..."
+        ...
+        exec(..., $S, ...)
+    - pattern: |
+        $V = request.$W[...]
+        ...
+        exec(..., f"...{$V}...", ...)
+    - pattern: |
+        $V = request.$W[...]
+        ...
+        $S = f"...{$V}..."
+        ...
+        exec(..., $S, ...)
+    - pattern: exec(..., base64.decodestring($S.format(..., request.$W.get(...), ...),
+        ...), ...)
+    - pattern: exec(..., base64.decodestring($S % request.$W.get(...), ...), ...)
+    - pattern: exec(..., base64.decodestring(f"...{request.$W.get(...)}...", ...),
+        ...)
+    - pattern: exec(..., base64.decodestring(request.$W.get(...), ...), ...)
+    - pattern: exec(..., base64.decodestring(bytes($S.format(..., request.$W.get(...),
+        ...), ...), ...), ...)
+    - pattern: exec(..., base64.decodestring(bytes($S % request.$W.get(...), ...),
+        ...), ...)
+    - pattern: exec(..., base64.decodestring(bytes(f"...{request.$W.get(...)}...",
+        ...), ...), ...)
+    - pattern: exec(..., base64.decodestring(bytes(request.$W.get(...), ...), ...),
+        ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        exec(..., base64.decodestring($DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = base64.decodestring($DATA, ...)
+        ...
+        exec(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        exec(..., base64.decodestring(bytes($DATA, ...), ...), ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = base64.decodestring(bytes($DATA, ...), ...)
+        ...
+        exec(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        exec(..., base64.decodestring($DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = base64.decodestring($DATA, ...)
+        ...
+        exec(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        exec(..., base64.decodestring(bytes($DATA, ...), ...), ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = base64.decodestring(bytes($DATA, ...), ...)
+        ...
+        exec(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        exec(..., base64.decodestring($DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = base64.decodestring($DATA, ...)
+        ...
+        exec(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        exec(..., base64.decodestring(bytes($DATA, ...), ...), ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = base64.decodestring(bytes($DATA, ...), ...)
+        ...
+        exec(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        exec(..., base64.decodestring($DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = base64.decodestring($DATA, ...)
+        ...
+        exec(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        exec(..., base64.decodestring(bytes($DATA, ...), ...), ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = base64.decodestring(bytes($DATA, ...), ...)
+        ...
+        exec(..., $INTERM, ...)
+  languages:
+  - python
+  severity: WARNING
+- id: python.django.security.passwords.use-none-for-password-default.use-none-for-password-default
+  message: '''$VAR'' is using the empty string as its default and is being used to
+    set the password on ''$MODEL''. If you meant to set an unusable password, set
+    the default value to ''None'' or call ''set_unusable_password()''.'
+  metadata:
+    cwe:
+    - 'CWE-521: Weak Password Requirements'
+    owasp:
+    - A07:2021 - Identification and Authentication Failures
+    - A07:2025 - Authentication Failures
+    references:
+    - https://docs.djangoproject.com/en/3.0/ref/contrib/auth/#django.contrib.auth.models.User.set_password
+    category: security
+    technology:
+    - django
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Improper Authentication
+    source: https://semgrep.dev/r/python.django.security.passwords.use-none-for-password-default.use-none-for-password-default
+    shortlink: https://sg.run/zvBW
+    semgrep.dev:
+      rule:
+        r_id: 9517
+        rv_id: 1263412
+        rule_id: yyUn6Z
+        version_id: RGT0LYX
+        url: https://semgrep.dev/playground/r/RGT0LYX/python.django.security.passwords.use-none-for-password-default.use-none-for-password-default
+        origin: community
+  languages:
+  - python
+  severity: ERROR
+  patterns:
+  - pattern-either:
+    - pattern: |
+        $VAR = request.$W.get($X, $EMPTY)
+        ...
+        $MODEL.set_password($VAR)
+        ...
+        $MODEL.save(...)
+    - pattern: |
+        def $F(..., $VAR=$EMPTY, ...):
+          ...
+          $MODEL.set_password($VAR)
+  - metavariable-pattern:
+      metavariable: $EMPTY
+      pattern: '""'
+  - focus-metavariable: $EMPTY
+  fix: |
+    None
+- id: python.django.security.injection.code.user-exec.user-exec
+  message: Found user data in a call to 'exec'. This is extremely dangerous because
+    it can enable an attacker to execute arbitrary remote code on the system. Instead,
+    refactor your code to not use 'eval' and instead use a safe library for the specific
+    functionality you need.
+  metadata:
+    cwe:
+    - 'CWE-95: Improper Neutralization of Directives in Dynamically Evaluated Code
+      (''Eval Injection'')'
+    owasp:
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    category: security
+    technology:
+    - django
+    references:
+    - https://owasp.org/www-community/attacks/Code_Injection
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: HIGH
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Code Injection
+    source: https://semgrep.dev/r/python.django.security.injection.code.user-exec.user-exec
+    shortlink: https://sg.run/5Q3X
+    semgrep.dev:
+      rule:
+        r_id: 9503
+        rv_id: 1263386
+        rule_id: 0oU5AW
+        version_id: nWT2LA2
+        url: https://semgrep.dev/playground/r/nWT2LA2/python.django.security.injection.code.user-exec.user-exec
+        origin: community
+  patterns:
+  - pattern-inside: |
+      def $F(...):
+        ...
+  - pattern-either:
+    - pattern: exec(..., request.$W.get(...), ...)
+    - pattern: |
+        $V = request.$W.get(...)
+        ...
+        exec(..., $V, ...)
+    - pattern: exec(..., request.$W(...), ...)
+    - pattern: |
+        $V = request.$W(...)
+        ...
+        exec(..., $V, ...)
+    - pattern: exec(..., request.$W[...], ...)
+    - pattern: |
+        $V = request.$W[...]
+        ...
+        exec(..., $V, ...)
+    - pattern: |
+        loop = asyncio.get_running_loop()
+        ...
+        await loop.run_in_executor(None, exec, request.$W[...])
+    - pattern: |
+        $V = request.$W[...]
+        ...
+        loop = asyncio.get_running_loop()
+        ...
+        await loop.run_in_executor(None, exec, $V)
+    - pattern: |
+        loop = asyncio.get_running_loop()
+        ...
+        await loop.run_in_executor(None, exec, request.$W.get(...))
+    - pattern: |
+        $V = request.$W.get(...)
+        ...
+        loop = asyncio.get_running_loop()
+        ...
+        await loop.run_in_executor(None, exec, $V)
+  languages:
+  - python
+  severity: WARNING
+- id: python.django.security.passwords.password-empty-string.password-empty-string
+  message: '''$VAR'' is the empty string and is being used to set the password on
+    ''$MODEL''. If you meant to set an unusable password, set the password to None
+    or call ''set_unusable_password()''.'
+  metadata:
+    cwe:
+    - 'CWE-521: Weak Password Requirements'
+    owasp:
+    - A07:2021 - Identification and Authentication Failures
+    - A07:2025 - Authentication Failures
+    references:
+    - https://docs.djangoproject.com/en/3.0/ref/contrib/auth/#django.contrib.auth.models.User.set_password
+    category: security
+    technology:
+    - django
+    subcategory:
+    - vuln
+    likelihood: LOW
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Improper Authentication
+    source: https://semgrep.dev/r/python.django.security.passwords.password-empty-string.password-empty-string
+    shortlink: https://sg.run/oxnR
+    semgrep.dev:
+      rule:
+        r_id: 9516
+        rv_id: 1263411
+        rule_id: 9AU1jW
+        version_id: GxTke5Q
+        url: https://semgrep.dev/playground/r/GxTke5Q/python.django.security.passwords.password-empty-string.password-empty-string
+        origin: community
+  patterns:
+  - pattern-either:
+    - pattern: |
+        $MODEL.set_password($EMPTY)
+        ...
+        $MODEL.save()
+    - pattern: |
+        $VAR = $EMPTY
+        ...
+        $MODEL.set_password($VAR)
+        ...
+        $MODEL.save()
+  - metavariable-regex:
+      metavariable: $EMPTY
+      regex: (\'\'|\"\")
+  languages:
+  - python
+  severity: ERROR
+- id: python.django.security.injection.raw-html-format.raw-html-format
+  languages:
+  - python
+  severity: WARNING
+  message: Detected user input flowing into a manually constructed HTML string. You
+    may be accidentally bypassing secure methods of rendering HTML by manually constructing
+    HTML and this could create a cross-site scripting vulnerability, which could let
+    attackers steal sensitive user data. To be sure this is safe, check that the HTML
+    is rendered safely. Otherwise, use templates (`django.shortcuts.render`) which
+    will safely render HTML instead.
+  metadata:
+    cwe:
+    - 'CWE-79: Improper Neutralization of Input During Web Page Generation (''Cross-site
+      Scripting'')'
+    owasp:
+    - A07:2017 - Cross-Site Scripting (XSS)
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    category: security
+    technology:
+    - django
+    references:
+    - https://docs.djangoproject.com/en/3.2/topics/http/shortcuts/#render
+    - https://docs.djangoproject.com/en/3.2/topics/security/#cross-site-scripting-xss-protection
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: HIGH
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Cross-Site-Scripting (XSS)
+    source: https://semgrep.dev/r/python.django.security.injection.raw-html-format.raw-html-format
+    shortlink: https://sg.run/oYj1
+    semgrep.dev:
+      rule:
+        r_id: 14360
+        rv_id: 1263397
+        rule_id: 2ZUPER
+        version_id: 5PTo100
+        url: https://semgrep.dev/playground/r/5PTo100/python.django.security.injection.raw-html-format.raw-html-format
+        origin: community
+  mode: taint
+  pattern-sanitizers:
+  - pattern: django.utils.html.escape(...)
+  pattern-sources:
+  - patterns:
+    - pattern: request.$ANYTHING
+    - pattern-not: request.build_absolute_uri
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - patterns:
+        - pattern-either:
+          - pattern: '"$HTMLSTR" % ...'
+          - pattern: '"$HTMLSTR".format(...)'
+          - pattern: '"$HTMLSTR" + ...'
+          - pattern: f"$HTMLSTR{...}..."
+      - patterns:
+        - pattern-inside: |
+            $HTML = "$HTMLSTR"
+            ...
+        - pattern-either:
+          - pattern: $HTML % ...
+          - pattern: $HTML.format(...)
+          - pattern: $HTML + ...
+    - metavariable-pattern:
+        metavariable: $HTMLSTR
+        language: generic
+        pattern: <$TAG ...
+- id: python.django.security.hashids-with-django-secret.hashids-with-django-secret
+  languages:
+  - python
+  message: The Django secret key is used as salt in HashIDs. The HashID mechanism
+    is not secure. By observing sufficient HashIDs, the salt used to construct them
+    can be recovered. This means the Django secret key can be obtained by attackers,
+    through the HashIDs.
+  metadata:
+    category: security
+    subcategory:
+    - vuln
+    cwe:
+    - 'CWE-327: Use of a Broken or Risky Cryptographic Algorithm'
+    owasp:
+    - "A02:2021 \u2013 Cryptographic Failures"
+    references:
+    - https://docs.djangoproject.com/en/4.2/ref/settings/#std-setting-SECRET_KEY
+    - http://carnage.github.io/2015/08/cryptanalysis-of-hashids
+    technology:
+    - django
+    likelihood: LOW
+    impact: HIGH
+    confidence: HIGH
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Cryptographic Issues
+    source: https://semgrep.dev/r/python.django.security.hashids-with-django-secret.hashids-with-django-secret
+    shortlink: https://sg.run/bxeZ
+    semgrep.dev:
+      rule:
+        r_id: 72426
+        rv_id: 946163
+        rule_id: 0oUXqy
+        version_id: 0bT15nn
+        url: https://semgrep.dev/playground/r/0bT15nn/python.django.security.hashids-with-django-secret.hashids-with-django-secret
+        origin: community
+  pattern-either:
+  - pattern: hashids.Hashids(..., salt=django.conf.settings.SECRET_KEY, ...)
+  - pattern: hashids.Hashids(django.conf.settings.SECRET_KEY, ...)
+  severity: ERROR
+- id: python.django.security.injection.sql.sql-injection-using-db-cursor-execute.sql-injection-db-cursor-execute
+  message: User-controlled data from a request is passed to 'execute()'. This could
+    lead to a SQL injection and therefore protected information could be leaked. Instead,
+    use django's QuerySets, which are built with query parameterization and therefore
+    not vulnerable to sql injection. For example, you could use `Entry.objects.filter(date=2006)`.
+  metadata:
+    cwe:
+    - 'CWE-89: Improper Neutralization of Special Elements used in an SQL Command
+      (''SQL Injection'')'
+    owasp:
+    - A01:2017 - Injection
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    references:
+    - https://docs.djangoproject.com/en/3.0/topics/security/#sql-injection-protection
+    category: security
+    technology:
+    - django
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: HIGH
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - SQL Injection
+    source: https://semgrep.dev/r/python.django.security.injection.sql.sql-injection-using-db-cursor-execute.sql-injection-db-cursor-execute
+    shortlink: https://sg.run/qx7y
+    semgrep.dev:
+      rule:
+        r_id: 9512
+        rv_id: 1263404
+        rule_id: 2ZUbDL
+        version_id: 0bTKzRj
+        url: https://semgrep.dev/playground/r/0bTKzRj/python.django.security.injection.sql.sql-injection-using-db-cursor-execute.sql-injection-db-cursor-execute
+        origin: community
+  languages:
+  - python
+  severity: WARNING
+  patterns:
+  - pattern-inside: |
+      def $FUNC(...):
+        ...
+  - pattern-either:
+    - pattern: $CURSOR.execute(..., $S.format(..., request.$W.get(...), ...), ...)
+    - pattern: $CURSOR.execute(..., $S % request.$W.get(...), ...)
+    - pattern: $CURSOR.execute(..., f"...{request.$W.get(...)}...", ...)
+    - pattern: $CURSOR.execute(..., request.$W.get(...), ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $CURSOR.execute(..., $DATA, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $DATA
+        ...
+        $CURSOR.execute(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $CURSOR.execute(..., $STR.format(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        $CURSOR.execute(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $CURSOR.execute(..., $STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        $CURSOR.execute(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $CURSOR.execute(..., f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        $CURSOR.execute(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $CURSOR.execute(..., $STR + $DATA, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        $CURSOR.execute(..., $INTERM, ...)
+    - pattern: $A = $CURSOR.execute(..., request.$W.get(...), ...)
+    - pattern: return $CURSOR.execute(..., request.$W.get(...), ...)
+    - pattern: $CURSOR.execute(..., $S.format(..., request.$W(...), ...), ...)
+    - pattern: $CURSOR.execute(..., $S % request.$W(...), ...)
+    - pattern: $CURSOR.execute(..., f"...{request.$W(...)}...", ...)
+    - pattern: $CURSOR.execute(..., request.$W(...), ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $CURSOR.execute(..., $DATA, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $DATA
+        ...
+        $CURSOR.execute(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $CURSOR.execute(..., $STR.format(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        $CURSOR.execute(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $CURSOR.execute(..., $STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        $CURSOR.execute(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $CURSOR.execute(..., f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        $CURSOR.execute(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $CURSOR.execute(..., $STR + $DATA, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        $CURSOR.execute(..., $INTERM, ...)
+    - pattern: $A = $CURSOR.execute(..., request.$W(...), ...)
+    - pattern: return $CURSOR.execute(..., request.$W(...), ...)
+    - pattern: $CURSOR.execute(..., $S.format(..., request.$W[...], ...), ...)
+    - pattern: $CURSOR.execute(..., $S % request.$W[...], ...)
+    - pattern: $CURSOR.execute(..., f"...{request.$W[...]}...", ...)
+    - pattern: $CURSOR.execute(..., request.$W[...], ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $CURSOR.execute(..., $DATA, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $DATA
+        ...
+        $CURSOR.execute(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $CURSOR.execute(..., $STR.format(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        $CURSOR.execute(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $CURSOR.execute(..., $STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        $CURSOR.execute(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $CURSOR.execute(..., f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        $CURSOR.execute(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $CURSOR.execute(..., $STR + $DATA, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        $CURSOR.execute(..., $INTERM, ...)
+    - pattern: $A = $CURSOR.execute(..., request.$W[...], ...)
+    - pattern: return $CURSOR.execute(..., request.$W[...], ...)
+    - pattern: $CURSOR.execute(..., $S.format(..., request.$W, ...), ...)
+    - pattern: $CURSOR.execute(..., $S % request.$W, ...)
+    - pattern: $CURSOR.execute(..., f"...{request.$W}...", ...)
+    - pattern: $CURSOR.execute(..., request.$W, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $CURSOR.execute(..., $DATA, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $DATA
+        ...
+        $CURSOR.execute(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $CURSOR.execute(..., $STR.format(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        $CURSOR.execute(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $CURSOR.execute(..., $STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        $CURSOR.execute(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $CURSOR.execute(..., f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        $CURSOR.execute(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $CURSOR.execute(..., $STR + $DATA, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        $CURSOR.execute(..., $INTERM, ...)
+    - pattern: $A = $CURSOR.execute(..., request.$W, ...)
+    - pattern: return $CURSOR.execute(..., request.$W, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $CURSOR.execute($STR % (..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $CURSOR.execute($STR % (..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $CURSOR.execute($STR % (..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $CURSOR.execute($STR % (..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $STR % (..., $DATA, ...)
+        ...
+        $CURSOR.execute($INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $STR % (..., $DATA, ...)
+        ...
+        $CURSOR.execute($INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $STR % (..., $DATA, ...)
+        ...
+        $CURSOR.execute($INTERM, ...)
+    - pattern: |-
+        $DATA = request.$W
+        ...
+        $INTERM = $STR % (..., $DATA, ...)
+        ...
+        $CURSOR.execute($INTERM, ...)
+- id: python.django.security.injection.request-data-fileresponse.request-data-fileresponse
+  message: Found user-controlled request data being passed into a file open, which
+    is them passed as an argument into the FileResponse. This is dangerous because
+    an attacker could specify an arbitrary file to read, which could result in leaking
+    important data. Be sure to validate or sanitize the user-inputted filename in
+    the request data before using it in FileResponse.
+  metadata:
+    cwe:
+    - 'CWE-22: Improper Limitation of a Pathname to a Restricted Directory (''Path
+      Traversal'')'
+    owasp:
+    - A05:2017 - Broken Access Control
+    - A01:2021 - Broken Access Control
+    - A01:2025 - Broken Access Control
+    references:
+    - https://django-book.readthedocs.io/en/latest/chapter20.html#cross-site-scripting-xss
+    category: security
+    technology:
+    - django
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: LOW
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Path Traversal
+    source: https://semgrep.dev/r/python.django.security.injection.request-data-fileresponse.request-data-fileresponse
+    shortlink: https://sg.run/W862
+    semgrep.dev:
+      rule:
+        r_id: 9497
+        rv_id: 1263400
+        rule_id: GdU7QR
+        version_id: A8Tgd1K
+        url: https://semgrep.dev/playground/r/A8Tgd1K/python.django.security.injection.request-data-fileresponse.request-data-fileresponse
+        origin: community
+  languages:
+  - python
+  severity: WARNING
+  patterns:
+  - pattern-inside: |
+      def $FUNC(...):
+        ...
+  - pattern-either:
+    - pattern: django.http.FileResponse(..., request.$W.get(...), ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        django.http.FileResponse(..., open($DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = open($DATA, ...)
+        ...
+        django.http.FileResponse(..., $INTERM, ...)
+    - pattern: $A = django.http.FileResponse(..., request.$W.get(...), ...)
+    - pattern: return django.http.FileResponse(..., request.$W.get(...), ...)
+    - pattern: django.http.FileResponse(..., request.$W(...), ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        django.http.FileResponse(..., open($DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = open($DATA, ...)
+        ...
+        django.http.FileResponse(..., $INTERM, ...)
+    - pattern: $A = django.http.FileResponse(..., request.$W(...), ...)
+    - pattern: return django.http.FileResponse(..., request.$W(...), ...)
+    - pattern: django.http.FileResponse(..., request.$W[...], ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        django.http.FileResponse(..., open($DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = open($DATA, ...)
+        ...
+        django.http.FileResponse(..., $INTERM, ...)
+    - pattern: $A = django.http.FileResponse(..., request.$W[...], ...)
+    - pattern: return django.http.FileResponse(..., request.$W[...], ...)
+    - pattern: django.http.FileResponse(..., request.$W, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        django.http.FileResponse(..., open($DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = open($DATA, ...)
+        ...
+        django.http.FileResponse(..., $INTERM, ...)
+    - pattern: $A = django.http.FileResponse(..., request.$W, ...)
+    - pattern: return django.http.FileResponse(..., request.$W, ...)
+- id: python.django.security.injection.ssrf.ssrf-injection-requests.ssrf-injection-requests
+  message: Data from request object is passed to a new server-side request. This could
+    lead to a server-side request forgery (SSRF). To mitigate, ensure that schemes
+    and hosts are validated against an allowlist, do not forward the response to the
+    user, and ensure proper authentication and transport-layer security in the proxied
+    request. See https://owasp.org/www-community/attacks/Server_Side_Request_Forgery
+    to learn more about SSRF vulnerabilities.
+  metadata:
+    cwe:
+    - 'CWE-918: Server-Side Request Forgery (SSRF)'
+    owasp:
+    - A10:2021 - Server-Side Request Forgery (SSRF)
+    - A01:2025 - Broken Access Control
+    references:
+    - https://owasp.org/www-community/attacks/Server_Side_Request_Forgery
+    category: security
+    technology:
+    - django
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: HIGH
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Server-Side Request Forgery (SSRF)
+    source: https://semgrep.dev/r/python.django.security.injection.ssrf.ssrf-injection-requests.ssrf-injection-requests
+    shortlink: https://sg.run/YvY4
+    semgrep.dev:
+      rule:
+        r_id: 9514
+        rv_id: 1263406
+        rule_id: j2UvEw
+        version_id: qkTR7zn
+        url: https://semgrep.dev/playground/r/qkTR7zn/python.django.security.injection.ssrf.ssrf-injection-requests.ssrf-injection-requests
+        origin: community
+  languages:
+  - python
+  severity: ERROR
+  patterns:
+  - pattern-inside: |
+      def $FUNC(...):
+        ...
+  - pattern-either:
+    - pattern: requests.$METHOD(..., $S.format(..., request.$W.get(...), ...), ...)
+    - pattern: requests.$METHOD(..., $S % request.$W.get(...), ...)
+    - pattern: requests.$METHOD(..., f"...{request.$W.get(...)}...", ...)
+    - pattern: requests.$METHOD(..., request.$W.get(...), ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        requests.$METHOD(..., $DATA, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $DATA
+        ...
+        requests.$METHOD(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        requests.$METHOD(..., $STR.format(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        requests.$METHOD(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        requests.$METHOD(..., $STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        requests.$METHOD(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        requests.$METHOD(..., f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        requests.$METHOD(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        requests.$METHOD(..., $STR + $DATA, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        requests.$METHOD(..., $INTERM, ...)
+    - pattern: $A = requests.$METHOD(..., request.$W.get(...), ...)
+    - pattern: return requests.$METHOD(..., request.$W.get(...), ...)
+    - pattern: requests.$METHOD(..., $S.format(..., request.$W(...), ...), ...)
+    - pattern: requests.$METHOD(..., $S % request.$W(...), ...)
+    - pattern: requests.$METHOD(..., f"...{request.$W(...)}...", ...)
+    - pattern: requests.$METHOD(..., request.$W(...), ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        requests.$METHOD(..., $DATA, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $DATA
+        ...
+        requests.$METHOD(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        requests.$METHOD(..., $STR.format(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        requests.$METHOD(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        requests.$METHOD(..., $STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        requests.$METHOD(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        requests.$METHOD(..., f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        requests.$METHOD(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        requests.$METHOD(..., $STR + $DATA, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        requests.$METHOD(..., $INTERM, ...)
+    - pattern: $A = requests.$METHOD(..., request.$W(...), ...)
+    - pattern: return requests.$METHOD(..., request.$W(...), ...)
+    - pattern: requests.$METHOD(..., $S.format(..., request.$W[...], ...), ...)
+    - pattern: requests.$METHOD(..., $S % request.$W[...], ...)
+    - pattern: requests.$METHOD(..., f"...{request.$W[...]}...", ...)
+    - pattern: requests.$METHOD(..., request.$W[...], ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        requests.$METHOD(..., $DATA, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $DATA
+        ...
+        requests.$METHOD(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        requests.$METHOD(..., $STR.format(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        requests.$METHOD(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        requests.$METHOD(..., $STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        requests.$METHOD(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        requests.$METHOD(..., f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        requests.$METHOD(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        requests.$METHOD(..., $STR + $DATA, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        requests.$METHOD(..., $INTERM, ...)
+    - pattern: $A = requests.$METHOD(..., request.$W[...], ...)
+    - pattern: return requests.$METHOD(..., request.$W[...], ...)
+    - pattern: requests.$METHOD(..., $S.format(..., request.$W, ...), ...)
+    - pattern: requests.$METHOD(..., $S % request.$W, ...)
+    - pattern: requests.$METHOD(..., f"...{request.$W}...", ...)
+    - pattern: requests.$METHOD(..., request.$W, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        requests.$METHOD(..., $DATA, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $DATA
+        ...
+        requests.$METHOD(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        requests.$METHOD(..., $STR.format(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        requests.$METHOD(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        requests.$METHOD(..., $STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        requests.$METHOD(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        requests.$METHOD(..., f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        requests.$METHOD(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        requests.$METHOD(..., $STR + $DATA, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        requests.$METHOD(..., $INTERM, ...)
+    - pattern: $A = requests.$METHOD(..., request.$W, ...)
+    - pattern: return requests.$METHOD(..., request.$W, ...)
+- id: python.django.security.injection.sql.sql-injection-rawsql.sql-injection-using-rawsql
+  message: User-controlled data from request is passed to 'RawSQL()'. This could lead
+    to a SQL injection and therefore protected information could be leaked. Instead,
+    use parameterized queries or escape the user-controlled data by using `params`
+    and not using quote placeholders in the SQL string.
+  metadata:
+    cwe:
+    - 'CWE-89: Improper Neutralization of Special Elements used in an SQL Command
+      (''SQL Injection'')'
+    owasp:
+    - A01:2017 - Injection
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    references:
+    - https://docs.djangoproject.com/en/3.0/ref/models/expressions/#django.db.models.expressions.RawSQL
+    category: security
+    technology:
+    - django
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: HIGH
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - SQL Injection
+    source: https://semgrep.dev/r/python.django.security.injection.sql.sql-injection-rawsql.sql-injection-using-rawsql
+    shortlink: https://sg.run/Kl4X
+    semgrep.dev:
+      rule:
+        r_id: 9511
+        rv_id: 1263403
+        rule_id: pKUOBp
+        version_id: WrTqK2L
+        url: https://semgrep.dev/playground/r/WrTqK2L/python.django.security.injection.sql.sql-injection-rawsql.sql-injection-using-rawsql
+        origin: community
+  languages:
+  - python
+  severity: WARNING
+  patterns:
+  - pattern-inside: |
+      def $FUNC(...):
+        ...
+  - pattern-either:
+    - pattern: django.db.models.expressions.RawSQL(..., $S.format(..., request.$W.get(...),
+        ...), ...)
+    - pattern: django.db.models.expressions.RawSQL(..., $S % request.$W.get(...),
+        ...)
+    - pattern: django.db.models.expressions.RawSQL(..., f"...{request.$W.get(...)}...",
+        ...)
+    - pattern: django.db.models.expressions.RawSQL(..., request.$W.get(...), ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        django.db.models.expressions.RawSQL(..., $DATA, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $DATA
+        ...
+        django.db.models.expressions.RawSQL(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        django.db.models.expressions.RawSQL(..., $STR.format(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        django.db.models.expressions.RawSQL(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        django.db.models.expressions.RawSQL(..., $STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        django.db.models.expressions.RawSQL(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        django.db.models.expressions.RawSQL(..., f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        django.db.models.expressions.RawSQL(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        django.db.models.expressions.RawSQL(..., $STR + $DATA, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        django.db.models.expressions.RawSQL(..., $INTERM, ...)
+    - pattern: $A = django.db.models.expressions.RawSQL(..., request.$W.get(...),
+        ...)
+    - pattern: return django.db.models.expressions.RawSQL(..., request.$W.get(...),
+        ...)
+    - pattern: django.db.models.expressions.RawSQL(..., $S.format(..., request.$W(...),
+        ...), ...)
+    - pattern: django.db.models.expressions.RawSQL(..., $S % request.$W(...), ...)
+    - pattern: django.db.models.expressions.RawSQL(..., f"...{request.$W(...)}...",
+        ...)
+    - pattern: django.db.models.expressions.RawSQL(..., request.$W(...), ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        django.db.models.expressions.RawSQL(..., $DATA, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $DATA
+        ...
+        django.db.models.expressions.RawSQL(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        django.db.models.expressions.RawSQL(..., $STR.format(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        django.db.models.expressions.RawSQL(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        django.db.models.expressions.RawSQL(..., $STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        django.db.models.expressions.RawSQL(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        django.db.models.expressions.RawSQL(..., f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        django.db.models.expressions.RawSQL(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        django.db.models.expressions.RawSQL(..., $STR + $DATA, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        django.db.models.expressions.RawSQL(..., $INTERM, ...)
+    - pattern: $A = django.db.models.expressions.RawSQL(..., request.$W(...), ...)
+    - pattern: return django.db.models.expressions.RawSQL(..., request.$W(...), ...)
+    - pattern: django.db.models.expressions.RawSQL(..., $S.format(..., request.$W[...],
+        ...), ...)
+    - pattern: django.db.models.expressions.RawSQL(..., $S % request.$W[...], ...)
+    - pattern: django.db.models.expressions.RawSQL(..., f"...{request.$W[...]}...",
+        ...)
+    - pattern: django.db.models.expressions.RawSQL(..., request.$W[...], ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        django.db.models.expressions.RawSQL(..., $DATA, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $DATA
+        ...
+        django.db.models.expressions.RawSQL(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        django.db.models.expressions.RawSQL(..., $STR.format(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        django.db.models.expressions.RawSQL(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        django.db.models.expressions.RawSQL(..., $STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        django.db.models.expressions.RawSQL(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        django.db.models.expressions.RawSQL(..., f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        django.db.models.expressions.RawSQL(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        django.db.models.expressions.RawSQL(..., $STR + $DATA, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        django.db.models.expressions.RawSQL(..., $INTERM, ...)
+    - pattern: $A = django.db.models.expressions.RawSQL(..., request.$W[...], ...)
+    - pattern: return django.db.models.expressions.RawSQL(..., request.$W[...], ...)
+    - pattern: django.db.models.expressions.RawSQL(..., $S.format(..., request.$W,
+        ...), ...)
+    - pattern: django.db.models.expressions.RawSQL(..., $S % request.$W, ...)
+    - pattern: django.db.models.expressions.RawSQL(..., f"...{request.$W}...", ...)
+    - pattern: django.db.models.expressions.RawSQL(..., request.$W, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        django.db.models.expressions.RawSQL(..., $DATA, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $DATA
+        ...
+        django.db.models.expressions.RawSQL(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        django.db.models.expressions.RawSQL(..., $STR.format(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        django.db.models.expressions.RawSQL(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        django.db.models.expressions.RawSQL(..., $STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        django.db.models.expressions.RawSQL(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        django.db.models.expressions.RawSQL(..., f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        django.db.models.expressions.RawSQL(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        django.db.models.expressions.RawSQL(..., $STR + $DATA, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        django.db.models.expressions.RawSQL(..., $INTERM, ...)
+    - pattern: $A = django.db.models.expressions.RawSQL(..., request.$W, ...)
+    - pattern: return django.db.models.expressions.RawSQL(..., request.$W, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        django.db.models.expressions.RawSQL($STR % (..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        django.db.models.expressions.RawSQL($STR % (..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        django.db.models.expressions.RawSQL($STR % (..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        django.db.models.expressions.RawSQL($STR % (..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $STR % (..., $DATA, ...)
+        ...
+        django.db.models.expressions.RawSQL($INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $STR % (..., $DATA, ...)
+        ...
+        django.db.models.expressions.RawSQL($INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $STR % (..., $DATA, ...)
+        ...
+        django.db.models.expressions.RawSQL($INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $STR % (..., $DATA, ...)
+        ...
+        django.db.models.expressions.RawSQL($INTERM, ...)
+- id: python.django.security.injection.csv-writer-injection.csv-writer-injection
+  languages:
+  - python
+  message: Detected user input into a generated CSV file using the built-in `csv`
+    module. If user data is used to generate the data in this file, it is possible
+    that an attacker could inject a formula when the CSV is imported into a spreadsheet
+    application that runs an attacker script, which could steal data from the importing
+    user or, at worst, install malware on the user's computer. `defusedcsv` is a drop-in
+    replacement with the same API that will attempt to mitigate formula injection
+    attempts. You can use `defusedcsv` instead of `csv` to safely generate CSVs.
+  metadata:
+    category: security
+    confidence: MEDIUM
+    cwe:
+    - 'CWE-1236: Improper Neutralization of Formula Elements in a CSV File'
+    owasp:
+    - A01:2017 - Injection
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    references:
+    - https://github.com/raphaelm/defusedcsv
+    - https://owasp.org/www-community/attacks/CSV_Injection
+    - https://web.archive.org/web/20220516052229/https://www.contextis.com/us/blog/comma-separated-vulnerabilities
+    technology:
+    - django
+    - python
+    subcategory:
+    - vuln
+    impact: MEDIUM
+    likelihood: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Improper Validation
+    source: https://semgrep.dev/r/python.django.security.injection.csv-writer-injection.csv-writer-injection
+    shortlink: https://sg.run/Pw9q
+    semgrep.dev:
+      rule:
+        r_id: 31145
+        rv_id: 1263389
+        rule_id: 7KUK1y
+        version_id: LjTkgD9
+        url: https://semgrep.dev/playground/r/LjTkgD9/python.django.security.injection.csv-writer-injection.csv-writer-injection
+        origin: community
+  mode: taint
+  pattern-sinks:
+  - patterns:
+    - pattern-inside: |
+        $WRITER = csv.writer(...)
+
+        ...
+
+        $WRITER.$WRITE(...)
+    - pattern: $WRITER.$WRITE(...)
+    - metavariable-regex:
+        metavariable: $WRITE
+        regex: ^(writerow|writerows|writeheader)$
+  pattern-sources:
+  - patterns:
+    - pattern-inside: |
+        def $FUNC(..., $REQUEST, ...):
+          ...
+    - focus-metavariable: $REQUEST
+    - metavariable-pattern:
+        metavariable: $REQUEST
+        patterns:
+        - pattern: request
+        - pattern-not-inside: request.build_absolute_uri
+  severity: ERROR
+- id: python.django.security.django-using-request-post-after-is-valid.django-using-request-post-after-is-valid
+  patterns:
+  - pattern-inside: |
+      def $FUNC(request, ...):
+        ...
+  - pattern-inside: |
+      if $FORM.is_valid():
+        ...
+  - pattern-either:
+    - pattern: request.POST[...]
+    - pattern: request.POST.get(...)
+  message: Use $FORM.cleaned_data[] instead of request.POST[] after form.is_valid()
+    has been executed to only access sanitized data
+  languages:
+  - python
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-20: Improper Input Validation'
+    references:
+    - https://docs.djangoproject.com/en/4.2/ref/forms/api/#accessing-clean-data
+    confidence: MEDIUM
+    likelihood: MEDIUM
+    impact: MEDIUM
+    subcategory:
+    - audit
+    technology:
+    - django
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Improper Validation
+    source: https://semgrep.dev/r/python.django.security.django-using-request-post-after-is-valid.django-using-request-post-after-is-valid
+    shortlink: https://sg.run/kJn7
+    semgrep.dev:
+      rule:
+        r_id: 73472
+        rv_id: 946161
+        rule_id: JDUjqx
+        version_id: DkTNpEJ
+        url: https://semgrep.dev/playground/r/DkTNpEJ/python.django.security.django-using-request-post-after-is-valid.django-using-request-post-after-is-valid
+        origin: community
+- id: python.django.security.injection.email.xss-html-email-body.xss-html-email-body
+  message: Found request data in an EmailMessage that is set to use HTML. This is
+    dangerous because HTML emails are susceptible to XSS. An attacker could inject
+    data into this HTML email, causing XSS.
+  metadata:
+    cwe:
+    - 'CWE-74: Improper Neutralization of Special Elements in Output Used by a Downstream
+      Component (''Injection'')'
+    owasp:
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    references:
+    - https://www.damonkohler.com/2008/12/email-injection.html
+    category: security
+    technology:
+    - django
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Other
+    source: https://semgrep.dev/r/python.django.security.injection.email.xss-html-email-body.xss-html-email-body
+    shortlink: https://sg.run/RoBe
+    semgrep.dev:
+      rule:
+        r_id: 9505
+        rv_id: 1263390
+        rule_id: qNUj02
+        version_id: 8KT5rOn
+        url: https://semgrep.dev/playground/r/8KT5rOn/python.django.security.injection.email.xss-html-email-body.xss-html-email-body
+        origin: community
+  languages:
+  - python
+  severity: WARNING
+  patterns:
+  - pattern-inside: |
+      def $FUNC(...):
+        ...
+        $EMAIL.content_subtype = "html"
+        ...
+  - pattern-either:
+    - pattern: django.core.mail.EmailMessage($SUBJ, request.$W.get(...), ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        django.core.mail.EmailMessage($SUBJ, $DATA, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $DATA
+        ...
+        django.core.mail.EmailMessage($SUBJ, $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        django.core.mail.EmailMessage($SUBJ, $B.$C(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $B.$C(..., $DATA, ...)
+        ...
+        django.core.mail.EmailMessage($SUBJ, $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        django.core.mail.EmailMessage($SUBJ, $STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        django.core.mail.EmailMessage($SUBJ, $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        django.core.mail.EmailMessage($SUBJ, f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        django.core.mail.EmailMessage($SUBJ, $INTERM, ...)
+    - pattern: $A = django.core.mail.EmailMessage($SUBJ, request.$W.get(...), ...)
+    - pattern: return django.core.mail.EmailMessage($SUBJ, request.$W.get(...), ...)
+    - pattern: django.core.mail.EmailMessage($SUBJ, request.$W(...), ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        django.core.mail.EmailMessage($SUBJ, $DATA, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $DATA
+        ...
+        django.core.mail.EmailMessage($SUBJ, $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        django.core.mail.EmailMessage($SUBJ, $B.$C(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $B.$C(..., $DATA, ...)
+        ...
+        django.core.mail.EmailMessage($SUBJ, $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        django.core.mail.EmailMessage($SUBJ, $STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        django.core.mail.EmailMessage($SUBJ, $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        django.core.mail.EmailMessage($SUBJ, f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        django.core.mail.EmailMessage($SUBJ, $INTERM, ...)
+    - pattern: $A = django.core.mail.EmailMessage($SUBJ, request.$W(...), ...)
+    - pattern: return django.core.mail.EmailMessage($SUBJ, request.$W(...), ...)
+    - pattern: django.core.mail.EmailMessage($SUBJ, request.$W[...], ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        django.core.mail.EmailMessage($SUBJ, $DATA, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $DATA
+        ...
+        django.core.mail.EmailMessage($SUBJ, $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        django.core.mail.EmailMessage($SUBJ, $B.$C(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $B.$C(..., $DATA, ...)
+        ...
+        django.core.mail.EmailMessage($SUBJ, $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        django.core.mail.EmailMessage($SUBJ, $STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        django.core.mail.EmailMessage($SUBJ, $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        django.core.mail.EmailMessage($SUBJ, f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        django.core.mail.EmailMessage($SUBJ, $INTERM, ...)
+    - pattern: $A = django.core.mail.EmailMessage($SUBJ, request.$W[...], ...)
+    - pattern: return django.core.mail.EmailMessage($SUBJ, request.$W[...], ...)
+    - pattern: django.core.mail.EmailMessage($SUBJ, request.$W, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        django.core.mail.EmailMessage($SUBJ, $DATA, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $DATA
+        ...
+        django.core.mail.EmailMessage($SUBJ, $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        django.core.mail.EmailMessage($SUBJ, $B.$C(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $B.$C(..., $DATA, ...)
+        ...
+        django.core.mail.EmailMessage($SUBJ, $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        django.core.mail.EmailMessage($SUBJ, $STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        django.core.mail.EmailMessage($SUBJ, $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        django.core.mail.EmailMessage($SUBJ, f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        django.core.mail.EmailMessage($SUBJ, $INTERM, ...)
+    - pattern: $A = django.core.mail.EmailMessage($SUBJ, request.$W, ...)
+    - pattern: return django.core.mail.EmailMessage($SUBJ, request.$W, ...)
+- id: python.django.security.injection.ssrf.ssrf-injection-urllib.ssrf-injection-urllib
+  message: Data from request object is passed to a new server-side request. This could
+    lead to a server-side request forgery (SSRF), which could result in attackers
+    gaining access to private organization data. To mitigate, ensure that schemes
+    and hosts are validated against an allowlist, do not forward the response to the
+    user, and ensure proper authentication and transport-layer security in the proxied
+    request.
+  metadata:
+    cwe:
+    - 'CWE-918: Server-Side Request Forgery (SSRF)'
+    owasp:
+    - A10:2021 - Server-Side Request Forgery (SSRF)
+    - A01:2025 - Broken Access Control
+    references:
+    - https://owasp.org/www-community/attacks/Server_Side_Request_Forgery
+    category: security
+    technology:
+    - django
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: HIGH
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Server-Side Request Forgery (SSRF)
+    source: https://semgrep.dev/r/python.django.security.injection.ssrf.ssrf-injection-urllib.ssrf-injection-urllib
+    shortlink: https://sg.run/6n2B
+    semgrep.dev:
+      rule:
+        r_id: 9515
+        rv_id: 1263407
+        rule_id: 10UKDo
+        version_id: l4TJRwD
+        url: https://semgrep.dev/playground/r/l4TJRwD/python.django.security.injection.ssrf.ssrf-injection-urllib.ssrf-injection-urllib
+        origin: community
+  languages:
+  - python
+  severity: ERROR
+  patterns:
+  - pattern-inside: |
+      def $FUNC(...):
+        ...
+  - pattern-either:
+    - pattern: urllib.request.urlopen(..., $S.format(..., request.$W.get(...), ...),
+        ...)
+    - pattern: urllib.request.urlopen(..., $S % request.$W.get(...), ...)
+    - pattern: urllib.request.urlopen(..., f"...{request.$W.get(...)}...", ...)
+    - pattern: urllib.request.urlopen(..., request.$W.get(...), ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        urllib.request.urlopen(..., $DATA, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $DATA
+        ...
+        urllib.request.urlopen(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        urllib.request.urlopen(..., $STR.format(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        urllib.request.urlopen(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        urllib.request.urlopen(..., $STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        urllib.request.urlopen(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        urllib.request.urlopen(..., f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        urllib.request.urlopen(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        urllib.request.urlopen(..., $STR + $DATA, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        urllib.request.urlopen(..., $INTERM, ...)
+    - pattern: $A = urllib.request.urlopen(..., request.$W.get(...), ...)
+    - pattern: return urllib.request.urlopen(..., request.$W.get(...), ...)
+    - pattern: urllib.request.urlopen(..., $S.format(..., request.$W(...), ...), ...)
+    - pattern: urllib.request.urlopen(..., $S % request.$W(...), ...)
+    - pattern: urllib.request.urlopen(..., f"...{request.$W(...)}...", ...)
+    - pattern: urllib.request.urlopen(..., request.$W(...), ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        urllib.request.urlopen(..., $DATA, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $DATA
+        ...
+        urllib.request.urlopen(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        urllib.request.urlopen(..., $STR.format(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        urllib.request.urlopen(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        urllib.request.urlopen(..., $STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        urllib.request.urlopen(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        urllib.request.urlopen(..., f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        urllib.request.urlopen(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        urllib.request.urlopen(..., $STR + $DATA, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        urllib.request.urlopen(..., $INTERM, ...)
+    - pattern: $A = urllib.request.urlopen(..., request.$W(...), ...)
+    - pattern: return urllib.request.urlopen(..., request.$W(...), ...)
+    - pattern: urllib.request.urlopen(..., $S.format(..., request.$W[...], ...), ...)
+    - pattern: urllib.request.urlopen(..., $S % request.$W[...], ...)
+    - pattern: urllib.request.urlopen(..., f"...{request.$W[...]}...", ...)
+    - pattern: urllib.request.urlopen(..., request.$W[...], ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        urllib.request.urlopen(..., $DATA, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $DATA
+        ...
+        urllib.request.urlopen(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        urllib.request.urlopen(..., $STR.format(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        urllib.request.urlopen(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        urllib.request.urlopen(..., $STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        urllib.request.urlopen(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        urllib.request.urlopen(..., f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        urllib.request.urlopen(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        urllib.request.urlopen(..., $STR + $DATA, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        urllib.request.urlopen(..., $INTERM, ...)
+    - pattern: $A = urllib.request.urlopen(..., request.$W[...], ...)
+    - pattern: return urllib.request.urlopen(..., request.$W[...], ...)
+    - pattern: urllib.request.urlopen(..., $S.format(..., request.$W, ...), ...)
+    - pattern: urllib.request.urlopen(..., $S % request.$W, ...)
+    - pattern: urllib.request.urlopen(..., f"...{request.$W}...", ...)
+    - pattern: urllib.request.urlopen(..., request.$W, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        urllib.request.urlopen(..., $DATA, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $DATA
+        ...
+        urllib.request.urlopen(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        urllib.request.urlopen(..., $STR.format(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        urllib.request.urlopen(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        urllib.request.urlopen(..., $STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        urllib.request.urlopen(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        urllib.request.urlopen(..., f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        urllib.request.urlopen(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        urllib.request.urlopen(..., $STR + $DATA, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        urllib.request.urlopen(..., $INTERM, ...)
+    - pattern: $A = urllib.request.urlopen(..., request.$W, ...)
+    - pattern: return urllib.request.urlopen(..., request.$W, ...)
+- id: python.django.security.injection.open-redirect.open-redirect
+  message: Data from request ($DATA) is passed to redirect(). This is an open redirect
+    and could be exploited. Ensure you are redirecting to safe URLs by using django.utils.http.is_safe_url().
+    See https://cwe.mitre.org/data/definitions/601.html for more information.
+  metadata:
+    cwe:
+    - 'CWE-601: URL Redirection to Untrusted Site (''Open Redirect'')'
+    owasp:
+    - A01:2021 - Broken Access Control
+    - A01:2025 - Broken Access Control
+    references:
+    - https://www.djm.org.uk/posts/djangos-little-protections-word-redirect-dangers/
+    - https://github.com/django/django/blob/d1b7bd030b1db111e1a3505b1fc029ab964382cc/django/utils/http.py#L231
+    category: security
+    technology:
+    - django
+    subcategory:
+    - vuln
+    likelihood: LOW
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Open Redirect
+    source: https://semgrep.dev/r/python.django.security.injection.open-redirect.open-redirect
+    shortlink: https://sg.run/Ave2
+    semgrep.dev:
+      rule:
+        r_id: 9494
+        rv_id: 1263393
+        rule_id: PeUZgr
+        version_id: 3ZT4XD7
+        url: https://semgrep.dev/playground/r/3ZT4XD7/python.django.security.injection.open-redirect.open-redirect
+        origin: community
+  languages:
+  - python
+  severity: WARNING
+  patterns:
+  - pattern-inside: |
+      def $FUNC(...):
+        ...
+  - pattern-not-inside: |
+      def $FUNC(...):
+        ...
+        django.utils.http.is_safe_url(...)
+        ...
+  - pattern-not-inside: |
+      def $FUNC(...):
+        ...
+        if <... django.utils.http.is_safe_url(...) ...>:
+          ...
+  - pattern-not-inside: |
+      def $FUNC(...):
+        ...
+        django.utils.http.url_has_allowed_host_and_scheme(...)
+        ...
+  - pattern-not-inside: |
+      def $FUNC(...):
+        ...
+        if <... django.utils.http.url_has_allowed_host_and_scheme(...) ...>:
+          ...
+  - pattern-either:
+    - pattern: django.shortcuts.redirect(..., request.$W.get(...), ...)
+    - pattern: django.shortcuts.redirect(..., $S.format(..., request.$W.get(...),
+        ...), ...)
+    - pattern: django.shortcuts.redirect(..., $S % request.$W.get(...), ...)
+    - pattern: django.shortcuts.redirect(..., f"...{request.$W.get(...)}...", ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        django.shortcuts.redirect(..., $DATA, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $DATA
+        ...
+        django.shortcuts.redirect(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        django.shortcuts.redirect(..., $STR.format(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        django.shortcuts.redirect(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        django.shortcuts.redirect(..., $STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        django.shortcuts.redirect(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        django.shortcuts.redirect(..., f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        django.shortcuts.redirect(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        django.shortcuts.redirect(..., $STR + $DATA, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        django.shortcuts.redirect(..., $INTERM, ...)
+    - pattern: $A = django.shortcuts.redirect(..., request.$W.get(...), ...)
+    - pattern: $A = django.shortcuts.redirect(..., $S.format(..., request.$W.get(...),
+        ...), ...)
+    - pattern: $A = django.shortcuts.redirect(..., $S % request.$W.get(...), ...)
+    - pattern: $A = django.shortcuts.redirect(..., f"...{request.$W.get(...)}...",
+        ...)
+    - pattern: return django.shortcuts.redirect(..., request.$W.get(...), ...)
+    - pattern: return django.shortcuts.redirect(..., $S.format(..., request.$W.get(...),
+        ...), ...)
+    - pattern: return django.shortcuts.redirect(..., $S % request.$W.get(...), ...)
+    - pattern: return django.shortcuts.redirect(..., f"...{request.$W.get(...)}...",
+        ...)
+    - pattern: django.shortcuts.redirect(..., request.$W(...), ...)
+    - pattern: django.shortcuts.redirect(..., $S.format(..., request.$W(...), ...),
+        ...)
+    - pattern: django.shortcuts.redirect(..., $S % request.$W(...), ...)
+    - pattern: django.shortcuts.redirect(..., f"...{request.$W(...)}...", ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        django.shortcuts.redirect(..., $DATA, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $DATA
+        ...
+        django.shortcuts.redirect(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        django.shortcuts.redirect(..., $STR.format(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        django.shortcuts.redirect(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        django.shortcuts.redirect(..., $STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        django.shortcuts.redirect(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        django.shortcuts.redirect(..., f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        django.shortcuts.redirect(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        django.shortcuts.redirect(..., $STR + $DATA, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        django.shortcuts.redirect(..., $INTERM, ...)
+    - pattern: $A = django.shortcuts.redirect(..., request.$W(...), ...)
+    - pattern: $A = django.shortcuts.redirect(..., $S.format(..., request.$W(...),
+        ...), ...)
+    - pattern: $A = django.shortcuts.redirect(..., $S % request.$W(...), ...)
+    - pattern: $A = django.shortcuts.redirect(..., f"...{request.$W(...)}...", ...)
+    - pattern: return django.shortcuts.redirect(..., request.$W(...), ...)
+    - pattern: return django.shortcuts.redirect(..., $S.format(..., request.$W(...),
+        ...), ...)
+    - pattern: return django.shortcuts.redirect(..., $S % request.$W(...), ...)
+    - pattern: return django.shortcuts.redirect(..., f"...{request.$W(...)}...", ...)
+    - pattern: django.shortcuts.redirect(..., request.$W[...], ...)
+    - pattern: django.shortcuts.redirect(..., $S.format(..., request.$W[...], ...),
+        ...)
+    - pattern: django.shortcuts.redirect(..., $S % request.$W[...], ...)
+    - pattern: django.shortcuts.redirect(..., f"...{request.$W[...]}...", ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        django.shortcuts.redirect(..., $DATA, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $DATA
+        ...
+        django.shortcuts.redirect(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        django.shortcuts.redirect(..., $STR.format(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        django.shortcuts.redirect(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        django.shortcuts.redirect(..., $STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        django.shortcuts.redirect(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        django.shortcuts.redirect(..., f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        django.shortcuts.redirect(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        django.shortcuts.redirect(..., $STR + $DATA, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        django.shortcuts.redirect(..., $INTERM, ...)
+    - pattern: $A = django.shortcuts.redirect(..., request.$W[...], ...)
+    - pattern: $A = django.shortcuts.redirect(..., $S.format(..., request.$W[...],
+        ...), ...)
+    - pattern: $A = django.shortcuts.redirect(..., $S % request.$W[...], ...)
+    - pattern: $A = django.shortcuts.redirect(..., f"...{request.$W[...]}...", ...)
+    - pattern: return django.shortcuts.redirect(..., request.$W[...], ...)
+    - pattern: return django.shortcuts.redirect(..., $S.format(..., request.$W[...],
+        ...), ...)
+    - pattern: return django.shortcuts.redirect(..., $S % request.$W[...], ...)
+    - pattern: return django.shortcuts.redirect(..., f"...{request.$W[...]}...", ...)
+    - pattern: django.shortcuts.redirect(..., request.$W, ...)
+    - pattern: django.shortcuts.redirect(..., $S.format(..., request.$W, ...), ...)
+    - pattern: django.shortcuts.redirect(..., $S % request.$W, ...)
+    - pattern: django.shortcuts.redirect(..., f"...{request.$W}...", ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        django.shortcuts.redirect(..., $DATA, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $DATA
+        ...
+        django.shortcuts.redirect(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        django.shortcuts.redirect(..., $STR.format(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        django.shortcuts.redirect(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        django.shortcuts.redirect(..., $STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        django.shortcuts.redirect(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        django.shortcuts.redirect(..., f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        django.shortcuts.redirect(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        django.shortcuts.redirect(..., $STR + $DATA, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        django.shortcuts.redirect(..., $INTERM, ...)
+    - pattern: $A = django.shortcuts.redirect(..., request.$W, ...)
+    - pattern: $A = django.shortcuts.redirect(..., $S.format(..., request.$W, ...),
+        ...)
+    - pattern: $A = django.shortcuts.redirect(..., $S % request.$W, ...)
+    - pattern: $A = django.shortcuts.redirect(..., f"...{request.$W}...", ...)
+    - pattern: return django.shortcuts.redirect(..., request.$W, ...)
+    - pattern: return django.shortcuts.redirect(..., $S.format(..., request.$W, ...),
+        ...)
+    - pattern: return django.shortcuts.redirect(..., $S % request.$W, ...)
+    - pattern: return django.shortcuts.redirect(..., f"...{request.$W}...", ...)
+    - pattern: django.http.HttpResponseRedirect(..., request.$W.get(...), ...)
+    - pattern: django.http.HttpResponseRedirect(..., $S.format(..., request.$W.get(...),
+        ...), ...)
+    - pattern: django.http.HttpResponseRedirect(..., $S % request.$W.get(...), ...)
+    - pattern: django.http.HttpResponseRedirect(..., f"...{request.$W.get(...)}...",
+        ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        django.http.HttpResponseRedirect(..., $DATA, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $DATA
+        ...
+        django.http.HttpResponseRedirect(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        django.http.HttpResponseRedirect(..., $STR.format(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        django.http.HttpResponseRedirect(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        django.http.HttpResponseRedirect(..., $STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        django.http.HttpResponseRedirect(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        django.http.HttpResponseRedirect(..., f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        django.http.HttpResponseRedirect(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        django.http.HttpResponseRedirect(..., $STR + $DATA, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        django.http.HttpResponseRedirect(..., $INTERM, ...)
+    - pattern: $A = django.http.HttpResponseRedirect(..., request.$W.get(...), ...)
+    - pattern: $A = django.http.HttpResponseRedirect(..., $S.format(..., request.$W.get(...),
+        ...), ...)
+    - pattern: $A = django.http.HttpResponseRedirect(..., $S % request.$W.get(...),
+        ...)
+    - pattern: $A = django.http.HttpResponseRedirect(..., f"...{request.$W.get(...)}...",
+        ...)
+    - pattern: return django.http.HttpResponseRedirect(..., request.$W.get(...), ...)
+    - pattern: return django.http.HttpResponseRedirect(..., $S.format(..., request.$W.get(...),
+        ...), ...)
+    - pattern: return django.http.HttpResponseRedirect(..., $S % request.$W.get(...),
+        ...)
+    - pattern: return django.http.HttpResponseRedirect(..., f"...{request.$W.get(...)}...",
+        ...)
+    - pattern: django.http.HttpResponseRedirect(..., request.$W(...), ...)
+    - pattern: django.http.HttpResponseRedirect(..., $S.format(..., request.$W(...),
+        ...), ...)
+    - pattern: django.http.HttpResponseRedirect(..., $S % request.$W(...), ...)
+    - pattern: django.http.HttpResponseRedirect(..., f"...{request.$W(...)}...", ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        django.http.HttpResponseRedirect(..., $DATA, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $DATA
+        ...
+        django.http.HttpResponseRedirect(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        django.http.HttpResponseRedirect(..., $STR.format(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        django.http.HttpResponseRedirect(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        django.http.HttpResponseRedirect(..., $STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        django.http.HttpResponseRedirect(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        django.http.HttpResponseRedirect(..., f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        django.http.HttpResponseRedirect(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        django.http.HttpResponseRedirect(..., $STR + $DATA, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        django.http.HttpResponseRedirect(..., $INTERM, ...)
+    - pattern: $A = django.http.HttpResponseRedirect(..., request.$W(...), ...)
+    - pattern: $A = django.http.HttpResponseRedirect(..., $S.format(..., request.$W(...),
+        ...), ...)
+    - pattern: $A = django.http.HttpResponseRedirect(..., $S % request.$W(...), ...)
+    - pattern: $A = django.http.HttpResponseRedirect(..., f"...{request.$W(...)}...",
+        ...)
+    - pattern: return django.http.HttpResponseRedirect(..., request.$W(...), ...)
+    - pattern: return django.http.HttpResponseRedirect(..., $S.format(..., request.$W(...),
+        ...), ...)
+    - pattern: return django.http.HttpResponseRedirect(..., $S % request.$W(...),
+        ...)
+    - pattern: return django.http.HttpResponseRedirect(..., f"...{request.$W(...)}...",
+        ...)
+    - pattern: django.http.HttpResponseRedirect(..., request.$W[...], ...)
+    - pattern: django.http.HttpResponseRedirect(..., $S.format(..., request.$W[...],
+        ...), ...)
+    - pattern: django.http.HttpResponseRedirect(..., $S % request.$W[...], ...)
+    - pattern: django.http.HttpResponseRedirect(..., f"...{request.$W[...]}...", ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        django.http.HttpResponseRedirect(..., $DATA, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $DATA
+        ...
+        django.http.HttpResponseRedirect(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        django.http.HttpResponseRedirect(..., $STR.format(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        django.http.HttpResponseRedirect(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        django.http.HttpResponseRedirect(..., $STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        django.http.HttpResponseRedirect(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        django.http.HttpResponseRedirect(..., f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        django.http.HttpResponseRedirect(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        django.http.HttpResponseRedirect(..., $STR + $DATA, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        django.http.HttpResponseRedirect(..., $INTERM, ...)
+    - pattern: $A = django.http.HttpResponseRedirect(..., request.$W[...], ...)
+    - pattern: $A = django.http.HttpResponseRedirect(..., $S.format(..., request.$W[...],
+        ...), ...)
+    - pattern: $A = django.http.HttpResponseRedirect(..., $S % request.$W[...], ...)
+    - pattern: $A = django.http.HttpResponseRedirect(..., f"...{request.$W[...]}...",
+        ...)
+    - pattern: return django.http.HttpResponseRedirect(..., request.$W[...], ...)
+    - pattern: return django.http.HttpResponseRedirect(..., $S.format(..., request.$W[...],
+        ...), ...)
+    - pattern: return django.http.HttpResponseRedirect(..., $S % request.$W[...],
+        ...)
+    - pattern: return django.http.HttpResponseRedirect(..., f"...{request.$W[...]}...",
+        ...)
+    - pattern: django.http.HttpResponseRedirect(..., request.$W, ...)
+    - pattern: django.http.HttpResponseRedirect(..., $S.format(..., request.$W, ...),
+        ...)
+    - pattern: django.http.HttpResponseRedirect(..., $S % request.$W, ...)
+    - pattern: django.http.HttpResponseRedirect(..., f"...{request.$W}...", ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        django.http.HttpResponseRedirect(..., $DATA, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $DATA
+        ...
+        django.http.HttpResponseRedirect(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        django.http.HttpResponseRedirect(..., $STR.format(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        django.http.HttpResponseRedirect(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        django.http.HttpResponseRedirect(..., $STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        django.http.HttpResponseRedirect(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        django.http.HttpResponseRedirect(..., f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        django.http.HttpResponseRedirect(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        django.http.HttpResponseRedirect(..., $STR + $DATA, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        django.http.HttpResponseRedirect(..., $INTERM, ...)
+    - pattern: $A = django.http.HttpResponseRedirect(..., request.$W, ...)
+    - pattern: $A = django.http.HttpResponseRedirect(..., $S.format(..., request.$W,
+        ...), ...)
+    - pattern: $A = django.http.HttpResponseRedirect(..., $S % request.$W, ...)
+    - pattern: $A = django.http.HttpResponseRedirect(..., f"...{request.$W}...", ...)
+    - pattern: return django.http.HttpResponseRedirect(..., request.$W, ...)
+    - pattern: return django.http.HttpResponseRedirect(..., $S.format(..., request.$W,
+        ...), ...)
+    - pattern: return django.http.HttpResponseRedirect(..., $S % request.$W, ...)
+    - pattern: return django.http.HttpResponseRedirect(..., f"...{request.$W}...",
+        ...)
+  - metavariable-regex:
+      metavariable: $W
+      regex: (?!get_full_path)
+- id: python.django.security.injection.reflected-data-httpresponse.reflected-data-httpresponse
+  message: Found user-controlled request data passed into HttpResponse. This could
+    be vulnerable to XSS, leading to attackers gaining access to user cookies and
+    protected information. Ensure that the request data is properly escaped or sanitzed.
+  metadata:
+    cwe:
+    - 'CWE-79: Improper Neutralization of Input During Web Page Generation (''Cross-site
+      Scripting'')'
+    owasp:
+    - A07:2017 - Cross-Site Scripting (XSS)
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    references:
+    - https://django-book.readthedocs.io/en/latest/chapter20.html#cross-site-scripting-xss
+    category: security
+    technology:
+    - django
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Cross-Site-Scripting (XSS)
+    source: https://semgrep.dev/r/python.django.security.injection.reflected-data-httpresponse.reflected-data-httpresponse
+    shortlink: https://sg.run/BkvA
+    semgrep.dev:
+      rule:
+        r_id: 9495
+        rv_id: 1263398
+        rule_id: JDUydR
+        version_id: GxTke5K
+        url: https://semgrep.dev/playground/r/GxTke5K/python.django.security.injection.reflected-data-httpresponse.reflected-data-httpresponse
+        origin: community
+  languages:
+  - python
+  severity: WARNING
+  patterns:
+  - pattern-inside: |
+      def $FUNC(...):
+        ...
+  - pattern-either:
+    - pattern: django.http.HttpResponse(..., $S.format(..., request.$W.get(...), ...),
+        ...)
+    - pattern: django.http.HttpResponse(..., $S % request.$W.get(...), ...)
+    - pattern: django.http.HttpResponse(..., f"...{request.$W.get(...)}...", ...)
+    - pattern: django.http.HttpResponse(..., request.$W.get(...), ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        django.http.HttpResponse(..., $DATA, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $DATA
+        ...
+        django.http.HttpResponse(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        django.http.HttpResponse(..., $STR.format(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        django.http.HttpResponse(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        django.http.HttpResponse(..., $STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        django.http.HttpResponse(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        django.http.HttpResponse(..., f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        django.http.HttpResponse(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        django.http.HttpResponse(..., $STR + $DATA, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        django.http.HttpResponse(..., $INTERM, ...)
+    - pattern: $A = django.http.HttpResponse(..., request.$W.get(...), ...)
+    - pattern: return django.http.HttpResponse(..., request.$W.get(...), ...)
+    - pattern: django.http.HttpResponse(..., $S.format(..., request.$W(...), ...),
+        ...)
+    - pattern: django.http.HttpResponse(..., $S % request.$W(...), ...)
+    - pattern: django.http.HttpResponse(..., f"...{request.$W(...)}...", ...)
+    - pattern: django.http.HttpResponse(..., request.$W(...), ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        django.http.HttpResponse(..., $DATA, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $DATA
+        ...
+        django.http.HttpResponse(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        django.http.HttpResponse(..., $STR.format(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        django.http.HttpResponse(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        django.http.HttpResponse(..., $STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        django.http.HttpResponse(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        django.http.HttpResponse(..., f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        django.http.HttpResponse(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        django.http.HttpResponse(..., $STR + $DATA, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        django.http.HttpResponse(..., $INTERM, ...)
+    - pattern: $A = django.http.HttpResponse(..., request.$W(...), ...)
+    - pattern: return django.http.HttpResponse(..., request.$W(...), ...)
+    - pattern: django.http.HttpResponse(..., $S.format(..., request.$W[...], ...),
+        ...)
+    - pattern: django.http.HttpResponse(..., $S % request.$W[...], ...)
+    - pattern: django.http.HttpResponse(..., f"...{request.$W[...]}...", ...)
+    - pattern: django.http.HttpResponse(..., request.$W[...], ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        django.http.HttpResponse(..., $DATA, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $DATA
+        ...
+        django.http.HttpResponse(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        django.http.HttpResponse(..., $STR.format(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        django.http.HttpResponse(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        django.http.HttpResponse(..., $STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        django.http.HttpResponse(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        django.http.HttpResponse(..., f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        django.http.HttpResponse(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        django.http.HttpResponse(..., $STR + $DATA, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        django.http.HttpResponse(..., $INTERM, ...)
+    - pattern: $A = django.http.HttpResponse(..., request.$W[...], ...)
+    - pattern: return django.http.HttpResponse(..., request.$W[...], ...)
+    - pattern: django.http.HttpResponse(..., $S.format(..., request.$W, ...), ...)
+    - pattern: django.http.HttpResponse(..., $S % request.$W, ...)
+    - pattern: django.http.HttpResponse(..., f"...{request.$W}...", ...)
+    - pattern: django.http.HttpResponse(..., request.$W, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        django.http.HttpResponse(..., $DATA, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $DATA
+        ...
+        django.http.HttpResponse(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        django.http.HttpResponse(..., $STR.format(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        django.http.HttpResponse(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        django.http.HttpResponse(..., $STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        django.http.HttpResponse(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        django.http.HttpResponse(..., f"...{$DATA}...", ...)
+    - pattern: $A = django.http.HttpResponse(..., request.$W, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        $A = django.http.HttpResponse(..., $INTERM, ...)
+    - pattern: return django.http.HttpResponse(..., request.$W, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        django.http.HttpResponse(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        django.http.HttpResponse(..., $STR + $DATA, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        django.http.HttpResponse(..., $INTERM, ...)
+- id: python.django.security.injection.command.command-injection-os-system.command-injection-os-system
+  message: Request data detected in os.system. This could be vulnerable to a command
+    injection and should be avoided. If this must be done, use the 'subprocess' module
+    instead and pass the arguments as a list. See https://owasp.org/www-community/attacks/Command_Injection
+    for more information.
+  metadata:
+    cwe:
+    - 'CWE-78: Improper Neutralization of Special Elements used in an OS Command (''OS
+      Command Injection'')'
+    owasp:
+    - A01:2017 - Injection
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    references:
+    - https://owasp.org/www-community/attacks/Command_Injection
+    category: security
+    technology:
+    - django
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: HIGH
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Command Injection
+    source: https://semgrep.dev/r/python.django.security.injection.command.command-injection-os-system.command-injection-os-system
+    shortlink: https://sg.run/Gen2
+    semgrep.dev:
+      rule:
+        r_id: 9504
+        rv_id: 1263387
+        rule_id: KxUbp2
+        version_id: ExTExPo
+        url: https://semgrep.dev/playground/r/ExTExPo/python.django.security.injection.command.command-injection-os-system.command-injection-os-system
+        origin: community
+  languages:
+  - python
+  severity: ERROR
+  patterns:
+  - pattern-inside: |
+      def $FUNC(...):
+        ...
+  - pattern-either:
+    - pattern: os.system(..., request.$W.get(...), ...)
+    - pattern: os.system(..., $S.format(..., request.$W.get(...), ...), ...)
+    - pattern: os.system(..., $S % request.$W.get(...), ...)
+    - pattern: os.system(..., f"...{request.$W.get(...)}...", ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        os.system(..., $DATA, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $DATA
+        ...
+        os.system(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        os.system(..., $STR.format(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        os.system(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        os.system(..., $STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        os.system(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        os.system(..., f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        os.system(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        os.system(..., $STR + $DATA, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        os.system(..., $INTERM, ...)
+    - pattern: $A = os.system(..., request.$W.get(...), ...)
+    - pattern: $A = os.system(..., $S.format(..., request.$W.get(...), ...), ...)
+    - pattern: $A = os.system(..., $S % request.$W.get(...), ...)
+    - pattern: $A = os.system(..., f"...{request.$W.get(...)}...", ...)
+    - pattern: return os.system(..., request.$W.get(...), ...)
+    - pattern: return os.system(..., $S.format(..., request.$W.get(...), ...), ...)
+    - pattern: return os.system(..., $S % request.$W.get(...), ...)
+    - pattern: return os.system(..., f"...{request.$W.get(...)}...", ...)
+    - pattern: os.system(..., request.$W(...), ...)
+    - pattern: os.system(..., $S.format(..., request.$W(...), ...), ...)
+    - pattern: os.system(..., $S % request.$W(...), ...)
+    - pattern: os.system(..., f"...{request.$W(...)}...", ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        os.system(..., $DATA, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $DATA
+        ...
+        os.system(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        os.system(..., $STR.format(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        os.system(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        os.system(..., $STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        os.system(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        os.system(..., f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        os.system(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        os.system(..., $STR + $DATA, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        os.system(..., $INTERM, ...)
+    - pattern: $A = os.system(..., request.$W(...), ...)
+    - pattern: $A = os.system(..., $S.format(..., request.$W(...), ...), ...)
+    - pattern: $A = os.system(..., $S % request.$W(...), ...)
+    - pattern: $A = os.system(..., f"...{request.$W(...)}...", ...)
+    - pattern: return os.system(..., request.$W(...), ...)
+    - pattern: return os.system(..., $S.format(..., request.$W(...), ...), ...)
+    - pattern: return os.system(..., $S % request.$W(...), ...)
+    - pattern: return os.system(..., f"...{request.$W(...)}...", ...)
+    - pattern: os.system(..., request.$W[...], ...)
+    - pattern: os.system(..., $S.format(..., request.$W[...], ...), ...)
+    - pattern: os.system(..., $S % request.$W[...], ...)
+    - pattern: os.system(..., f"...{request.$W[...]}...", ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        os.system(..., $DATA, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $DATA
+        ...
+        os.system(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        os.system(..., $STR.format(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        os.system(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        os.system(..., $STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        os.system(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        os.system(..., f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        os.system(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        os.system(..., $STR + $DATA, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        os.system(..., $INTERM, ...)
+    - pattern: $A = os.system(..., request.$W[...], ...)
+    - pattern: $A = os.system(..., $S.format(..., request.$W[...], ...), ...)
+    - pattern: $A = os.system(..., $S % request.$W[...], ...)
+    - pattern: $A = os.system(..., f"...{request.$W[...]}...", ...)
+    - pattern: return os.system(..., request.$W[...], ...)
+    - pattern: return os.system(..., $S.format(..., request.$W[...], ...), ...)
+    - pattern: return os.system(..., $S % request.$W[...], ...)
+    - pattern: return os.system(..., f"...{request.$W[...]}...", ...)
+    - pattern: os.system(..., request.$W, ...)
+    - pattern: os.system(..., $S.format(..., request.$W, ...), ...)
+    - pattern: os.system(..., $S % request.$W, ...)
+    - pattern: os.system(..., f"...{request.$W}...", ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        os.system(..., $DATA, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $DATA
+        ...
+        os.system(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        os.system(..., $STR.format(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        os.system(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        os.system(..., $STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        os.system(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        os.system(..., f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        os.system(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        os.system(..., $STR + $DATA, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        os.system(..., $INTERM, ...)
+    - pattern: $A = os.system(..., request.$W, ...)
+    - pattern: $A = os.system(..., $S.format(..., request.$W, ...), ...)
+    - pattern: $A = os.system(..., $S % request.$W, ...)
+    - pattern: $A = os.system(..., f"...{request.$W}...", ...)
+    - pattern: return os.system(..., request.$W, ...)
+    - pattern: return os.system(..., $S.format(..., request.$W, ...), ...)
+    - pattern: return os.system(..., $S % request.$W, ...)
+    - pattern: return os.system(..., f"...{request.$W}...", ...)
+- id: python.django.security.injection.request-data-write.request-data-write
+  message: Found user-controlled request data passed into '.write(...)'. This could
+    be dangerous if a malicious actor is able to control data into sensitive files.
+    For example, a malicious actor could force rolling of critical log files, or cause
+    a denial-of-service by using up available disk space. Instead, ensure that request
+    data is properly escaped or sanitized.
+  metadata:
+    cwe:
+    - 'CWE-93: Improper Neutralization of CRLF Sequences (''CRLF Injection'')'
+    owasp:
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    category: security
+    technology:
+    - django
+    references:
+    - https://owasp.org/Top10/A03_2021-Injection
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Improper Validation
+    source: https://semgrep.dev/r/python.django.security.injection.request-data-write.request-data-write
+    shortlink: https://sg.run/0Q6j
+    semgrep.dev:
+      rule:
+        r_id: 9498
+        rv_id: 1263401
+        rule_id: ReUg5z
+        version_id: BjTkZO5
+        url: https://semgrep.dev/playground/r/BjTkZO5/python.django.security.injection.request-data-write.request-data-write
+        origin: community
+  languages:
+  - python
+  severity: WARNING
+  pattern-either:
+  - pattern: $F.write(..., request.$W.get(...), ...)
+  - pattern: |
+      $DATA = request.$W.get(...)
+      ...
+      $F.write(..., $DATA, ...)
+  - pattern: |
+      $DATA = request.$W.get(...)
+      ...
+      $INTERM = $DATA
+      ...
+      $F.write(..., $INTERM, ...)
+  - pattern: |
+      $DATA = request.$W.get(...)
+      ...
+      $F.write(..., $B.$C(..., $DATA, ...), ...)
+  - pattern: |
+      $DATA = request.$W.get(...)
+      ...
+      $INTERM = $B.$C(..., $DATA, ...)
+      ...
+      $F.write(..., $INTERM, ...)
+  - pattern: |
+      $DATA = request.$W.get(...)
+      ...
+      $F.write(..., $STR % $DATA, ...)
+  - pattern: |
+      $DATA = request.$W.get(...)
+      ...
+      $INTERM = $STR % $DATA
+      ...
+      $F.write(..., $INTERM, ...)
+  - pattern: |
+      $DATA = request.$W.get(...)
+      ...
+      $F.write(..., f"...{$DATA}...", ...)
+  - pattern: |
+      $DATA = request.$W.get(...)
+      ...
+      $INTERM = f"...{$DATA}..."
+      ...
+      $F.write(..., $INTERM, ...)
+  - pattern: $A = $F.write(..., request.$W.get(...), ...)
+  - pattern: return $F.write(..., request.$W.get(...), ...)
+  - pattern: $F.write(..., request.$W(...), ...)
+  - pattern: |
+      $DATA = request.$W(...)
+      ...
+      $F.write(..., $DATA, ...)
+  - pattern: |
+      $DATA = request.$W(...)
+      ...
+      $INTERM = $DATA
+      ...
+      $F.write(..., $INTERM, ...)
+  - pattern: |
+      $DATA = request.$W(...)
+      ...
+      $F.write(..., $B.$C(..., $DATA, ...), ...)
+  - pattern: |
+      $DATA = request.$W(...)
+      ...
+      $INTERM = $B.$C(..., $DATA, ...)
+      ...
+      $F.write(..., $INTERM, ...)
+  - pattern: |
+      $DATA = request.$W(...)
+      ...
+      $F.write(..., $STR % $DATA, ...)
+  - pattern: |
+      $DATA = request.$W(...)
+      ...
+      $INTERM = $STR % $DATA
+      ...
+      $F.write(..., $INTERM, ...)
+  - pattern: |
+      $DATA = request.$W(...)
+      ...
+      $F.write(..., f"...{$DATA}...", ...)
+  - pattern: |
+      $DATA = request.$W(...)
+      ...
+      $INTERM = f"...{$DATA}..."
+      ...
+      $F.write(..., $INTERM, ...)
+  - pattern: $A = $F.write(..., request.$W(...), ...)
+  - pattern: return $F.write(..., request.$W(...), ...)
+  - pattern: $F.write(..., request.$W[...], ...)
+  - pattern: |
+      $DATA = request.$W[...]
+      ...
+      $F.write(..., $DATA, ...)
+  - pattern: |
+      $DATA = request.$W[...]
+      ...
+      $INTERM = $DATA
+      ...
+      $F.write(..., $INTERM, ...)
+  - pattern: |
+      $DATA = request.$W[...]
+      ...
+      $F.write(..., $B.$C(..., $DATA, ...), ...)
+  - pattern: |
+      $DATA = request.$W[...]
+      ...
+      $INTERM = $B.$C(..., $DATA, ...)
+      ...
+      $F.write(..., $INTERM, ...)
+  - pattern: |
+      $DATA = request.$W[...]
+      ...
+      $F.write(..., $STR % $DATA, ...)
+  - pattern: |
+      $DATA = request.$W[...]
+      ...
+      $INTERM = $STR % $DATA
+      ...
+      $F.write(..., $INTERM, ...)
+  - pattern: |
+      $DATA = request.$W[...]
+      ...
+      $F.write(..., f"...{$DATA}...", ...)
+  - pattern: |
+      $DATA = request.$W[...]
+      ...
+      $INTERM = f"...{$DATA}..."
+      ...
+      $F.write(..., $INTERM, ...)
+  - pattern: $A = $F.write(..., request.$W[...], ...)
+  - pattern: return $F.write(..., request.$W[...], ...)
+  - pattern: $F.write(..., request.$W, ...)
+  - pattern: |
+      $DATA = request.$W
+      ...
+      $F.write(..., $DATA, ...)
+  - pattern: |
+      $DATA = request.$W
+      ...
+      $INTERM = $DATA
+      ...
+      $F.write(..., $INTERM, ...)
+  - pattern: |
+      $DATA = request.$W
+      ...
+      $F.write(..., $B.$C(..., $DATA, ...), ...)
+  - pattern: |
+      $DATA = request.$W
+      ...
+      $INTERM = $B.$C(..., $DATA, ...)
+      ...
+      $F.write(..., $INTERM, ...)
+  - pattern: |
+      $DATA = request.$W
+      ...
+      $F.write(..., $STR % $DATA, ...)
+  - pattern: |
+      $DATA = request.$W
+      ...
+      $INTERM = $STR % $DATA
+      ...
+      $F.write(..., $INTERM, ...)
+  - pattern: |
+      $DATA = request.$W
+      ...
+      $F.write(..., f"...{$DATA}...", ...)
+  - pattern: |
+      $DATA = request.$W
+      ...
+      $INTERM = f"...{$DATA}..."
+      ...
+      $F.write(..., $INTERM, ...)
+  - pattern: $A = $F.write(..., request.$W, ...)
+  - pattern: return $F.write(..., request.$W, ...)
+- id: python.django.security.injection.email.xss-send-mail-html-message.xss-send-mail-html-message
+  message: Found request data in 'send_mail(...)' that uses 'html_message'. This is
+    dangerous because HTML emails are susceptible to XSS. An attacker could inject
+    data into this HTML email, causing XSS.
+  metadata:
+    cwe:
+    - 'CWE-74: Improper Neutralization of Special Elements in Output Used by a Downstream
+      Component (''Injection'')'
+    owasp:
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    references:
+    - https://www.damonkohler.com/2008/12/email-injection.html
+    category: security
+    technology:
+    - django
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Other
+    source: https://semgrep.dev/r/python.django.security.injection.email.xss-send-mail-html-message.xss-send-mail-html-message
+    shortlink: https://sg.run/Avx8
+    semgrep.dev:
+      rule:
+        r_id: 9506
+        rv_id: 1263391
+        rule_id: lBU9Ll
+        version_id: gETB7Gn
+        url: https://semgrep.dev/playground/r/gETB7Gn/python.django.security.injection.email.xss-send-mail-html-message.xss-send-mail-html-message
+        origin: community
+  languages:
+  - python
+  severity: WARNING
+  patterns:
+  - pattern-inside: |
+      def $FUNC(...):
+        ...
+  - pattern-either:
+    - pattern: django.core.mail.send_mail(..., html_message=request.$W.get(...), ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        django.core.mail.send_mail(..., html_message=$DATA, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $DATA
+        ...
+        django.core.mail.send_mail(..., html_message=$INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        django.core.mail.send_mail(..., html_message=$STR.format(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        django.core.mail.send_mail(..., html_message=$INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        django.core.mail.send_mail(..., html_message=$STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        django.core.mail.send_mail(..., html_message=$INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        django.core.mail.send_mail(..., html_message=f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        django.core.mail.send_mail(..., html_message=$INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        django.core.mail.send_mail(..., html_message=$STR + $DATA, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        django.core.mail.send_mail(..., html_message=$INTERM, ...)
+    - pattern: $A = django.core.mail.send_mail(..., html_message=request.$W.get(...),
+        ...)
+    - pattern: return django.core.mail.send_mail(..., html_message=request.$W.get(...),
+        ...)
+    - pattern: django.core.mail.send_mail(..., html_message=request.$W(...), ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        django.core.mail.send_mail(..., html_message=$DATA, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $DATA
+        ...
+        django.core.mail.send_mail(..., html_message=$INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        django.core.mail.send_mail(..., html_message=$STR.format(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        django.core.mail.send_mail(..., html_message=$INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        django.core.mail.send_mail(..., html_message=$STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        django.core.mail.send_mail(..., html_message=$INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        django.core.mail.send_mail(..., html_message=f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        django.core.mail.send_mail(..., html_message=$INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        django.core.mail.send_mail(..., html_message=$STR + $DATA, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        django.core.mail.send_mail(..., html_message=$INTERM, ...)
+    - pattern: $A = django.core.mail.send_mail(..., html_message=request.$W(...),
+        ...)
+    - pattern: return django.core.mail.send_mail(..., html_message=request.$W(...),
+        ...)
+    - pattern: django.core.mail.send_mail(..., html_message=request.$W[...], ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        django.core.mail.send_mail(..., html_message=$DATA, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $DATA
+        ...
+        django.core.mail.send_mail(..., html_message=$INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        django.core.mail.send_mail(..., html_message=$STR.format(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        django.core.mail.send_mail(..., html_message=$INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        django.core.mail.send_mail(..., html_message=$STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        django.core.mail.send_mail(..., html_message=$INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        django.core.mail.send_mail(..., html_message=f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        django.core.mail.send_mail(..., html_message=$INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        django.core.mail.send_mail(..., html_message=$STR + $DATA, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        django.core.mail.send_mail(..., html_message=$INTERM, ...)
+    - pattern: $A = django.core.mail.send_mail(..., html_message=request.$W[...],
+        ...)
+    - pattern: return django.core.mail.send_mail(..., html_message=request.$W[...],
+        ...)
+    - pattern: django.core.mail.send_mail(..., html_message=request.$W, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        django.core.mail.send_mail(..., html_message=$DATA, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $DATA
+        ...
+        django.core.mail.send_mail(..., html_message=$INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        django.core.mail.send_mail(..., html_message=$STR.format(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        django.core.mail.send_mail(..., html_message=$INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        django.core.mail.send_mail(..., html_message=$STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        django.core.mail.send_mail(..., html_message=$INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        django.core.mail.send_mail(..., html_message=f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        django.core.mail.send_mail(..., html_message=$INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        django.core.mail.send_mail(..., html_message=$STR + $DATA, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        django.core.mail.send_mail(..., html_message=$INTERM, ...)
+    - pattern: $A = django.core.mail.send_mail(..., html_message=request.$W, ...)
+    - pattern: return django.core.mail.send_mail(..., html_message=request.$W, ...)
+- id: python.django.security.injection.path-traversal.path-traversal-open.path-traversal-open
+  message: Found request data in a call to 'open'. Ensure the request data is validated
+    or sanitized, otherwise it could result in path traversal attacks and therefore
+    sensitive data being leaked. To mitigate, consider using os.path.abspath or os.path.realpath
+    or the pathlib library.
+  metadata:
+    cwe:
+    - 'CWE-22: Improper Limitation of a Pathname to a Restricted Directory (''Path
+      Traversal'')'
+    owasp:
+    - A05:2017 - Broken Access Control
+    - A01:2021 - Broken Access Control
+    - A01:2025 - Broken Access Control
+    references:
+    - https://owasp.org/www-community/attacks/Path_Traversal
+    category: security
+    technology:
+    - django
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Path Traversal
+    source: https://semgrep.dev/r/python.django.security.injection.path-traversal.path-traversal-open.path-traversal-open
+    shortlink: https://sg.run/W8qg
+    semgrep.dev:
+      rule:
+        r_id: 9509
+        rv_id: 1263396
+        rule_id: oqUe7z
+        version_id: JdTzxAw
+        url: https://semgrep.dev/playground/r/JdTzxAw/python.django.security.injection.path-traversal.path-traversal-open.path-traversal-open
+        origin: community
+  languages:
+  - python
+  severity: WARNING
+  patterns:
+  - pattern-inside: |
+      def $FUNC(...):
+        ...
+  - pattern-either:
+    - pattern: open(..., request.$W.get(...), ...)
+    - pattern: open(..., $S.format(..., request.$W.get(...), ...), ...)
+    - pattern: open(..., $S % request.$W.get(...), ...)
+    - pattern: open(..., f"...{request.$W.get(...)}...", ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        open(..., $DATA, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $DATA
+        ...
+        open(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $DATA
+        ...
+        with open(..., $INTERM, ...) as $FD:
+          ...
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        open(..., $STR.format(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        open(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        with open(..., $INTERM, ...) as $FD:
+          ...
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        open(..., $STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        open(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        with open(..., $INTERM, ...) as $FD:
+          ...
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        open(..., f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        open(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        with open(..., $INTERM, ...) as $FD:
+          ...
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        open(..., $STR + $DATA, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        open(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        with open(..., $INTERM, ...) as $FD:
+          ...
+    - pattern: $A = open(..., request.$W.get(...), ...)
+    - pattern: $A = open(..., $S.format(..., request.$W.get(...), ...), ...)
+    - pattern: $A = open(..., $S % request.$W.get(...), ...)
+    - pattern: $A = open(..., f"...{request.$W.get(...)}...", ...)
+    - pattern: return open(..., request.$W.get(...), ...)
+    - pattern: return open(..., $S.format(..., request.$W.get(...), ...), ...)
+    - pattern: return open(..., $S % request.$W.get(...), ...)
+    - pattern: return open(..., f"...{request.$W.get(...)}...", ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        with open(..., $DATA, ...) as $FD:
+          ...
+    - pattern: open(..., request.$W(...), ...)
+    - pattern: open(..., $S.format(..., request.$W(...), ...), ...)
+    - pattern: open(..., $S % request.$W(...), ...)
+    - pattern: open(..., f"...{request.$W(...)}...", ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        open(..., $DATA, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $DATA
+        ...
+        open(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $DATA
+        ...
+        with open(..., $INTERM, ...) as $FD:
+          ...
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        open(..., $STR.format(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        open(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        with open(..., $INTERM, ...) as $FD:
+          ...
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        open(..., $STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        open(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        with open(..., $INTERM, ...) as $FD:
+          ...
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        open(..., f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        open(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        with open(..., $INTERM, ...) as $FD:
+          ...
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        open(..., $STR + $DATA, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        open(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        with open(..., $INTERM, ...) as $FD:
+          ...
+    - pattern: $A = open(..., request.$W(...), ...)
+    - pattern: $A = open(..., $S.format(..., request.$W(...), ...), ...)
+    - pattern: $A = open(..., $S % request.$W(...), ...)
+    - pattern: $A = open(..., f"...{request.$W(...)}...", ...)
+    - pattern: return open(..., request.$W(...), ...)
+    - pattern: return open(..., $S.format(..., request.$W(...), ...), ...)
+    - pattern: return open(..., $S % request.$W(...), ...)
+    - pattern: return open(..., f"...{request.$W(...)}...", ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        with open(..., $DATA, ...) as $FD:
+          ...
+    - pattern: open(..., request.$W[...], ...)
+    - pattern: open(..., $S.format(..., request.$W[...], ...), ...)
+    - pattern: open(..., $S % request.$W[...], ...)
+    - pattern: open(..., f"...{request.$W[...]}...", ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        open(..., $DATA, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $DATA
+        ...
+        open(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $DATA
+        ...
+        with open(..., $INTERM, ...) as $FD:
+          ...
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        open(..., $STR.format(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        open(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        with open(..., $INTERM, ...) as $FD:
+          ...
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        open(..., $STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        open(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        with open(..., $INTERM, ...) as $FD:
+          ...
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        open(..., f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        open(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        with open(..., $INTERM, ...) as $FD:
+          ...
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        open(..., $STR + $DATA, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        open(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        with open(..., $INTERM, ...) as $FD:
+          ...
+    - pattern: $A = open(..., request.$W[...], ...)
+    - pattern: $A = open(..., $S.format(..., request.$W[...], ...), ...)
+    - pattern: $A = open(..., $S % request.$W[...], ...)
+    - pattern: $A = open(..., f"...{request.$W[...]}...", ...)
+    - pattern: return open(..., request.$W[...], ...)
+    - pattern: return open(..., $S.format(..., request.$W[...], ...), ...)
+    - pattern: return open(..., $S % request.$W[...], ...)
+    - pattern: return open(..., f"...{request.$W[...]}...", ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        with open(..., $DATA, ...) as $FD:
+          ...
+    - pattern: open(..., request.$W, ...)
+    - pattern: open(..., $S.format(..., request.$W, ...), ...)
+    - pattern: open(..., $S % request.$W, ...)
+    - pattern: open(..., f"...{request.$W}...", ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        open(..., $DATA, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $DATA
+        ...
+        open(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $DATA
+        ...
+        with open(..., $INTERM, ...) as $FD:
+          ...
+    - pattern: |
+        $DATA = request.$W
+        ...
+        open(..., $STR.format(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        open(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        with open(..., $INTERM, ...) as $FD:
+          ...
+    - pattern: |
+        $DATA = request.$W
+        ...
+        open(..., $STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        open(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        with open(..., $INTERM, ...) as $FD:
+          ...
+    - pattern: |
+        $DATA = request.$W
+        ...
+        open(..., f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        open(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        with open(..., $INTERM, ...) as $FD:
+          ...
+    - pattern: |
+        $DATA = request.$W
+        ...
+        open(..., $STR + $DATA, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        open(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        with open(..., $INTERM, ...) as $FD:
+          ...
+    - pattern: $A = open(..., request.$W, ...)
+    - pattern: $A = open(..., $S.format(..., request.$W, ...), ...)
+    - pattern: $A = open(..., $S % request.$W, ...)
+    - pattern: $A = open(..., f"...{request.$W}...", ...)
+    - pattern: return open(..., request.$W, ...)
+    - pattern: return open(..., $S.format(..., request.$W, ...), ...)
+    - pattern: return open(..., $S % request.$W, ...)
+    - pattern: return open(..., f"...{request.$W}...", ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        with open(..., $DATA, ...) as $FD:
+          ...
+- id: python.django.security.nan-injection.nan-injection
+  message: Found user input going directly into typecast for bool(), float(), or complex().
+    This allows an attacker to inject Python's not-a-number (NaN) into the typecast.
+    This results in undefind behavior, particularly when doing comparisons. Either
+    cast to a different type, or add a guard checking for all capitalizations of the
+    string 'nan'.
+  languages:
+  - python
+  severity: ERROR
+  mode: taint
+  pattern-sources:
+  - patterns:
+    - pattern-inside: |
+        def $FUNC(request, ...):
+          ...
+    - pattern-either:
+      - pattern: request.$PROPERTY.get(...)
+      - pattern: request.$PROPERTY[...]
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - pattern: float(...)
+      - pattern: bool(...)
+      - pattern: complex(...)
+    - pattern-not-inside: |
+        if $COND:
+          ...
+        ...
+  pattern-sanitizers:
+  - pattern: $ANYTHING(...)
+    not_conflicting: true
+  metadata:
+    references:
+    - https://discuss.python.org/t/nan-breaks-min-max-and-sorting-functions-a-solution/2868
+    - https://blog.bitdiscovery.com/2021/12/python-nan-injection/
+    category: security
+    cwe:
+    - 'CWE-704: Incorrect Type Conversion or Cast'
+    technology:
+    - django
+    subcategory:
+    - vuln
+    impact: MEDIUM
+    likelihood: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Improper Validation
+    source: https://semgrep.dev/r/python.django.security.nan-injection.nan-injection
+    shortlink: https://sg.run/Og7L
+    semgrep.dev:
+      rule:
+        r_id: 18275
+        rv_id: 946193
+        rule_id: DbUGvk
+        version_id: NdTqk7G
+        url: https://semgrep.dev/playground/r/NdTqk7G/python.django.security.nan-injection.nan-injection
+        origin: community
+- id: python.django.security.injection.reflected-data-httpresponsebadrequest.reflected-data-httpresponsebadrequest
+  message: Found user-controlled request data passed into a HttpResponseBadRequest.
+    This could be vulnerable to XSS, leading to attackers gaining access to user cookies
+    and protected information. Ensure that the request data is properly escaped or
+    sanitzed.
+  metadata:
+    cwe:
+    - 'CWE-79: Improper Neutralization of Input During Web Page Generation (''Cross-site
+      Scripting'')'
+    owasp:
+    - A07:2017 - Cross-Site Scripting (XSS)
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    references:
+    - https://django-book.readthedocs.io/en/latest/chapter20.html#cross-site-scripting-xss
+    category: security
+    technology:
+    - django
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: LOW
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Cross-Site-Scripting (XSS)
+    source: https://semgrep.dev/r/python.django.security.injection.reflected-data-httpresponsebadrequest.reflected-data-httpresponsebadrequest
+    shortlink: https://sg.run/DoZP
+    semgrep.dev:
+      rule:
+        r_id: 9496
+        rv_id: 1263399
+        rule_id: 5rUOX1
+        version_id: RGT0LY6
+        url: https://semgrep.dev/playground/r/RGT0LY6/python.django.security.injection.reflected-data-httpresponsebadrequest.reflected-data-httpresponsebadrequest
+        origin: community
+  languages:
+  - python
+  severity: WARNING
+  patterns:
+  - pattern-inside: |
+      def $FUNC(...):
+        ...
+  - pattern-either:
+    - pattern: django.http.HttpResponseBadRequest(..., $S.format(..., request.$W.get(...),
+        ...), ...)
+    - pattern: django.http.HttpResponseBadRequest(..., $S % request.$W.get(...), ...)
+    - pattern: django.http.HttpResponseBadRequest(..., f"...{request.$W.get(...)}...",
+        ...)
+    - pattern: django.http.HttpResponseBadRequest(..., request.$W.get(...), ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        django.http.HttpResponseBadRequest(..., $DATA, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $DATA
+        ...
+        django.http.HttpResponseBadRequest(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        django.http.HttpResponseBadRequest(..., $STR.format(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        django.http.HttpResponseBadRequest(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        django.http.HttpResponseBadRequest(..., $STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        django.http.HttpResponseBadRequest(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        django.http.HttpResponseBadRequest(..., f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        django.http.HttpResponseBadRequest(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        django.http.HttpResponseBadRequest(..., $STR + $DATA, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        django.http.HttpResponseBadRequest(..., $INTERM, ...)
+    - pattern: $A = django.http.HttpResponseBadRequest(..., request.$W.get(...), ...)
+    - pattern: return django.http.HttpResponseBadRequest(..., request.$W.get(...),
+        ...)
+    - pattern: django.http.HttpResponseBadRequest(..., $S.format(..., request.$W(...),
+        ...), ...)
+    - pattern: django.http.HttpResponseBadRequest(..., $S % request.$W(...), ...)
+    - pattern: django.http.HttpResponseBadRequest(..., f"...{request.$W(...)}...",
+        ...)
+    - pattern: django.http.HttpResponseBadRequest(..., request.$W(...), ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        django.http.HttpResponseBadRequest(..., $DATA, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $DATA
+        ...
+        django.http.HttpResponseBadRequest(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        django.http.HttpResponseBadRequest(..., $STR.format(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        django.http.HttpResponseBadRequest(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        django.http.HttpResponseBadRequest(..., $STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        django.http.HttpResponseBadRequest(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        django.http.HttpResponseBadRequest(..., f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        django.http.HttpResponseBadRequest(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        django.http.HttpResponseBadRequest(..., $STR + $DATA, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        django.http.HttpResponseBadRequest(..., $INTERM, ...)
+    - pattern: $A = django.http.HttpResponseBadRequest(..., request.$W(...), ...)
+    - pattern: return django.http.HttpResponseBadRequest(..., request.$W(...), ...)
+    - pattern: django.http.HttpResponseBadRequest(..., $S.format(..., request.$W[...],
+        ...), ...)
+    - pattern: django.http.HttpResponseBadRequest(..., $S % request.$W[...], ...)
+    - pattern: django.http.HttpResponseBadRequest(..., f"...{request.$W[...]}...",
+        ...)
+    - pattern: django.http.HttpResponseBadRequest(..., request.$W[...], ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        django.http.HttpResponseBadRequest(..., $DATA, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $DATA
+        ...
+        django.http.HttpResponseBadRequest(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        django.http.HttpResponseBadRequest(..., $STR.format(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        django.http.HttpResponseBadRequest(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        django.http.HttpResponseBadRequest(..., $STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        django.http.HttpResponseBadRequest(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        django.http.HttpResponseBadRequest(..., f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        django.http.HttpResponseBadRequest(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        django.http.HttpResponseBadRequest(..., $STR + $DATA, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        django.http.HttpResponseBadRequest(..., $INTERM, ...)
+    - pattern: $A = django.http.HttpResponseBadRequest(..., request.$W[...], ...)
+    - pattern: return django.http.HttpResponseBadRequest(..., request.$W[...], ...)
+    - pattern: django.http.HttpResponseBadRequest(..., $S.format(..., request.$W,
+        ...), ...)
+    - pattern: django.http.HttpResponseBadRequest(..., $S % request.$W, ...)
+    - pattern: django.http.HttpResponseBadRequest(..., f"...{request.$W}...", ...)
+    - pattern: django.http.HttpResponseBadRequest(..., request.$W, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        django.http.HttpResponseBadRequest(..., $DATA, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $DATA
+        ...
+        django.http.HttpResponseBadRequest(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        django.http.HttpResponseBadRequest(..., $STR.format(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        django.http.HttpResponseBadRequest(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        django.http.HttpResponseBadRequest(..., $STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        django.http.HttpResponseBadRequest(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        django.http.HttpResponseBadRequest(..., f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        django.http.HttpResponseBadRequest(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        django.http.HttpResponseBadRequest(..., $STR + $DATA, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        django.http.HttpResponseBadRequest(..., $INTERM, ...)
+    - pattern: $A = django.http.HttpResponseBadRequest(..., request.$W, ...)
+    - pattern: return django.http.HttpResponseBadRequest(..., request.$W, ...)
+- id: python.django.security.injection.sql.sql-injection-using-raw.sql-injection-using-raw
+  message: Data that is possible user-controlled from a python request is passed to
+    `raw()`. This could lead to SQL injection and attackers gaining access to protected
+    information. Instead, use django's QuerySets, which are built with query parameterization
+    and therefore not vulnerable to sql injection. For example, you could use `Entry.objects.filter(date=2006)`.
+  metadata:
+    cwe:
+    - 'CWE-89: Improper Neutralization of Special Elements used in an SQL Command
+      (''SQL Injection'')'
+    owasp:
+    - A01:2017 - Injection
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    references:
+    - https://docs.djangoproject.com/en/3.0/topics/security/#sql-injection-protection
+    category: security
+    technology:
+    - django
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: HIGH
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - SQL Injection
+    source: https://semgrep.dev/r/python.django.security.injection.sql.sql-injection-using-raw.sql-injection-using-raw
+    shortlink: https://sg.run/l2v9
+    semgrep.dev:
+      rule:
+        r_id: 9513
+        rv_id: 1263405
+        rule_id: X5U8v5
+        version_id: K3TKkBW
+        url: https://semgrep.dev/playground/r/K3TKkBW/python.django.security.injection.sql.sql-injection-using-raw.sql-injection-using-raw
+        origin: community
+  languages:
+  - python
+  severity: WARNING
+  patterns:
+  - pattern-inside: |
+      def $FUNC(...):
+        ...
+  - pattern-either:
+    - pattern: $MODEL.objects.raw(..., $S.format(..., request.$W.get(...), ...), ...)
+    - pattern: $MODEL.objects.raw(..., $S % request.$W.get(...), ...)
+    - pattern: $MODEL.objects.raw(..., f"...{request.$W.get(...)}...", ...)
+    - pattern: $MODEL.objects.raw(..., request.$W.get(...), ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $MODEL.objects.raw(..., $DATA, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $DATA
+        ...
+        $MODEL.objects.raw(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $MODEL.objects.raw(..., $STR.format(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        $MODEL.objects.raw(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $MODEL.objects.raw(..., $STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        $MODEL.objects.raw(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $MODEL.objects.raw(..., f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        $MODEL.objects.raw(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $MODEL.objects.raw(..., $STR + $DATA, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        $MODEL.objects.raw(..., $INTERM, ...)
+    - pattern: $A = $MODEL.objects.raw(..., request.$W.get(...), ...)
+    - pattern: return $MODEL.objects.raw(..., request.$W.get(...), ...)
+    - pattern: $MODEL.objects.raw(..., $S.format(..., request.$W(...), ...), ...)
+    - pattern: $MODEL.objects.raw(..., $S % request.$W(...), ...)
+    - pattern: $MODEL.objects.raw(..., f"...{request.$W(...)}...", ...)
+    - pattern: $MODEL.objects.raw(..., request.$W(...), ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $MODEL.objects.raw(..., $DATA, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $DATA
+        ...
+        $MODEL.objects.raw(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $MODEL.objects.raw(..., $STR.format(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        $MODEL.objects.raw(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $MODEL.objects.raw(..., $STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        $MODEL.objects.raw(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $MODEL.objects.raw(..., f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        $MODEL.objects.raw(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $MODEL.objects.raw(..., $STR + $DATA, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        $MODEL.objects.raw(..., $INTERM, ...)
+    - pattern: $A = $MODEL.objects.raw(..., request.$W(...), ...)
+    - pattern: return $MODEL.objects.raw(..., request.$W(...), ...)
+    - pattern: $MODEL.objects.raw(..., $S.format(..., request.$W[...], ...), ...)
+    - pattern: $MODEL.objects.raw(..., $S % request.$W[...], ...)
+    - pattern: $MODEL.objects.raw(..., f"...{request.$W[...]}...", ...)
+    - pattern: $MODEL.objects.raw(..., request.$W[...], ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $MODEL.objects.raw(..., $DATA, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $DATA
+        ...
+        $MODEL.objects.raw(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $MODEL.objects.raw(..., $STR.format(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        $MODEL.objects.raw(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $MODEL.objects.raw(..., $STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        $MODEL.objects.raw(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $MODEL.objects.raw(..., f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        $MODEL.objects.raw(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $MODEL.objects.raw(..., $STR + $DATA, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        $MODEL.objects.raw(..., $INTERM, ...)
+    - pattern: $A = $MODEL.objects.raw(..., request.$W[...], ...)
+    - pattern: return $MODEL.objects.raw(..., request.$W[...], ...)
+    - pattern: $MODEL.objects.raw(..., $S.format(..., request.$W, ...), ...)
+    - pattern: $MODEL.objects.raw(..., $S % request.$W, ...)
+    - pattern: $MODEL.objects.raw(..., f"...{request.$W}...", ...)
+    - pattern: $MODEL.objects.raw(..., request.$W, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $MODEL.objects.raw(..., $DATA, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $DATA
+        ...
+        $MODEL.objects.raw(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $MODEL.objects.raw(..., $STR.format(..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        $MODEL.objects.raw(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $MODEL.objects.raw(..., $STR % $DATA, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        $MODEL.objects.raw(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $MODEL.objects.raw(..., f"...{$DATA}...", ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        $MODEL.objects.raw(..., $INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $MODEL.objects.raw(..., $STR + $DATA, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        $MODEL.objects.raw(..., $INTERM, ...)
+    - pattern: $A = $MODEL.objects.raw(..., request.$W, ...)
+    - pattern: return $MODEL.objects.raw(..., request.$W, ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $MODEL.objects.raw($STR % (..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $MODEL.objects.raw($STR % (..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $MODEL.objects.raw($STR % (..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $MODEL.objects.raw($STR % (..., $DATA, ...), ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $STR % (..., $DATA, ...)
+        ...
+        $MODEL.objects.raw($INTERM, ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $STR % (..., $DATA, ...)
+        ...
+        $MODEL.objects.raw($INTERM, ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $STR % (..., $DATA, ...)
+        ...
+        $MODEL.objects.raw($INTERM, ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $STR % (..., $DATA, ...)
+        ...
+        $MODEL.objects.raw($INTERM, ...)
+- id: python.django.security.django-no-csrf-token.django-no-csrf-token
+  patterns:
+  - pattern: <form...>...</form>
+  - pattern-either:
+    - pattern: |
+        <form ... method="$METHOD" ...>...</form>
+    - pattern: |
+        <form ... method='$METHOD' ...>...</form>
+    - pattern: |
+        <form ... method=$METHOD ...>...</form>
+  - metavariable-regex:
+      metavariable: $METHOD
+      regex: (?i)(post|put|delete|patch)
+  - pattern-not-inside: <form...>...{% csrf_token %}...</form>
+  - pattern-not-inside: <form...>...{{ $VAR.csrf_token }}...</form>
+  message: Manually-created forms in django templates should specify a csrf_token
+    to prevent CSRF attacks.
+  languages:
+  - generic
+  severity: WARNING
+  metadata:
+    category: security
+    cwe: 'CWE-352: Cross-Site Request Forgery (CSRF)'
+    references:
+    - https://docs.djangoproject.com/en/4.2/howto/csrf/
+    confidence: MEDIUM
+    likelihood: MEDIUM
+    impact: MEDIUM
+    subcategory:
+    - audit
+    technology:
+    - django
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Cross-Site Request Forgery (CSRF)
+    source: https://semgrep.dev/r/python.django.security.django-no-csrf-token.django-no-csrf-token
+    shortlink: https://sg.run/N0Bp
+    semgrep.dev:
+      rule:
+        r_id: 73471
+        rv_id: 946160
+        rule_id: PeUyYG
+        version_id: BjT1NRl
+        url: https://semgrep.dev/playground/r/BjT1NRl/python.django.security.django-no-csrf-token.django-no-csrf-token
+        origin: community
+  paths:
+    include:
+    - '*.html'
+- id: python.django.security.injection.sql.sql-injection-extra.sql-injection-using-extra-where
+  message: User-controlled data from a request is passed to 'extra()'. This could
+    lead to a SQL injection and therefore protected information could be leaked. Instead,
+    use parameterized queries or escape the user-controlled data by using `params`
+    and not using quote placeholders in the SQL string.
+  metadata:
+    cwe:
+    - 'CWE-89: Improper Neutralization of Special Elements used in an SQL Command
+      (''SQL Injection'')'
+    owasp:
+    - A01:2017 - Injection
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    references:
+    - https://docs.djangoproject.com/en/3.0/ref/models/expressions/#.objects.extra
+    category: security
+    technology:
+    - django
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: HIGH
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - SQL Injection
+    source: https://semgrep.dev/r/python.django.security.injection.sql.sql-injection-extra.sql-injection-using-extra-where
+    shortlink: https://sg.run/0Ql5
+    semgrep.dev:
+      rule:
+        r_id: 9510
+        rv_id: 1263402
+        rule_id: zdUkx1
+        version_id: DkTRb4l
+        url: https://semgrep.dev/playground/r/DkTRb4l/python.django.security.injection.sql.sql-injection-extra.sql-injection-using-extra-where
+        origin: community
+  languages:
+  - python
+  severity: WARNING
+  patterns:
+  - pattern-inside: |
+      def $FUNC(...):
+        ...
+  - pattern-either:
+    - pattern: $MODEL.objects.extra(..., where=[..., $S.format(..., request.$W.get(...),
+        ...), ...], ...)
+    - pattern: $MODEL.objects.extra(..., where=[..., $S % request.$W.get(...), ...],
+        ...)
+    - pattern: $MODEL.objects.extra(..., where=[..., f"...{request.$W.get(...)}...",
+        ...], ...)
+    - pattern: $MODEL.objects.extra(..., where=[..., request.$W.get(...), ...], ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $MODEL.objects.extra(..., where=[..., $DATA, ...], ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $DATA
+        ...
+        $MODEL.objects.extra(..., where=[..., $INTERM, ...], ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $MODEL.objects.extra(..., where=[..., $STR.format(..., $DATA, ...), ...], ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        $MODEL.objects.extra(..., where=[..., $INTERM, ...], ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $MODEL.objects.extra(..., where=[..., $STR % $DATA, ...], ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        $MODEL.objects.extra(..., where=[..., $INTERM, ...], ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $MODEL.objects.extra(..., where=[..., f"...{$DATA}...", ...], ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        $MODEL.objects.extra(..., where=[..., $INTERM, ...], ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $MODEL.objects.extra(..., where=[..., $STR + $DATA, ...], ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        $MODEL.objects.extra(..., where=[..., $INTERM, ...], ...)
+    - pattern: $A = $MODEL.objects.extra(..., where=[..., request.$W.get(...), ...],
+        ...)
+    - pattern: return $MODEL.objects.extra(..., where=[..., request.$W.get(...), ...],
+        ...)
+    - pattern: $MODEL.objects.extra(..., where=[..., $S.format(..., request.$W(...),
+        ...), ...], ...)
+    - pattern: $MODEL.objects.extra(..., where=[..., $S % request.$W(...), ...], ...)
+    - pattern: $MODEL.objects.extra(..., where=[..., f"...{request.$W(...)}...", ...],
+        ...)
+    - pattern: $MODEL.objects.extra(..., where=[..., request.$W(...), ...], ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $MODEL.objects.extra(..., where=[..., $DATA, ...], ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $DATA
+        ...
+        $MODEL.objects.extra(..., where=[..., $INTERM, ...], ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $MODEL.objects.extra(..., where=[..., $STR.format(..., $DATA, ...), ...], ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        $MODEL.objects.extra(..., where=[..., $INTERM, ...], ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $MODEL.objects.extra(..., where=[..., $STR % $DATA, ...], ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        $MODEL.objects.extra(..., where=[..., $INTERM, ...], ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $MODEL.objects.extra(..., where=[..., f"...{$DATA}...", ...], ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        $MODEL.objects.extra(..., where=[..., $INTERM, ...], ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $MODEL.objects.extra(..., where=[..., $STR + $DATA, ...], ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        $MODEL.objects.extra(..., where=[..., $INTERM, ...], ...)
+    - pattern: $A = $MODEL.objects.extra(..., where=[..., request.$W(...), ...], ...)
+    - pattern: return $MODEL.objects.extra(..., where=[..., request.$W(...), ...],
+        ...)
+    - pattern: $MODEL.objects.extra(..., where=[..., $S.format(..., request.$W[...],
+        ...), ...], ...)
+    - pattern: $MODEL.objects.extra(..., where=[..., $S % request.$W[...], ...], ...)
+    - pattern: $MODEL.objects.extra(..., where=[..., f"...{request.$W[...]}...", ...],
+        ...)
+    - pattern: $MODEL.objects.extra(..., where=[..., request.$W[...], ...], ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $MODEL.objects.extra(..., where=[..., $DATA, ...], ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $DATA
+        ...
+        $MODEL.objects.extra(..., where=[..., $INTERM, ...], ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $MODEL.objects.extra(..., where=[..., $STR.format(..., $DATA, ...), ...], ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        $MODEL.objects.extra(..., where=[..., $INTERM, ...], ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $MODEL.objects.extra(..., where=[..., $STR % $DATA, ...], ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        $MODEL.objects.extra(..., where=[..., $INTERM, ...], ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $MODEL.objects.extra(..., where=[..., f"...{$DATA}...", ...], ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        $MODEL.objects.extra(..., where=[..., $INTERM, ...], ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $MODEL.objects.extra(..., where=[..., $STR + $DATA, ...], ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        $MODEL.objects.extra(..., where=[..., $INTERM, ...], ...)
+    - pattern: $A = $MODEL.objects.extra(..., where=[..., request.$W[...], ...], ...)
+    - pattern: return $MODEL.objects.extra(..., where=[..., request.$W[...], ...],
+        ...)
+    - pattern: $MODEL.objects.extra(..., where=[..., $S.format(..., request.$W, ...),
+        ...], ...)
+    - pattern: $MODEL.objects.extra(..., where=[..., $S % request.$W, ...], ...)
+    - pattern: $MODEL.objects.extra(..., where=[..., f"...{request.$W}...", ...],
+        ...)
+    - pattern: $MODEL.objects.extra(..., where=[..., request.$W, ...], ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $MODEL.objects.extra(..., where=[..., $DATA, ...], ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $DATA
+        ...
+        $MODEL.objects.extra(..., where=[..., $INTERM, ...], ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $MODEL.objects.extra(..., where=[..., $STR.format(..., $DATA, ...), ...], ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $STR.format(..., $DATA, ...)
+        ...
+        $MODEL.objects.extra(..., where=[..., $INTERM, ...], ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $MODEL.objects.extra(..., where=[..., $STR % $DATA, ...], ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $STR % $DATA
+        ...
+        $MODEL.objects.extra(..., where=[..., $INTERM, ...], ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $MODEL.objects.extra(..., where=[..., f"...{$DATA}...", ...], ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = f"...{$DATA}..."
+        ...
+        $MODEL.objects.extra(..., where=[..., $INTERM, ...], ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $MODEL.objects.extra(..., where=[..., $STR + $DATA, ...], ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $STR + $DATA
+        ...
+        $MODEL.objects.extra(..., where=[..., $INTERM, ...], ...)
+    - pattern: $A = $MODEL.objects.extra(..., where=[..., request.$W, ...], ...)
+    - pattern: return $MODEL.objects.extra(..., where=[..., request.$W, ...], ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $MODEL.objects.extra(..., where=[..., $STR % (..., $DATA, ...), ...], ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $MODEL.objects.extra(..., where=[..., $STR % (..., $DATA, ...), ...], ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $MODEL.objects.extra(..., where=[..., $STR % (..., $DATA, ...), ...], ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $MODEL.objects.extra(..., where=[..., $STR % (..., $DATA, ...), ...], ...)
+    - pattern: |
+        $DATA = request.$W.get(...)
+        ...
+        $INTERM = $STR % (..., $DATA, ...)
+        ...
+        $MODEL.objects.extra(..., where=[..., $INTERM, ...], ...)
+    - pattern: |
+        $DATA = request.$W(...)
+        ...
+        $INTERM = $STR % (..., $DATA, ...)
+        ...
+        $MODEL.objects.extra(..., where=[..., $INTERM, ...], ...)
+    - pattern: |
+        $DATA = request.$W[...]
+        ...
+        $INTERM = $STR % (..., $DATA, ...)
+        ...
+        $MODEL.objects.extra(..., where=[..., $INTERM, ...], ...)
+    - pattern: |
+        $DATA = request.$W
+        ...
+        $INTERM = $STR % (..., $DATA, ...)
+        ...
+        $MODEL.objects.extra(..., where=[..., $INTERM, ...], ...)

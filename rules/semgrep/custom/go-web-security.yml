@@ -1,0 +1,83 @@
+rules:
+  - id: dede.go.web.sql-injection
+    languages: [go]
+    mode: taint
+    severity: ERROR
+    message: HTTP request input reaches SQL statement text.
+    metadata:
+      category: security
+      cwe: [CWE-89]
+      confidence: HIGH
+      analysis: taint
+      recommendation: Use constant SQL and pass values separately as driver parameters.
+      references: [https://cwe.mitre.org/data/definitions/89.html]
+    pattern-sources:
+      - pattern-either:
+          - pattern: $REQ.URL.Query().Get(...)
+          - pattern: $REQ.FormValue(...)
+          - pattern: $REQ.PostFormValue(...)
+          - pattern: $REQ.Header.Get(...)
+        exact: true
+    pattern-sinks:
+      - patterns:
+          - pattern-either:
+              - pattern: $DB.Query($QUERY, ...)
+              - pattern: $DB.QueryRow($QUERY, ...)
+              - pattern: $DB.Exec($QUERY, ...)
+              - pattern: $DB.QueryContext($CTX, $QUERY, ...)
+              - pattern: $DB.ExecContext($CTX, $QUERY, ...)
+          - focus-metavariable: $QUERY
+
+  - id: dede.go.web.command-injection
+    languages: [go]
+    mode: taint
+    severity: ERROR
+    message: HTTP request input reaches shell command text.
+    metadata:
+      category: security
+      cwe: [CWE-78]
+      confidence: HIGH
+      analysis: taint
+      recommendation: Use a fixed executable with separate validated arguments instead of a shell interpreter.
+      references: [https://cwe.mitre.org/data/definitions/78.html]
+    pattern-sources:
+      - pattern-either:
+          - pattern: $REQ.URL.Query().Get(...)
+          - pattern: $REQ.FormValue(...)
+          - pattern: $REQ.PostFormValue(...)
+          - pattern: $REQ.Header.Get(...)
+        exact: true
+    pattern-sinks:
+      - patterns:
+          - pattern-either:
+              - pattern: exec.Command("sh", "-c", $COMMAND, ...)
+              - pattern: exec.Command("bash", "-c", $COMMAND, ...)
+              - pattern: exec.CommandContext($CTX, "sh", "-c", $COMMAND, ...)
+          - focus-metavariable: $COMMAND
+
+  - id: dede.go.web.path-traversal
+    languages: [go]
+    mode: taint
+    severity: ERROR
+    message: HTTP request input controls a filesystem path.
+    metadata:
+      category: security
+      cwe: [CWE-22]
+      confidence: HIGH
+      analysis: taint
+      recommendation: Resolve paths beneath an allowed directory and enforce containment; cleaning a path alone is insufficient.
+      references: [https://cwe.mitre.org/data/definitions/22.html]
+    pattern-sources:
+      - pattern-either:
+          - pattern: $REQ.URL.Query().Get(...)
+          - pattern: $REQ.FormValue(...)
+          - pattern: $REQ.PostFormValue(...)
+          - pattern: $REQ.Header.Get(...)
+        exact: true
+    pattern-sinks:
+      - patterns:
+          - pattern-either:
+              - pattern: os.Open($PATH)
+              - pattern: os.ReadFile($PATH)
+              - pattern: os.Create($PATH)
+          - focus-metavariable: $PATH

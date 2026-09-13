@@ -1,0 +1,6 @@
+{
+  "name": "vulnerable-samples",
+  "version": "0.0.0",
+  "private": true,
+  "description": "FAKE vulnerable fixtures for LocalCodeAudit offline tests"
+}

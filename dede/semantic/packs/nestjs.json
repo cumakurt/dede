@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "name": "dede/nestjs",
+  "version": "1.0.0",
+  "models": {
+    "typescript": {
+      "sources": [
+        {
+          "call": "request.param",
+          "kind": "http.parameter"
+        }
+      ],
+      "sinks": [
+        {
+          "call": "prisma.$queryRawUnsafe",
+          "kind": "sql-execution",
+          "cwe": "CWE-89",
+          "severity": "HIGH"
+        },
+        {
+          "call": "sequelize.query",
+          "kind": "sql-execution",
+          "cwe": "CWE-89",
+          "severity": "HIGH"
+        }
+      ],
+      "sanitizers": [
+        "parseInt"
+      ]
+    },
+    "javascript": {
+      "sources": [
+        {
+          "call": "request.param",
+          "kind": "http.parameter"
+        }
+      ],
+      "sinks": [
+        {
+          "call": "prisma.$queryRawUnsafe",
+          "kind": "sql-execution",
+          "cwe": "CWE-89",
+          "severity": "HIGH"
+        }
+      ],
+      "sanitizers": [
+        "parseInt"
+      ]
+    }
+  },
+  "integrity": {
+    "sha256": "ff890943de58fa935a7a49f21e030a7f76927ecd0757f3f96b2cdb3dbc0d319c"
+  }
+}

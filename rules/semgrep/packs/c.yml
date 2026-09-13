@@ -1,0 +1,85 @@
+rules:
+- id: c.lang.security.random-fd-exhaustion.random-fd-exhaustion
+  pattern-either:
+  - patterns:
+    - pattern: |
+        $FD = open("/dev/urandom", ...);
+        ...
+        read($FD, ...);
+    - pattern-not: |
+        $FD = open("/dev/urandom", ...);
+        ...
+        $BYTES_READ = read($FD, ...);
+  - patterns:
+    - pattern: |
+        $FD = open("/dev/random", ...);
+        ...
+        read($FD, ...);
+    - pattern-not: |
+        $FD = open("/dev/random", ...);
+        ...
+        $BYTES_READ = read($FD, ...);
+  message: Call to 'read()' without error checking is susceptible to file descriptor
+    exhaustion. Consider using the 'getrandom()' function.
+  metadata:
+    cwe:
+    - 'CWE-774: Allocation of File Descriptors or Handles Without Limits or Throttling'
+    references:
+    - https://lwn.net/Articles/606141/
+    category: security
+    technology:
+    - c
+    confidence: MEDIUM
+    subcategory:
+    - audit
+    likelihood: LOW
+    impact: HIGH
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Denial-of-Service (DoS)
+    source: https://semgrep.dev/r/c.lang.security.random-fd-exhaustion.random-fd-exhaustion
+    shortlink: https://sg.run/8yNj
+    semgrep.dev:
+      rule:
+        r_id: 8840
+        rv_id: 945177
+        rule_id: 0oU5k4
+        version_id: jQTzvry
+        url: https://semgrep.dev/playground/r/jQTzvry/c.lang.security.random-fd-exhaustion.random-fd-exhaustion
+        origin: community
+  languages:
+  - c
+  severity: WARNING
+- id: c.lang.security.insecure-use-gets-fn.insecure-use-gets-fn
+  pattern: gets(...)
+  message: Avoid 'gets()'. This function does not consider buffer boundaries and can
+    lead to buffer overflows. Use 'fgets()' or 'gets_s()' instead.
+  metadata:
+    cwe:
+    - 'CWE-676: Use of Potentially Dangerous Function'
+    references:
+    - https://us-cert.cisa.gov/bsi/articles/knowledge/coding-practices/fgets-and-gets_s
+    category: security
+    technology:
+    - c
+    confidence: MEDIUM
+    subcategory:
+    - audit
+    likelihood: LOW
+    impact: HIGH
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Dangerous Method or Function
+    source: https://semgrep.dev/r/c.lang.security.insecure-use-gets-fn.insecure-use-gets-fn
+    shortlink: https://sg.run/dKqX
+    semgrep.dev:
+      rule:
+        r_id: 8834
+        rv_id: 945170
+        rule_id: GdU7OE
+        version_id: YDTvRlQ
+        url: https://semgrep.dev/playground/r/YDTvRlQ/c.lang.security.insecure-use-gets-fn.insecure-use-gets-fn
+        origin: community
+  languages:
+  - c
+  severity: ERROR

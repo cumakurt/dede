@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "name": "dede/go-web",
+  "version": "1.0.0",
+  "models": {
+    "go": {
+      "sources": [
+        {
+          "call": "c.Query",
+          "kind": "http.query"
+        },
+        {
+          "call": "c.Param",
+          "kind": "http.path"
+        }
+      ],
+      "sinks": [
+        {
+          "call": "db.Raw",
+          "kind": "sql-execution",
+          "cwe": "CWE-89",
+          "severity": "HIGH"
+        },
+        {
+          "call": "db.Exec",
+          "kind": "sql-execution",
+          "cwe": "CWE-89",
+          "severity": "HIGH"
+        }
+      ],
+      "sanitizers": [
+        "strconv.Atoi"
+      ]
+    }
+  },
+  "integrity": {
+    "sha256": "320ae1645a4240d75a5f69ece7898a1de9fb3ba23f7a9e9bc9756d529b134e4d"
+  }
+}

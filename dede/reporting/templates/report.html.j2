@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="description" content="Dede offline application security analysis report for {{ project_name }}"/>
+<meta name="generator" content="{{ engine_label }}"/>
+<title>Dede Security Report — {{ project_name }}</title>
+<style>
+{% include "_theme.css.j2" %}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#executive-summary">Skip to report</a>
+<div class="html-toolbar" role="toolbar" aria-label="Report controls">
+  <div class="toolbar-brand"><strong>dede</strong><span>{{ project_name }}</span></div>
+  <div class="toolbar-actions">
+    <span id="visible-findings" class="toolbar-status">{{ finding_views|length }} findings</span>
+    <button type="button" id="expand-all">Expand findings</button>
+    <button type="button" id="collapse-all">Collapse</button>
+    <button type="button" id="theme-toggle" aria-pressed="false">Dark mode</button>
+    <button type="button" id="print-report">Print</button>
+  </div>
+</div>
+<div class="report-shell">
+  <aside class="report-nav" aria-label="Report sections">
+    <div class="nav-summary">
+      <span class="badge {% if critical_count %}CRITICAL{% elif high_count %}HIGH{% else %}LOW{% endif %}">{{ overall_risk_label }}</span>
+      <strong>{{ total_findings }}</strong><span>active findings</span>
+    </div>
+    <nav>
+      <a href="#executive-summary">Executive Summary</a>
+      <a href="#findings-overview">Findings Overview</a>
+      <a href="#security-operations">Security Operations</a>
+      <a href="#security-score">Security Score</a>
+      <a href="#top-risks">Top Risks</a>
+      <a href="#detailed-findings">Detailed Findings</a>
+      <a href="#hotspots-taxonomy">Hotspots</a>
+      <a href="#remediation">Remediation</a>
+      <a href="#coverage">Coverage</a>
+      <a href="#methodology">Methodology</a>
+    </nav>
+    <p class="nav-hint"><kbd>/</kbd> focuses finding search.</p>
+  </aside>
+  <main class="wrap" id="report-main">
+    {% include "_cover.html.j2" %}
+    {% include "_executive_summary.html.j2" %}
+    {% include "_findings_overview.html.j2" %}
+    {% include "_security_operations.html.j2" %}
+    {% include "_quality.html.j2" %}
+    {% include "_security_score.html.j2" %}
+    {% include "_top_risks.html.j2" %}
+    {% include "_detailed_findings.html.j2" %}
+    {% include "_secrets.html.j2" %}
+    {% include "_hotspots.html.j2" %}
+    {% include "_remediation.html.j2" %}
+    {% include "_coverage.html.j2" %}
+    {% include "_methodology.html.j2" %}
+  </main>
+</div>
+<button type="button" class="back-top" id="back-top" aria-label="Back to top">↑</button>
+<script>
+(function () {
+  "use strict";
+  const q = (id) => document.getElementById(id);
+  const findingSelector = "details.finding";
+
+  const visibleFindings = () => Array.from(document.querySelectorAll(findingSelector)).filter((el) => el.style.display !== "none");
+
+  const apply = () => {
+    const textEl = q("filter-text");
+    if (!textEl) return;
+    const text = (textEl.value || "").trim().toLowerCase();
+    const sev = q("filter-severity")?.value || "";
+    const cat = q("filter-category")?.value || "";
+    const tool = q("filter-tool")?.value || "";
+    const lifecycle = q("filter-lifecycle")?.value || "";
+    const reachability = q("filter-reachability")?.value || "";
+    document.querySelectorAll(findingSelector).forEach((el) => {
+      const hay = ((el.dataset.file || "") + " " + el.textContent).toLowerCase();
+      let show = true;
+      if (text && !hay.includes(text)) show = false;
+      if (sev && el.dataset.severity !== sev) show = false;
+      if (cat && el.dataset.category !== cat) show = false;
+      if (tool && !(el.dataset.tools || "").split(" ").includes(tool)) show = false;
+      if (lifecycle && el.dataset.lifecycle !== lifecycle) show = false;
+      if (reachability === "reachable" && el.dataset.reachable !== "true") show = false;
+      if (reachability === "unreachable" && el.dataset.reachable !== "false") show = false;
+      if (reachability === "exposed" && el.dataset.exposed !== "true") show = false;
+      el.style.display = show ? "" : "none";
+    });
+    const visible = visibleFindings().length;
+    const counter = q("visible-findings");
+    if (counter) counter.textContent = visible + " / " + document.querySelectorAll(findingSelector).length + " findings";
+    const empty = q("filter-empty");
+    if (empty) empty.hidden = visible !== 0;
+  };
+
+  ["filter-text", "filter-severity", "filter-category", "filter-tool", "filter-lifecycle", "filter-reachability"].forEach((id) => {
+    const el = q(id);
+    if (!el) return;
+    el.addEventListener("input", apply);
+    el.addEventListener("change", apply);
+  });
+  q("clear-filters")?.addEventListener("click", () => {
+    ["filter-text", "filter-severity", "filter-category", "filter-tool", "filter-lifecycle", "filter-reachability"].forEach((id) => { const el = q(id); if (el) el.value = ""; });
+    apply();
+  });
+  q("expand-all")?.addEventListener("click", () => visibleFindings().forEach((el) => { el.open = true; }));
+  q("collapse-all")?.addEventListener("click", () => document.querySelectorAll(findingSelector).forEach((el) => { el.open = false; }));
+  q("print-report")?.addEventListener("click", () => window.print());
+
+  const setTheme = (theme) => {
+    document.documentElement.dataset.theme = theme;
+    const button = q("theme-toggle");
+    if (button) {
+      const dark = theme === "dark";
+      button.setAttribute("aria-pressed", String(dark));
+      button.textContent = dark ? "Light mode" : "Dark mode";
+    }
+  };
+  let storedTheme = null;
+  try { storedTheme = localStorage.getItem("dede-report-theme"); } catch (_) {}
+  setTheme(storedTheme || "light");
+  q("theme-toggle")?.addEventListener("click", () => {
+    const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+    setTheme(next);
+    try { localStorage.setItem("dede-report-theme", next); } catch (_) {}
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "/" && !event.ctrlKey && !event.metaKey && document.activeElement?.tagName !== "INPUT") {
+      event.preventDefault(); q("filter-text")?.focus();
+    }
+    if (event.key === "Escape" && document.activeElement === q("filter-text")) q("filter-text")?.blur();
+  });
+
+  document.querySelectorAll(".copy-link").forEach((button) => {
+    button.addEventListener("click", async (event) => {
+      event.preventDefault(); event.stopPropagation();
+      const target = button.dataset.target;
+      if (!target) return;
+      const url = new URL(window.location.href); url.hash = target;
+      try { await navigator.clipboard.writeText(url.toString()); button.textContent = "Copied"; setTimeout(() => button.textContent = "Copy link", 1200); }
+      catch (_) { window.location.hash = target; }
+    });
+  });
+
+  const back = q("back-top");
+  const updateBack = () => { if (back) back.hidden = window.scrollY < 600; };
+  window.addEventListener("scroll", updateBack, {passive:true}); updateBack();
+  back?.addEventListener("click", () => window.scrollTo({top:0, behavior:"smooth"}));
+
+  if ("IntersectionObserver" in window) {
+    const links = new Map(Array.from(document.querySelectorAll(".report-nav a")).map((a) => [a.getAttribute("href")?.slice(1), a]));
+    const observer = new IntersectionObserver((entries) => {
+      entries.filter((entry) => entry.isIntersecting).forEach((entry) => {
+        links.forEach((link) => link.classList.remove("active")); links.get(entry.target.id)?.classList.add("active");
+      });
+    }, {rootMargin:"-20% 0px -70% 0px"});
+    document.querySelectorAll("main section[id]").forEach((section) => observer.observe(section));
+  }
+  apply();
+})();
+</script>
+</body>
+</html>

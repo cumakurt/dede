@@ -1,0 +1,902 @@
+{
+  "schema": 1,
+  "rules": [
+    {
+      "id": "dede.native.jvm.ecb",
+      "message": "Jvm ecb requires review.",
+      "languages": [
+        "java",
+        "kotlin",
+        "scala",
+        "groovy"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "\\bCipher\\s*\\.\\s*getInstance\\s*\\(\\s*[\\\"\\'](?:AES|DES|DESede)/ECB/"
+        }
+      ],
+      "cwe": [
+        "CWE-327"
+      ],
+      "owasp": [
+        "A04:2025"
+      ],
+      "recommendation": "Use authenticated encryption with a fresh nonce, such as AES-GCM.",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/javax/crypto/Cipher.html"
+      ]
+    },
+    {
+      "id": "dede.native.kotlin.webview-file-access",
+      "message": "Kotlin webview file access requires review.",
+      "languages": [
+        "kotlin",
+        "java"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "\\ballowUniversalAccessFromFileURLs\\s*=\\s*true\\b"
+        }
+      ],
+      "cwe": [
+        "CWE-200"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "recommendation": "Disable universal access from file URLs; use a scoped WebViewAssetLoader for application assets.",
+      "references": [
+        "https://developer.android.com/privacy-and-security/risks/webview-unsafe-file-inclusion"
+      ]
+    },
+    {
+      "id": "dede.native.groovy.dynamic-evaluation",
+      "message": "Groovy dynamic evaluation requires review.",
+      "languages": [
+        "groovy"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "\\b(?:Eval\\.me|GroovyShell\\s*\\(\\s*\\)\\s*\\.evaluate)\\s*\\(\\s*(?![\\\"\\'])[a-zA-Z_]"
+        }
+      ],
+      "cwe": [
+        "CWE-94"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Parse data with a fixed schema; do not evaluate externally supplied Groovy source.",
+      "references": [
+        "https://docs.groovy-lang.org/latest/html/api/groovy/util/Eval.html"
+      ]
+    },
+    {
+      "id": "dede.native.rust.invalid-certificates",
+      "message": "Rust invalid certificates requires review.",
+      "languages": [
+        "rust"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "\\.\\s*(?:tls_)?danger_accept_invalid_certs\\s*\\(\\s*true\\s*\\)"
+        }
+      ],
+      "cwe": [
+        "CWE-295"
+      ],
+      "owasp": [
+        "A04:2025"
+      ],
+      "recommendation": "Keep TLS certificate verification enabled and configure explicit trusted roots for private endpoints.",
+      "references": [
+        "https://docs.rs/reqwest/latest/reqwest/struct.ClientBuilder.html"
+      ]
+    },
+    {
+      "id": "dede.native.rust.invalid-hostnames",
+      "message": "Rust invalid hostnames requires review.",
+      "languages": [
+        "rust"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "\\.\\s*(?:tls_)?danger_accept_invalid_hostnames\\s*\\(\\s*true\\s*\\)"
+        }
+      ],
+      "cwe": [
+        "CWE-295"
+      ],
+      "owasp": [
+        "A04:2025"
+      ],
+      "recommendation": "Validate the certificate hostname against the requested server.",
+      "references": [
+        "https://docs.rs/reqwest/latest/reqwest/struct.ClientBuilder.html"
+      ]
+    },
+    {
+      "id": "dede.native.swift.disabled-trust",
+      "message": "Swift disabled trust requires review.",
+      "languages": [
+        "swift"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "\\bDisabledTrustEvaluator\\s*\\("
+        }
+      ],
+      "cwe": [
+        "CWE-295"
+      ],
+      "owasp": [
+        "A04:2025"
+      ],
+      "recommendation": "Use normal certificate trust evaluation or a maintained pinning policy.",
+      "references": [
+        "https://alamofire.github.io/Alamofire/Classes/DisabledTrustEvaluator.html"
+      ]
+    },
+    {
+      "id": "dede.native.swift.insecure-unarchiver",
+      "message": "Swift insecure unarchiver requires review.",
+      "languages": [
+        "swift"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "\\.\\s*requiresSecureCoding\\s*=\\s*false\\b"
+        }
+      ],
+      "cwe": [
+        "CWE-502"
+      ],
+      "owasp": [
+        "A08:2025"
+      ],
+      "recommendation": "Require secure coding and restrict decoded classes to expected data types.",
+      "references": [
+        "https://developer.apple.com/documentation/foundation/nskeyedunarchiver"
+      ]
+    },
+    {
+      "id": "dede.native.objc.weak-md5",
+      "message": "Objc weak md5 requires review.",
+      "languages": [
+        "objective-c",
+        "objective-c++"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "\\bCC_MD5\\s*\\("
+        }
+      ],
+      "cwe": [
+        "CWE-327"
+      ],
+      "owasp": [
+        "A04:2025"
+      ],
+      "recommendation": "Use a modern hash for security-sensitive integrity checks and a password-specific KDF for passwords.",
+      "references": [
+        "https://developer.apple.com/library/archive/documentation/Security/Conceptual/cryptoservices/GeneralPurposeCrypto/GeneralPurposeCrypto.html"
+      ]
+    },
+    {
+      "id": "dede.native.dart.accept-bad-certificate",
+      "message": "Dart accept bad certificate requires review.",
+      "languages": [
+        "dart"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "\\bbadCertificateCallback\\s*=\\s*\\([^;{}]*\\)\\s*=>\\s*true\\b"
+        }
+      ],
+      "cwe": [
+        "CWE-295"
+      ],
+      "owasp": [
+        "A04:2025"
+      ],
+      "recommendation": "Keep the default certificate validation policy and explicitly trust development roots instead of all invalid certificates.",
+      "references": [
+        "https://api.flutter.dev/flutter/dart-io/HttpClient/badCertificateCallback.html"
+      ]
+    },
+    {
+      "id": "dede.native.powershell.skip-certificate",
+      "message": "Powershell skip certificate requires review.",
+      "languages": [
+        "powershell"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)\\b(?:Invoke-WebRequest|Invoke-RestMethod|iwr|irm)\\b[^\\r\\n;]*-SkipCertificateCheck\\b"
+        }
+      ],
+      "cwe": [
+        "CWE-295"
+      ],
+      "owasp": [
+        "A04:2025"
+      ],
+      "recommendation": "Remove SkipCertificateCheck and configure trusted certificate roots.",
+      "references": [
+        "https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/invoke-webrequest"
+      ]
+    },
+    {
+      "id": "dede.native.powershell.dynamic-expression",
+      "message": "Powershell dynamic expression requires review.",
+      "languages": [
+        "powershell"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?im)^\\s*(?:Invoke-Expression|iex)\\s+\\$"
+        }
+      ],
+      "cwe": [
+        "CWE-94"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Use a fixed command and separate validated arguments; avoid evaluating a command string.",
+      "references": [
+        "https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/invoke-expression"
+      ]
+    },
+    {
+      "id": "dede.native.perl.tls-verification-disabled",
+      "message": "Perl tls verification disabled requires review.",
+      "languages": [
+        "perl"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "\\b(?:verify_hostname\\s*=>\\s*0\\b|SSL_verify_mode\\s*=>\\s*(?:0\\b|SSL_VERIFY_NONE\\b))"
+        }
+      ],
+      "cwe": [
+        "CWE-295"
+      ],
+      "owasp": [
+        "A04:2025"
+      ],
+      "recommendation": "Enable certificate and hostname verification for outbound HTTPS requests.",
+      "references": [
+        "https://metacpan.org/pod/LWP::UserAgent"
+      ]
+    },
+    {
+      "id": "dede.native.perl.string-eval",
+      "message": "Perl string eval requires review.",
+      "languages": [
+        "perl"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "\\beval\\s+\\$\\w+"
+        }
+      ],
+      "cwe": [
+        "CWE-94"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Do not evaluate strings from untrusted sources; use a data parser or explicit operation dispatch.",
+      "references": [
+        "https://perldoc.perl.org/functions/eval"
+      ]
+    },
+    {
+      "id": "dede.native.lua.dynamic-load",
+      "message": "Lua dynamic load requires review.",
+      "languages": [
+        "lua"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "\\b(?:loadstring|load)\\s*\\(\\s*(?![\\\"\\'])[a-zA-Z_]"
+        }
+      ],
+      "cwe": [
+        "CWE-94"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Keep executable Lua source trusted and separate from user data; use a fixed data format for external input.",
+      "references": [
+        "https://www.lua.org/manual/5.4/manual.html#pdf-load"
+      ]
+    },
+    {
+      "id": "dede.native.r.dynamic-eval",
+      "message": "R dynamic eval requires review.",
+      "languages": [
+        "r"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "\\beval\\s*\\(\\s*parse\\s*\\(\\s*text\\s*="
+        }
+      ],
+      "cwe": [
+        "CWE-94"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Treat external input as data; avoid converting it into executable R expressions.",
+      "references": [
+        "https://stat.ethz.ch/R-manual/R-devel/library/base/html/eval.html"
+      ]
+    },
+    {
+      "id": "dede.native.r.tls-verification-disabled",
+      "message": "R tls verification disabled requires review.",
+      "languages": [
+        "r"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "\\bssl_verifypeer\\s*=\\s*(?:0|FALSE)\\b"
+        }
+      ],
+      "cwe": [
+        "CWE-295"
+      ],
+      "owasp": [
+        "A04:2025"
+      ],
+      "recommendation": "Keep TLS peer validation enabled and use an appropriate CA bundle.",
+      "references": [
+        "https://httr.r-lib.org/reference/config.html"
+      ]
+    },
+    {
+      "id": "dede.native.julia.dynamic-eval",
+      "message": "Julia dynamic eval requires review.",
+      "languages": [
+        "julia"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "\\beval\\s*\\(\\s*Meta\\.parse\\s*\\("
+        }
+      ],
+      "cwe": [
+        "CWE-94"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Use a schema-bound data parser; do not evaluate Julia source obtained from untrusted inputs.",
+      "references": [
+        "https://docs.julialang.org/en/v1/manual/metaprogramming/"
+      ]
+    },
+    {
+      "id": "dede.native.elixir.dynamic-eval",
+      "message": "Elixir dynamic eval requires review.",
+      "languages": [
+        "elixir"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "\\bCode\\.eval_string\\s*\\(\\s*(?![\\\"\\'])[a-zA-Z_]"
+        }
+      ],
+      "cwe": [
+        "CWE-94"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Use a data decoder and explicit allowed operations instead of evaluating user-supplied Elixir code.",
+      "references": [
+        "https://hexdocs.pm/elixir/Code.html#eval_string/3"
+      ]
+    },
+    {
+      "id": "dede.native.erlang.unsafe-binary-term",
+      "message": "Erlang unsafe binary term requires review.",
+      "languages": [
+        "erlang"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "\\bbinary_to_term\\s*\\(\\s*[A-Z]\\w*\\s*\\)"
+        }
+      ],
+      "cwe": [
+        "CWE-502"
+      ],
+      "owasp": [
+        "A08:2025"
+      ],
+      "recommendation": "Use binary_to_term with the safe option for external data and impose size limits; prefer a simple fixed data schema.",
+      "references": [
+        "https://www.erlang.org/doc/apps/erts/erlang.html#binary_to_term/2"
+      ]
+    },
+    {
+      "id": "dede.native.clojure.reader-eval",
+      "message": "Clojure reader eval requires review.",
+      "languages": [
+        "clojure"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "\\*read-eval\\*\\s+true\\b"
+        }
+      ],
+      "cwe": [
+        "CWE-94"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Keep reader evaluation disabled and prefer clojure.edn/read-string for untrusted data.",
+      "references": [
+        "https://clojure.org/reference/reader"
+      ]
+    },
+    {
+      "id": "dede.native.haskell.shell-command",
+      "message": "Haskell shell command requires review.",
+      "languages": [
+        "haskell"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "\\b(?:callCommand|system)\\s+[a-z][\\w\\x27]*"
+        }
+      ],
+      "cwe": [
+        "CWE-78"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Use callProcess/proc with a fixed executable and validated argument list rather than a shell command string.",
+      "references": [
+        "https://hackage.haskell.org/package/process/docs/System-Process.html"
+      ]
+    },
+    {
+      "id": "dede.native.ocaml.shell-command",
+      "message": "Ocaml shell command requires review.",
+      "languages": [
+        "ocaml"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "\\bSys\\.command\\s+[a-z][\\w\\x27]*"
+        }
+      ],
+      "cwe": [
+        "CWE-78"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Use a fixed executable with separate validated arguments instead of invoking the system shell.",
+      "references": [
+        "https://ocaml.org/manual/5.4/api/Sys.html"
+      ]
+    },
+    {
+      "id": "dede.native.solidity.tx-origin-auth",
+      "message": "Solidity tx origin auth requires review.",
+      "languages": [
+        "solidity"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "\\brequire\\s*\\(\\s*tx\\.origin\\s*=="
+        }
+      ],
+      "cwe": [
+        "CWE-287"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "recommendation": "Authorize using msg.sender and a reviewed access-control model, never tx.origin.",
+      "references": [
+        "https://docs.soliditylang.org/en/latest/security-considerations.html#tx-origin"
+      ]
+    },
+    {
+      "id": "dede.native.apex.dynamic-soql",
+      "message": "Apex dynamic soql requires review.",
+      "languages": [
+        "apex"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "\\bDatabase\\.query\\s*\\(\\s*[\\\"\\'][^\\r\\n]*[\\\"\\']\\s*\\+"
+        }
+      ],
+      "cwe": [
+        "CWE-89"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Use bind variables, queryWithBinds and appropriate CRUD/FLS enforcement for dynamic SOQL.",
+      "references": [
+        "https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_dynamic_soql.htm"
+      ]
+    },
+    {
+      "id": "dede.native.sql.xp-cmdshell",
+      "message": "Sql xp cmdshell requires review.",
+      "languages": [
+        "sql"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)\\bsp_configure\\s+[\\\"\\']xp_cmdshell[\\\"\\']\\s*,\\s*1\\b"
+        }
+      ],
+      "cwe": [
+        "CWE-78"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Keep xp_cmdshell disabled; use narrowly privileged audited services for operating-system operations.",
+      "references": [
+        "https://learn.microsoft.com/en-us/sql/database-engine/configure-windows/xp-cmdshell-server-configuration-option"
+      ]
+    },
+    {
+      "id": "dede.native.sql.trustworthy",
+      "message": "Sql trustworthy requires review.",
+      "languages": [
+        "sql"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)\\bSET\\s+TRUSTWORTHY\\s+ON\\b"
+        }
+      ],
+      "cwe": [
+        "CWE-269"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "recommendation": "Keep TRUSTWORTHY off unless a reviewed signing/ownership design specifically requires it.",
+      "references": [
+        "https://learn.microsoft.com/en-us/sql/relational-databases/security/trustworthy-database-property"
+      ]
+    },
+    {
+      "id": "dede.native.frontend.vue-raw-html",
+      "message": "Frontend vue raw html requires review.",
+      "languages": [
+        "vue"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "\\bv-html\\s*="
+        }
+      ],
+      "cwe": [
+        "CWE-79"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Use escaped interpolation or sanitize trusted-format rich HTML before binding v-html.",
+      "references": [
+        "https://vuejs.org/guide/best-practices/security.html"
+      ]
+    },
+    {
+      "id": "dede.native.frontend.svelte-raw-html",
+      "message": "Frontend svelte raw html requires review.",
+      "languages": [
+        "svelte"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "\\{@html\\s+"
+        }
+      ],
+      "cwe": [
+        "CWE-79"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Use normal escaped expressions; sanitize any intentionally rendered HTML from outside the trust boundary.",
+      "references": [
+        "https://svelte.dev/docs/svelte/@html"
+      ]
+    },
+    {
+      "id": "dede.native.html.angular-trusted-html",
+      "message": "Html angular trusted html requires review.",
+      "languages": [
+        "html"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "\\bng-bind-html-unsafe\\s*="
+        }
+      ],
+      "cwe": [
+        "CWE-79"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Avoid unsafe HTML binding and use contextual escaping or a maintained HTML sanitizer.",
+      "references": [
+        "https://docs.angularjs.org/api/ng/service/$sce"
+      ]
+    },
+    {
+      "id": "dede.native.json.npm-tls-disabled",
+      "message": "Json npm tls disabled requires review.",
+      "languages": [
+        "json",
+        "jsonc"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "\\\"strict-ssl\\\"\\s*:\\s*false\\b"
+        }
+      ],
+      "cwe": [
+        "CWE-295"
+      ],
+      "owasp": [
+        "A04:2025"
+      ],
+      "recommendation": "Keep package registry TLS validation enabled and configure trusted CA certificates.",
+      "references": [
+        "https://docs.npmjs.com/cli/using-npm/config#strict-ssl"
+      ]
+    },
+    {
+      "id": "dede.native.toml.poetry-tls-disabled",
+      "message": "Toml poetry tls disabled requires review.",
+      "languages": [
+        "toml"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?im)^\\s*cert\\s*=\\s*false\\b"
+        }
+      ],
+      "cwe": [
+        "CWE-295"
+      ],
+      "owasp": [
+        "A04:2025"
+      ],
+      "recommendation": "Configure a trusted CA certificate for private package repositories instead of disabling verification.",
+      "references": [
+        "https://python-poetry.org/docs/repositories/#certificates"
+      ]
+    },
+    {
+      "id": "dede.native.ini.npm-tls-disabled",
+      "message": "Ini npm tls disabled requires review.",
+      "languages": [
+        "ini"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?im)^\\s*strict-ssl\\s*=\\s*false\\b"
+        }
+      ],
+      "cwe": [
+        "CWE-295"
+      ],
+      "owasp": [
+        "A04:2025"
+      ],
+      "recommendation": "Keep npm strict-ssl enabled and configure trusted CA certificates.",
+      "references": [
+        "https://docs.npmjs.com/cli/using-npm/config#strict-ssl"
+      ]
+    },
+    {
+      "id": "dede.native.zig.runtime-safety-disabled",
+      "message": "Zig runtime safety disabled requires review.",
+      "languages": [
+        "zig"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "@setRuntimeSafety\\s*\\(\\s*false\\s*\\)"
+        }
+      ],
+      "cwe": [
+        "CWE-119"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "recommendation": "Retain runtime safety checks around untrusted input; review any performance-driven opt-out against memory-safety invariants.",
+      "references": [
+        "https://ziglang.org/documentation/master/#setRuntimeSafety"
+      ]
+    }
+  ]
+}

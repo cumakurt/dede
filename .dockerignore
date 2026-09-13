@@ -1,0 +1,11 @@
+.venv
+.venv-backup.*
+.git
+audit-reports
+audit-reports-offline-test
+**/__pycache__
+.pytest_cache
+*.pyc
+sbom
+tasks
+.env

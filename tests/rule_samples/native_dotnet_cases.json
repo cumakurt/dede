@@ -1,0 +1,332 @@
+[
+  {
+    "rule_id": "dede.dotnet.deserialization.losformatter",
+    "filename": "Sample.cs",
+    "unsafe": "var formatter = new LosFormatter();",
+    "safe": "var value = JsonSerializer.Deserialize<Record>(json);"
+  },
+  {
+    "rule_id": "dede.dotnet.deserialization.objectstateformatter",
+    "filename": "Sample.cs",
+    "unsafe": "var formatter = new ObjectStateFormatter();",
+    "safe": "var value = JsonSerializer.Deserialize<Record>(json);"
+  },
+  {
+    "rule_id": "dede.dotnet.deserialization.netdatacontractserializer",
+    "filename": "Sample.cs",
+    "unsafe": "var formatter = new NetDataContractSerializer();",
+    "safe": "var value = JsonSerializer.Deserialize<Record>(json);"
+  },
+  {
+    "rule_id": "dede.dotnet.deserialization.simple-type-resolver",
+    "filename": "Sample.cs",
+    "unsafe": "var serializer = new JavaScriptSerializer(new SimpleTypeResolver());",
+    "safe": "var serializer = new JavaScriptSerializer();"
+  },
+  {
+    "rule_id": "dede.dotnet.deserialization.json-type-name",
+    "filename": "Sample.cs",
+    "unsafe": "settings.TypeNameHandling =\n TypeNameHandling.Auto;",
+    "safe": "settings.TypeNameHandling = TypeNameHandling.None;"
+  },
+  {
+    "rule_id": "dede.dotnet.jwt.require-signed-tokens",
+    "filename": "Sample.cs",
+    "unsafe": "options.RequireSignedTokens =\n false;",
+    "safe": "options.RequireSignedTokens = true;"
+  },
+  {
+    "rule_id": "dede.dotnet.jwt.validate-issuer-signing-key",
+    "filename": "Sample.cs",
+    "unsafe": "options.ValidateIssuerSigningKey =\n false;",
+    "safe": "options.ValidateIssuerSigningKey = true;"
+  },
+  {
+    "rule_id": "dede.dotnet.jwt.validate-lifetime",
+    "filename": "Sample.cs",
+    "unsafe": "options.ValidateLifetime =\n false;",
+    "safe": "options.ValidateLifetime = true;"
+  },
+  {
+    "rule_id": "dede.dotnet.jwt.validate-audience",
+    "filename": "Sample.cs",
+    "unsafe": "options.ValidateAudience =\n false;",
+    "safe": "options.ValidateAudience = true;"
+  },
+  {
+    "rule_id": "dede.dotnet.jwt.validate-issuer",
+    "filename": "Sample.cs",
+    "unsafe": "options.ValidateIssuer =\n false;",
+    "safe": "options.ValidateIssuer = true;"
+  },
+  {
+    "rule_id": "dede.dotnet.jwt.require-expiration-time",
+    "filename": "Sample.cs",
+    "unsafe": "options.RequireExpirationTime =\n false;",
+    "safe": "options.RequireExpirationTime = true;"
+  },
+  {
+    "rule_id": "dede.dotnet.tls.accept-any-certificate",
+    "filename": "Sample.cs",
+    "unsafe": "handler.ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;",
+    "safe": "var handler = new HttpClientHandler();"
+  },
+  {
+    "rule_id": "dede.dotnet.tls.callback-always-true",
+    "filename": "Sample.cs",
+    "unsafe": "handler.ServerCertificateCustomValidationCallback =\n (sender, certificate, chain, errors) => true;",
+    "safe": "handler.ServerCertificateCustomValidationCallback = (s, c, chain, errors) => errors == SslPolicyErrors.None;"
+  },
+  {
+    "rule_id": "dede.dotnet.tls.revocation-disabled",
+    "filename": "Sample.cs",
+    "unsafe": "handler.CheckCertificateRevocationList = false;",
+    "safe": "handler.CheckCertificateRevocationList = true;"
+  },
+  {
+    "rule_id": "dede.dotnet.tls.obsolete-protocol",
+    "filename": "Sample.cs",
+    "unsafe": "handler.SslProtocols = SslProtocols.Tls11;",
+    "safe": "handler.SslProtocols = SslProtocols.Tls12;"
+  },
+  {
+    "rule_id": "dede.dotnet.crypto.ecb",
+    "filename": "Sample.cs",
+    "unsafe": "cipher.Mode = CipherMode.ECB;",
+    "safe": "using var cipher = new AesGcm(key, 16);"
+  },
+  {
+    "rule_id": "dede.dotnet.crypto.broken-algorithm",
+    "filename": "Sample.cs",
+    "unsafe": "var digest = MD5.Create();",
+    "safe": "var digest = SHA256.Create();"
+  },
+  {
+    "rule_id": "dede.dotnet.crypto.weak-algorithm",
+    "filename": "Sample.cs",
+    "unsafe": "var digest = SHA1.Create();",
+    "safe": "var digest = SHA256.Create();"
+  },
+  {
+    "rule_id": "dede.dotnet.crypto.zero-iv",
+    "filename": "Sample.cs",
+    "unsafe": "cipher.IV = new byte[16];",
+    "safe": "cipher.GenerateIV();"
+  },
+  {
+    "rule_id": "dede.dotnet.crypto.obsolete-kdf",
+    "filename": "Sample.cs",
+    "unsafe": "var kdf = new PasswordDeriveBytes(password, salt);",
+    "safe": "var derived = Rfc2898DeriveBytes.Pbkdf2(password, salt, iterations, HashAlgorithmName.SHA256, 32);"
+  },
+  {
+    "rule_id": "dede.dotnet.crypto.small-rsa-key",
+    "filename": "Sample.cs",
+    "unsafe": "using var rsa = RSA.Create(1024);",
+    "safe": "using var rsa = RSA.Create(3072);"
+  },
+  {
+    "rule_id": "dede.dotnet.xml.dtd-enabled",
+    "filename": "Sample.cs",
+    "unsafe": "settings.DtdProcessing = DtdProcessing.Parse;",
+    "safe": "settings.DtdProcessing = DtdProcessing.Prohibit;"
+  },
+  {
+    "rule_id": "dede.dotnet.xml.external-resolver",
+    "filename": "Sample.cs",
+    "unsafe": "settings.XmlResolver = new XmlUrlResolver();",
+    "safe": "settings.XmlResolver = null;"
+  },
+  {
+    "rule_id": "dede.dotnet.xml.xslt-script",
+    "filename": "Sample.cs",
+    "unsafe": "settings.EnableScript = true;",
+    "safe": "var settings = new XsltSettings(false, false);"
+  },
+  {
+    "rule_id": "dede.dotnet.xml.xslt-script-constructor",
+    "filename": "Sample.cs",
+    "unsafe": "var settings = new XsltSettings(false, true);",
+    "safe": "var settings = new XsltSettings(false, false);"
+  },
+  {
+    "rule_id": "dede.dotnet.cookie.httponly-disabled",
+    "filename": "Sample.cs",
+    "unsafe": "var cookie = new CookieOptions { HttpOnly = false };",
+    "safe": "var cookie = new CookieOptions { HttpOnly = true };"
+  },
+  {
+    "rule_id": "dede.dotnet.cookie.secure-disabled",
+    "filename": "Sample.cs",
+    "unsafe": "var cookie = new CookieOptions { Secure = false };",
+    "safe": "var cookie = new CookieOptions { Secure = true };"
+  },
+  {
+    "rule_id": "dede.dotnet.cookie.insecure-policy",
+    "filename": "Sample.cs",
+    "unsafe": "options.Cookie.SecurePolicy = CookieSecurePolicy.None;",
+    "safe": "options.Cookie.SecurePolicy = CookieSecurePolicy.Always;"
+  },
+  {
+    "rule_id": "dede.dotnet.cors.credentials-any-origin",
+    "filename": "Sample.cs",
+    "unsafe": "policy.AllowAnyOrigin()\n .AllowCredentials();",
+    "safe": "policy.WithOrigins(\"https://example.test\").AllowCredentials();"
+  },
+  {
+    "rule_id": "dede.dotnet.cors.origin-predicate-all",
+    "filename": "Sample.cs",
+    "unsafe": "policy.SetIsOriginAllowed(origin => true).AllowCredentials();",
+    "safe": "policy.SetIsOriginAllowed(origin => trustedOrigins.Contains(origin)).AllowCredentials();"
+  },
+  {
+    "rule_id": "dede.dotnet.csrf.antiforgery-optout",
+    "filename": "Sample.cs",
+    "unsafe": "[IgnoreAntiforgeryToken]\npublic IActionResult Save() { return Ok(); }",
+    "safe": "[ValidateAntiForgeryToken]\npublic IActionResult Save() { return Ok(); }"
+  },
+  {
+    "rule_id": "dede.dotnet.xss.request-validation-disabled",
+    "filename": "Sample.cs",
+    "unsafe": "[ValidateInput(false)]\npublic void Save() { }",
+    "safe": "[ValidateInput(true)]\npublic void Save() { }"
+  },
+  {
+    "rule_id": "dede.dotnet.logging.sensitive-ef-data",
+    "filename": "Sample.cs",
+    "unsafe": "options.EnableSensitiveDataLogging();",
+    "safe": "options.EnableSensitiveDataLogging(false);"
+  },
+  {
+    "rule_id": "dede.dotnet.config.debug",
+    "filename": "web.config",
+    "unsafe": "<configuration><compilation\n debug=\"true\" /></configuration>",
+    "safe": "<configuration><compilation debug=\"false\" /></configuration>"
+  },
+  {
+    "rule_id": "dede.dotnet.config.viewstate-mac",
+    "filename": "web.config",
+    "unsafe": "<configuration><pages\n enableViewStateMac=\"false\" /></configuration>",
+    "safe": "<configuration><pages enableViewStateMac=\"true\" /></configuration>"
+  },
+  {
+    "rule_id": "dede.dotnet.config.request-validation",
+    "filename": "web.config",
+    "unsafe": "<configuration><pages\n validateRequest=\"false\" /></configuration>",
+    "safe": "<configuration><pages validateRequest=\"true\" /></configuration>"
+  },
+  {
+    "rule_id": "dede.dotnet.config.custom-errors",
+    "filename": "web.config",
+    "unsafe": "<configuration><customErrors\n mode=\"Off\" /></configuration>",
+    "safe": "<configuration><customErrors mode=\"RemoteOnly\" /></configuration>"
+  },
+  {
+    "rule_id": "dede.dotnet.config.detailed-errors",
+    "filename": "web.config",
+    "unsafe": "<configuration><httpErrors\n errorMode=\"Detailed\" /></configuration>",
+    "safe": "<configuration><httpErrors errorMode=\"DetailedLocalOnly\" /></configuration>"
+  },
+  {
+    "rule_id": "dede.dotnet.config.cookie-httponly",
+    "filename": "web.config",
+    "unsafe": "<configuration><httpCookies\n httpOnlyCookies=\"false\" /></configuration>",
+    "safe": "<configuration><httpCookies httpOnlyCookies=\"true\" /></configuration>"
+  },
+  {
+    "rule_id": "dede.dotnet.config.cookie-ssl",
+    "filename": "web.config",
+    "unsafe": "<configuration><httpCookies\n requireSSL=\"false\" /></configuration>",
+    "safe": "<configuration><httpCookies requireSSL=\"true\" /></configuration>"
+  },
+  {
+    "rule_id": "dede.dotnet.config.forms-ssl",
+    "filename": "web.config",
+    "unsafe": "<configuration><forms\n requireSSL=\"false\" /></configuration>",
+    "safe": "<configuration><forms requireSSL=\"true\" /></configuration>"
+  },
+  {
+    "rule_id": "dede.dotnet.config.session-in-url",
+    "filename": "web.config",
+    "unsafe": "<configuration><sessionState\n cookieless=\"UseUri\" /></configuration>",
+    "safe": "<configuration><sessionState cookieless=\"UseCookies\" /></configuration>"
+  },
+  {
+    "rule_id": "dede.dotnet.config.forms-in-url",
+    "filename": "web.config",
+    "unsafe": "<configuration><forms\n cookieless=\"UseUri\" /></configuration>",
+    "safe": "<configuration><forms cookieless=\"UseCookies\" /></configuration>"
+  },
+  {
+    "rule_id": "dede.dotnet.config.header-checking",
+    "filename": "web.config",
+    "unsafe": "<configuration><httpRuntime\n enableHeaderChecking=\"false\" /></configuration>",
+    "safe": "<configuration><httpRuntime enableHeaderChecking=\"true\" /></configuration>"
+  },
+  {
+    "rule_id": "dede.dotnet.project.binaryformatter-enabled",
+    "filename": "Example.csproj",
+    "unsafe": "<Project><PropertyGroup><EnableUnsafeBinaryFormatterSerialization>true</EnableUnsafeBinaryFormatterSerialization></PropertyGroup></Project>",
+    "safe": "<Project><PropertyGroup><EnableUnsafeBinaryFormatterSerialization>false</EnableUnsafeBinaryFormatterSerialization></PropertyGroup></Project>"
+  },
+  {
+    "rule_id": "dede.dotnet.project.nuget-audit-disabled",
+    "filename": "Example.csproj",
+    "unsafe": "<Project><PropertyGroup><NuGetAudit>false</NuGetAudit></PropertyGroup></Project>",
+    "safe": "<Project><PropertyGroup><NuGetAudit>true</NuGetAudit></PropertyGroup></Project>"
+  },
+  {
+    "rule_id": "dede.dotnet.project.analyzers-disabled",
+    "filename": "Example.csproj",
+    "unsafe": "<Project><PropertyGroup><EnableNETAnalyzers>false</EnableNETAnalyzers></PropertyGroup></Project>",
+    "safe": "<Project><PropertyGroup><EnableNETAnalyzers>true</EnableNETAnalyzers></PropertyGroup></Project>"
+  },
+  {
+    "rule_id": "dede.dotnet.project.build-analysis-disabled",
+    "filename": "Example.csproj",
+    "unsafe": "<Project><PropertyGroup><RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild></PropertyGroup></Project>",
+    "safe": "<Project><PropertyGroup><RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild></PropertyGroup></Project>"
+  },
+  {
+    "rule_id": "dede.dotnet.project.nullable-disabled",
+    "filename": "Example.csproj",
+    "unsafe": "<Project><PropertyGroup><Nullable>disable</Nullable></PropertyGroup></Project>",
+    "safe": "<Project><PropertyGroup><Nullable>enable</Nullable></PropertyGroup></Project>"
+  },
+  {
+    "rule_id": "dede.dotnet.nuget.insecure-source",
+    "filename": "NuGet.config",
+    "unsafe": "<configuration><packageSources><add key=\"feed\" value=\"http://example.test/v3/index.json\" allowInsecureConnections=\"true\" /></packageSources></configuration>",
+    "safe": "<configuration><packageSources><add key=\"feed\" value=\"https://example.test/v3/index.json\" /></packageSources></configuration>"
+  },
+  {
+    "rule_id": "dede.dotnet.razor.raw-model-output",
+    "filename": "View.cshtml",
+    "unsafe": "<div>@Html.Raw(Model.Body)</div>",
+    "safe": "<div>@Model.Body</div>"
+  },
+  {
+    "rule_id": "dede.dotnet.connection.tls-trust-bypass",
+    "filename": "appsettings.json",
+    "unsafe": "{\"ConnectionStrings\":{\"Db\":\"Server=example.test;TrustServerCertificate=True;Integrated Security=True\"}}",
+    "safe": "{\"ConnectionStrings\":{\"Db\":\"Server=example.test;TrustServerCertificate=False;Integrated Security=True\"}}"
+  },
+  {
+    "rule_id": "dede.dotnet.connection.encryption-disabled",
+    "filename": "appsettings.json",
+    "unsafe": "{\"ConnectionStrings\":{\"Db\":\"Server=example.test;Encrypt=False;Integrated Security=True\"}}",
+    "safe": "{\"ConnectionStrings\":{\"Db\":\"Server=example.test;Encrypt=True;Integrated Security=True\"}}"
+  },
+  {
+    "rule_id": "dede.dotnet.aspnet.page-validation-disabled",
+    "filename": "Default.aspx",
+    "unsafe": "<%@ Page Language=\"C#\" ValidateRequest=\"false\" %>",
+    "safe": "<%@ Page Language=\"C#\" ValidateRequest=\"true\" %>"
+  },
+  {
+    "rule_id": "dede.dotnet.aspnet.page-mac-disabled",
+    "filename": "Default.aspx",
+    "unsafe": "<%@ Page Language=\"C#\" EnableViewStateMac=\"false\" %>",
+    "safe": "<%@ Page Language=\"C#\" EnableViewStateMac=\"true\" %>"
+  }
+]

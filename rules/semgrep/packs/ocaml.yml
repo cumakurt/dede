@@ -1,0 +1,699 @@
+rules:
+- id: ocaml.lang.best-practice.string.ocamllint-str-string-after
+  pattern: String.sub $S $N (String.length $S - $N)
+  message: Use instead `Str.string_after`
+  languages:
+  - ocaml
+  severity: WARNING
+  metadata:
+    category: best-practice
+    technology:
+    - ocaml
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    source: https://semgrep.dev/r/ocaml.lang.best-practice.string.ocamllint-str-string-after
+    shortlink: https://sg.run/OPKk
+    semgrep.dev:
+      rule:
+        r_id: 9375
+        rv_id: 945959
+        rule_id: 8GUjZq
+        version_id: DkTNpP9
+        url: https://semgrep.dev/playground/r/DkTNpP9/ocaml.lang.best-practice.string.ocamllint-str-string-after
+        origin: community
+- id: ocaml.lang.best-practice.ref.ocamllint-ref-decr
+  pattern: $X := ! $X - 1
+  message: You should use `decr`
+  languages:
+  - ocaml
+  severity: WARNING
+  metadata:
+    category: best-practice
+    technology:
+    - ocaml
+    references:
+    - https://v2.ocaml.org/api/Stdlib.html#VALdecr
+    - https://v2.ocaml.org/api/Atomic.html#VALdecr
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    source: https://semgrep.dev/r/ocaml.lang.best-practice.ref.ocamllint-ref-decr
+    shortlink: https://sg.run/weYd
+    semgrep.dev:
+      rule:
+        r_id: 9373
+        rv_id: 945957
+        rule_id: 7KUQyg
+        version_id: A8TJzO9
+        url: https://semgrep.dev/playground/r/A8TJzO9/ocaml.lang.best-practice.ref.ocamllint-ref-decr
+        origin: community
+- id: ocaml.lang.performance.list.ocamllint-length-list-zero
+  pattern: List.length $X = 0
+  message: You probably want $X = [], which is faster.
+  languages:
+  - ocaml
+  severity: WARNING
+  metadata:
+    category: performance
+    technology:
+    - ocaml
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    source: https://semgrep.dev/r/ocaml.lang.performance.list.ocamllint-length-list-zero
+    shortlink: https://sg.run/8yrQ
+    semgrep.dev:
+      rule:
+        r_id: 9384
+        rv_id: 945969
+        rule_id: ReUglk
+        version_id: RGTAg6R
+        url: https://semgrep.dev/playground/r/RGTAg6R/ocaml.lang.performance.list.ocamllint-length-list-zero
+        origin: community
+- id: ocaml.lang.best-practice.ifs.ocamllint-useless-else
+  pattern: if $E then $E1 else ()
+  message: Useless else. Just remove the else branch;
+  languages:
+  - ocaml
+  severity: WARNING
+  metadata:
+    category: best-practice
+    technology:
+    - ocaml
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    source: https://semgrep.dev/r/ocaml.lang.best-practice.ifs.ocamllint-useless-else
+    shortlink: https://sg.run/rd7J
+    semgrep.dev:
+      rule:
+        r_id: 9369
+        rv_id: 945953
+        rule_id: d8UjxD
+        version_id: JdTDyYq
+        url: https://semgrep.dev/playground/r/JdTDyYq/ocaml.lang.best-practice.ifs.ocamllint-useless-else
+        origin: community
+- id: ocaml.lang.best-practice.ref.ocamllint-ref-incr
+  pattern: $X := ! $X + 1
+  message: You should use `incr`
+  languages:
+  - ocaml
+  severity: WARNING
+  metadata:
+    category: best-practice
+    technology:
+    - ocaml
+    references:
+    - https://v2.ocaml.org/api/Stdlib.html#VALincr
+    - https://v2.ocaml.org/api/Atomic.html#VALincr
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    source: https://semgrep.dev/r/ocaml.lang.best-practice.ref.ocamllint-ref-incr
+    shortlink: https://sg.run/kXJA
+    semgrep.dev:
+      rule:
+        r_id: 9372
+        rv_id: 945956
+        rule_id: EwU2w8
+        version_id: RGTAg6O
+        url: https://semgrep.dev/playground/r/RGTAg6O/ocaml.lang.best-practice.ref.ocamllint-ref-incr
+        origin: community
+- id: ocaml.lang.best-practice.bool.ocamllint-bool-false
+  pattern-either:
+  - pattern: $X = false
+  - pattern: $X == false
+  - pattern: $X <> true
+  message: Comparison to boolean. Just use `not $X`
+  languages:
+  - ocaml
+  severity: WARNING
+  metadata:
+    category: best-practice
+    technology:
+    - ocaml
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    source: https://semgrep.dev/r/ocaml.lang.best-practice.bool.ocamllint-bool-false
+    shortlink: https://sg.run/9oEy
+    semgrep.dev:
+      rule:
+        r_id: 9367
+        rv_id: 945950
+        rule_id: eqU8jW
+        version_id: 3ZTOPzN
+        url: https://semgrep.dev/playground/r/3ZTOPzN/ocaml.lang.best-practice.bool.ocamllint-bool-false
+        origin: community
+- id: ocaml.lang.best-practice.hashtbl.hashtbl-find-outside-try
+  patterns:
+  - pattern: |
+      Hashtbl.find ...
+  - pattern-not-inside: |
+      try ... with Not_found -> ...
+  message: '''Hashtbl.find'' raises the ''Not_found'' exception. Handle the exception
+    or use ''Hashtbl.find_opt'' instead. If you have proof that the key exists in
+    the table, use ''assert false'' as the exception handler to demonstrate awareness
+    of the issue. If your code uses the syntax ''match Hashtbl.find ... with exception
+    Not_found -> ...'', it''s fine and we apologize for not detecting it. Consider
+    using ''Hashtbl.find_opt'' to please Semgrep and stay safe.'
+  languages:
+  - ocaml
+  severity: WARNING
+  metadata:
+    category: best-practice
+    technology:
+    - ocaml
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    source: https://semgrep.dev/r/ocaml.lang.best-practice.hashtbl.hashtbl-find-outside-try
+    shortlink: https://sg.run/yd7A
+    semgrep.dev:
+      rule:
+        r_id: 9368
+        rv_id: 1197444
+        rule_id: v8Un6Z
+        version_id: 5PTokxQ
+        url: https://semgrep.dev/playground/r/5PTokxQ/ocaml.lang.best-practice.hashtbl.hashtbl-find-outside-try
+        origin: community
+- id: ocaml.lang.best-practice.ifs.ocamllint-backwards-if
+  pattern: if $E then () else $E2
+  message: Backwards if. Rewrite the code as 'if not $E then $E2'.
+  languages:
+  - ocaml
+  severity: WARNING
+  metadata:
+    category: best-practice
+    technology:
+    - ocaml
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    source: https://semgrep.dev/r/ocaml.lang.best-practice.ifs.ocamllint-backwards-if
+    shortlink: https://sg.run/b7Ov
+    semgrep.dev:
+      rule:
+        r_id: 9370
+        rv_id: 945954
+        rule_id: ZqU5AE
+        version_id: 5PT9O25
+        url: https://semgrep.dev/playground/r/5PT9O25/ocaml.lang.best-practice.ifs.ocamllint-backwards-if
+        origin: community
+- id: ocaml.lang.best-practice.bool.ocamllint-bool-true
+  pattern-either:
+  - pattern: $X = true
+  - pattern: $X == true
+  - pattern: $X != false
+  message: Comparison to boolean. Just use `$X`
+  languages:
+  - ocaml
+  severity: WARNING
+  metadata:
+    category: best-practice
+    technology:
+    - ocaml
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    source: https://semgrep.dev/r/ocaml.lang.best-practice.bool.ocamllint-bool-true
+    shortlink: https://sg.run/1ZE1
+    semgrep.dev:
+      rule:
+        r_id: 9366
+        rv_id: 945949
+        rule_id: OrU3xY
+        version_id: QkTZzjO
+        url: https://semgrep.dev/playground/r/QkTZzjO/ocaml.lang.best-practice.bool.ocamllint-bool-true
+        origin: community
+- id: ocaml.lang.performance.list.ocamllint-length-more-than-zero
+  pattern: List.length $X > 0
+  message: You probably want $X <> [], which is faster.
+  languages:
+  - ocaml
+  severity: WARNING
+  metadata:
+    category: performance
+    technology:
+    - ocaml
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    source: https://semgrep.dev/r/ocaml.lang.performance.list.ocamllint-length-more-than-zero
+    shortlink: https://sg.run/gLZ5
+    semgrep.dev:
+      rule:
+        r_id: 9385
+        rv_id: 945970
+        rule_id: AbUz2X
+        version_id: A8TJzOg
+        url: https://semgrep.dev/playground/r/A8TJzOg/ocaml.lang.performance.list.ocamllint-length-more-than-zero
+        origin: community
+- id: ocaml.lang.best-practice.string.ocamllint-str-last-chars
+  pattern: String.sub $S (String.length $S - $N) $N
+  message: Use instead `Str.last_chars`
+  languages:
+  - ocaml
+  severity: WARNING
+  metadata:
+    category: best-practice
+    technology:
+    - ocaml
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    source: https://semgrep.dev/r/ocaml.lang.best-practice.string.ocamllint-str-last-chars
+    shortlink: https://sg.run/eLvL
+    semgrep.dev:
+      rule:
+        r_id: 9376
+        rv_id: 945960
+        rule_id: gxU1D1
+        version_id: WrTEoXo
+        url: https://semgrep.dev/playground/r/WrTEoXo/ocaml.lang.best-practice.string.ocamllint-str-last-chars
+        origin: community
+- id: ocaml.lang.compatibility.deprecated.deprecated-pervasives
+  pattern: Pervasives.$X
+  message: Pervasives is deprecated and will not be available after 4.10. Use Stdlib.
+  languages:
+  - ocaml
+  severity: ERROR
+  metadata:
+    category: compatibility
+    technology:
+    - ocaml
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    source: https://semgrep.dev/r/ocaml.lang.compatibility.deprecated.deprecated-pervasives
+    shortlink: https://sg.run/dKe0
+    semgrep.dev:
+      rule:
+        r_id: 9378
+        rv_id: 945962
+        rule_id: 3qUP1E
+        version_id: K3TJbDY
+        url: https://semgrep.dev/playground/r/K3TJbDY/ocaml.lang.compatibility.deprecated.deprecated-pervasives
+        origin: community
+- id: ocaml.lang.best-practice.string.ocamllint-useless-sprintf
+  pattern-either:
+  - pattern: Printf.sprintf "..."
+  - pattern: Printf.sprintf "%s" $S
+  message: Useless sprintf
+  languages:
+  - ocaml
+  severity: WARNING
+  metadata:
+    category: best-practice
+    technology:
+    - ocaml
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    source: https://semgrep.dev/r/ocaml.lang.best-practice.string.ocamllint-useless-sprintf
+    shortlink: https://sg.run/vzl0
+    semgrep.dev:
+      rule:
+        r_id: 9377
+        rv_id: 945961
+        rule_id: QrUzO6
+        version_id: 0bT158E
+        url: https://semgrep.dev/playground/r/0bT158E/ocaml.lang.best-practice.string.ocamllint-useless-sprintf
+        origin: community
+- id: ocaml.lang.best-practice.string.ocamllint-str-first-chars
+  pattern: String.sub $S 0 $N
+  message: Use instead `Str.first_chars`
+  languages:
+  - ocaml
+  severity: WARNING
+  metadata:
+    category: best-practice
+    technology:
+    - ocaml
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    source: https://semgrep.dev/r/ocaml.lang.best-practice.string.ocamllint-str-first-chars
+    shortlink: https://sg.run/x16y
+    semgrep.dev:
+      rule:
+        r_id: 9374
+        rv_id: 945958
+        rule_id: L1Uy37
+        version_id: BjT1Ngx
+        url: https://semgrep.dev/playground/r/BjT1Ngx/ocaml.lang.best-practice.string.ocamllint-str-first-chars
+        origin: community
+- id: ocaml.lang.best-practice.list.list-find-outside-try
+  patterns:
+  - pattern: |
+      List.find ...
+  - pattern-not-inside: |
+      try ... with ... -> ...
+  message: You should not use List.find outside of a try, or you should use List.find_opt
+  languages:
+  - ocaml
+  severity: WARNING
+  metadata:
+    category: best-practice
+    technology:
+    - ocaml
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    source: https://semgrep.dev/r/ocaml.lang.best-practice.list.list-find-outside-try
+    shortlink: https://sg.run/N4KN
+    semgrep.dev:
+      rule:
+        r_id: 9371
+        rv_id: 945955
+        rule_id: nJUzLq
+        version_id: GxTP7K9
+        url: https://semgrep.dev/playground/r/GxTP7K9/ocaml.lang.best-practice.list.list-find-outside-try
+        origin: community
+- id: ocaml.lang.portability.crlf-support.broken-input-line
+  pattern: |
+    input_line
+  message: '''input_line'' leaves a ''\r'' (CR) character when reading lines from
+    a Windows text file, whose lines end in "\r\n" (CRLF). This is a problem for any
+    Windows file that is being read either on a Unix-like platform or on Windows in
+    binary mode. If the code already takes care of removing any trailing ''\r'' after
+    reading the line, add a ''(* nosemgrep *)'' comment to disable this warning.'
+  languages:
+  - ocaml
+  severity: WARNING
+  metadata:
+    category: portability
+    technology:
+    - ocaml
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    source: https://semgrep.dev/r/ocaml.lang.portability.crlf-support.broken-input-line
+    shortlink: https://sg.run/v2gY
+    semgrep.dev:
+      rule:
+        r_id: 12777
+        rv_id: 945971
+        rule_id: DbUKZX
+        version_id: BjT1Ngb
+        url: https://semgrep.dev/playground/r/BjT1Ngb/ocaml.lang.portability.crlf-support.broken-input-line
+        origin: community
+- id: ocaml.lang.portability.crlf-support.prefer-read-in-binary-mode
+  pattern: open_in
+  fix: open_in_bin
+  message: '''open_in'' behaves differently on Windows and on Unix-like systems with
+    respect to line endings. To get the same behavior everywhere, use ''open_in_bin''
+    or ''open_in_gen [Open_binary]''. If you really want CRLF-to-LF translations to
+    take place when running on Windows, use ''open_in_gen [Open_text]''.'
+  languages:
+  - ocaml
+  severity: WARNING
+  metadata:
+    category: portability
+    technology:
+    - ocaml
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    source: https://semgrep.dev/r/ocaml.lang.portability.crlf-support.prefer-read-in-binary-mode
+    shortlink: https://sg.run/d0YE
+    semgrep.dev:
+      rule:
+        r_id: 12778
+        rv_id: 945972
+        rule_id: WAUPAJ
+        version_id: DkTNpPw
+        url: https://semgrep.dev/playground/r/DkTNpPw/ocaml.lang.portability.crlf-support.prefer-read-in-binary-mode
+        origin: community
+- id: ocaml.lang.portability.crlf-support.prefer-write-in-binary-mode
+  pattern: open_out
+  fix: open_out_bin
+  message: '''open_out'' behaves differently on Windows and on Unix-like systems with
+    respect to line endings. To get the same behavior everywhere, use ''open_out_bin''
+    or ''open_out_gen [Open_binary]''. If you really want LF-to-CRLF translations
+    to take place when running on Windows, use ''open_out_gen [Open_text]''.'
+  languages:
+  - ocaml
+  severity: WARNING
+  metadata:
+    category: portability
+    technology:
+    - ocaml
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    source: https://semgrep.dev/r/ocaml.lang.portability.crlf-support.prefer-write-in-binary-mode
+    shortlink: https://sg.run/ZkGw
+    semgrep.dev:
+      rule:
+        r_id: 12779
+        rv_id: 945973
+        rule_id: 0oUJY9
+        version_id: WrTEoXG
+        url: https://semgrep.dev/playground/r/WrTEoXG/ocaml.lang.portability.crlf-support.prefer-write-in-binary-mode
+        origin: community
+- id: ocaml.lang.correctness.physical-vs-structural.physical-equal
+  pattern: $X == $Y
+  message: You probably want the structural equality operator =
+  languages:
+  - ocaml
+  severity: WARNING
+  metadata:
+    category: correctness
+    technology:
+    - ocaml
+    references:
+    - https://v2.ocaml.org/api/Stdlib.html#1_Comparisons
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    source: https://semgrep.dev/r/ocaml.lang.correctness.physical-vs-structural.physical-equal
+    shortlink: https://sg.run/EOZN
+    semgrep.dev:
+      rule:
+        r_id: 12781
+        rv_id: 945963
+        rule_id: qNUbP9
+        version_id: qkT4jdX
+        url: https://semgrep.dev/playground/r/qkT4jdX/ocaml.lang.correctness.physical-vs-structural.physical-equal
+        origin: community
+- id: ocaml.lang.correctness.physical-vs-structural.physical-not-equal
+  pattern: $X != $Y
+  message: You probably want the structural inequality operator <>
+  languages:
+  - ocaml
+  severity: WARNING
+  metadata:
+    category: correctness
+    technology:
+    - ocaml
+    references:
+    - https://v2.ocaml.org/api/Stdlib.html#1_Comparisons
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    source: https://semgrep.dev/r/ocaml.lang.correctness.physical-vs-structural.physical-not-equal
+    shortlink: https://sg.run/7Gw2
+    semgrep.dev:
+      rule:
+        r_id: 12782
+        rv_id: 945964
+        rule_id: lBUzAY
+        version_id: l4Tx9KW
+        url: https://semgrep.dev/playground/r/l4Tx9KW/ocaml.lang.correctness.physical-vs-structural.physical-not-equal
+        origin: community
+- id: ocaml.lang.correctness.useless-eq.useless-equal
+  pattern: $X = $X
+  message: This is always true. If testing for floating point NaN, use `Float.is_nan`
+    instead.
+  languages:
+  - ocaml
+  severity: ERROR
+  metadata:
+    category: correctness
+    technology:
+    - ocaml
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    source: https://semgrep.dev/r/ocaml.lang.correctness.useless-eq.useless-equal
+    shortlink: https://sg.run/L8Z6
+    semgrep.dev:
+      rule:
+        r_id: 12783
+        rv_id: 945966
+        rule_id: YGUQKg
+        version_id: JdTDyBo
+        url: https://semgrep.dev/playground/r/JdTDyBo/ocaml.lang.correctness.useless-eq.useless-equal
+        origin: community
+- id: ocaml.lang.correctness.useless-if.ocamllint-useless-if
+  pattern: if $X then $E else $E
+  message: Useless if. Both branches are equal.
+  languages:
+  - ocaml
+  severity: ERROR
+  metadata:
+    category: correctness
+    technology:
+    - ocaml
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    source: https://semgrep.dev/r/ocaml.lang.correctness.useless-if.ocamllint-useless-if
+    shortlink: https://sg.run/8ReN
+    semgrep.dev:
+      rule:
+        r_id: 12784
+        rv_id: 945967
+        rule_id: 6JU6w7
+        version_id: 5PT9OR9
+        url: https://semgrep.dev/playground/r/5PT9OR9/ocaml.lang.correctness.useless-if.ocamllint-useless-if
+        origin: community
+- id: ocaml.lang.correctness.useless-let.useless-let
+  pattern: let $X = $E in $X
+  message: Useless let
+  languages:
+  - ocaml
+  severity: ERROR
+  metadata:
+    category: correctness
+    technology:
+    - ocaml
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    source: https://semgrep.dev/r/ocaml.lang.correctness.useless-let.useless-let
+    shortlink: https://sg.run/grz0
+    semgrep.dev:
+      rule:
+        r_id: 12785
+        rv_id: 945968
+        rule_id: oqUrpj
+        version_id: GxTP7n6
+        url: https://semgrep.dev/playground/r/GxTP7n6/ocaml.lang.correctness.useless-let.useless-let
+        origin: community
+- id: ocaml.lang.portability.slash-tmp.not-portable-tmp-string
+  pattern: |
+    "=~/\/tmp/"
+  message: You should probably use Filename.get_temp_dirname().
+  languages:
+  - ocaml
+  severity: WARNING
+  metadata:
+    category: portability
+    technology:
+    - ocaml
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    source: https://semgrep.dev/r/ocaml.lang.portability.slash-tmp.not-portable-tmp-string
+    shortlink: https://sg.run/Q4ZZ
+    semgrep.dev:
+      rule:
+        r_id: 12786
+        rv_id: 945974
+        rule_id: zdU100
+        version_id: 0bT158q
+        url: https://semgrep.dev/playground/r/0bT158q/ocaml.lang.portability.slash-tmp.not-portable-tmp-string
+        origin: community
+- id: ocaml.lang.best-practice.exception.bad-reraise
+  patterns:
+  - pattern: |
+      raise $EXN
+  - metavariable-regex:
+      metavariable: $EXN
+      regex: \A[a-z_][a-z_A-Z0-9']*\z
+  message: You should not re-raise exceptions using 'raise' because it loses track
+    of where the exception was raised originally, leading to a useless and possibly
+    confusing stack trace. Instead, you should obtain a stack backtrace as soon as
+    the exception is caught using 'try ... with exn -> let trace = Printexc.get_raw_backtrace
+    () in ...', and keep it around until you re-raise the exception using 'Printexc.raise_with_backtrace
+    exn trace'. You must collect the stack backtrace before calling another function
+    which might internally raise and catch exceptions. To avoid false positives from
+    Semgrep, write 'raise (Foo args)' instead of 'let e = Foo args in raise e'.
+  languages:
+  - ocaml
+  severity: WARNING
+  metadata:
+    category: best-practice
+    technology:
+    - ocaml
+    references:
+    - https://v2.ocaml.org/api/Printexc.html
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    source: https://semgrep.dev/r/ocaml.lang.best-practice.exception.bad-reraise
+    shortlink: https://sg.run/5ewK
+    semgrep.dev:
+      rule:
+        r_id: 24391
+        rv_id: 945951
+        rule_id: BYUrnb
+        version_id: 44TZkwn
+        url: https://semgrep.dev/playground/r/44TZkwn/ocaml.lang.best-practice.exception.bad-reraise
+        origin: community
+- id: ocaml.lang.correctness.useless-compare.useless-compare
+  patterns:
+  - pattern-either:
+    - pattern: compare $X $X
+    - pattern: $MODULE.compare $X $X
+  message: This comparison is useless because the expressions being compared are identical.
+    This is expected to always return the same result, 0, unless your code is really
+    strange.
+  languages:
+  - ocaml
+  severity: ERROR
+  metadata:
+    category: correctness
+    technology:
+    - ocaml
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    source: https://semgrep.dev/r/ocaml.lang.correctness.useless-compare.useless-compare
+    shortlink: https://sg.run/RyvO
+    semgrep.dev:
+      rule:
+        r_id: 16249
+        rv_id: 945965
+        rule_id: JDU6Gv
+        version_id: YDTvR1l
+        url: https://semgrep.dev/playground/r/YDTvR1l/ocaml.lang.correctness.useless-compare.useless-compare
+        origin: community
+- id: ocaml.lang.security.unsafe.ocamllint-unsafe
+  pattern-either:
+  - pattern: $X.unsafe_get
+  - pattern: $X.unsafe_set
+  - pattern: $X.unsafe_to_string
+  - pattern: $X.unsafe_of_string
+  - pattern: $X.unsafe_blit
+  - pattern: $X.unsafe_blit_string
+  - pattern: $X.unsafe_fill
+  - pattern: $X.unsafe_to_string
+  - pattern: $X.unsafe_getenv
+  - pattern: $X.unsafe_environment
+  - pattern: $X.unsafe_chr
+  - pattern: $X.unsafe_of_int
+  - pattern: $X.unsafe_output
+  - pattern: $X.unsafe_output_string
+  - pattern: $X.unsafe_read
+  - pattern: $X.unsafe_recv
+  - pattern: $X.unsafe_recvfrom
+  - pattern: $X.unsafe_send
+  - pattern: $X.unsafe_sendto
+  - pattern: $X.unsafe_set
+  - pattern: $X.unsafe_set_int16
+  - pattern: $X.unsafe_set_int32
+  - pattern: $X.unsafe_set_int64
+  - pattern: $X.unsafe_set_int8
+  - pattern: $X.unsafe_set_uint16_ne
+  - pattern: $X.unsafe_set_uint8
+  - pattern: $X.unsafe_single_write
+  - pattern: $X.unsafe_string
+  - pattern: $X.unsafe_sub
+  - pattern: $X.unsafe_write
+  message: Unsafe functions do not perform boundary checks or have other side effects,
+    use with care.
+  languages:
+  - ocaml
+  severity: WARNING
+  metadata:
+    category: security
+    references:
+    - https://v2.ocaml.org/api/Bigarray.Array1.html#VALunsafe_get
+    - https://v2.ocaml.org/api/Bytes.html#VALunsafe_to_string
+    technology:
+    - ocaml
+    cwe: 'CWE-242: Use of Inherently Dangerous Function (4.12)'
+    confidence: MEDIUM
+    likelihood: MEDIUM
+    impact: MEDIUM
+    subcategory:
+    - audit
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Other
+    source: https://semgrep.dev/r/ocaml.lang.security.unsafe.ocamllint-unsafe
+    shortlink: https://sg.run/d8K80
+    semgrep.dev:
+      rule:
+        r_id: 92978
+        rv_id: 945981
+        rule_id: 6JUvjv6
+        version_id: zyTlkwv
+        url: https://semgrep.dev/playground/r/zyTlkwv/ocaml.lang.security.unsafe.ocamllint-unsafe
+        origin: community
+- id: ocaml.lang.best-practice.mutex.mutex-lock-exn
+  pattern: Mutex.lock $MUTEX
+  message: Raw `Mutex.lock`/`Mutex.unlock` is not exception-safe. If an exception
+    is raised between lock and unlock, the mutex will never be released, causing a
+    deadlock. Replace with `Mutex.protect $MUTEX (fun () -> ...)` which guarantees
+    the mutex is released even when exceptions are raised.
+  languages:
+  - ocaml
+  severity: WARNING
+  metadata:
+    category: best-practice
+    technology:
+    - ocaml
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    source: https://semgrep.dev/r/ocaml.lang.best-practice.mutex.mutex-lock-exn
+    shortlink: https://sg.run/P9B53
+    semgrep.dev:
+      rule:
+        r_id: 291645
+        rv_id: 1423384
+        rule_id: 6JU5WrQ
+        version_id: A8TEB3K
+        url: https://semgrep.dev/playground/r/A8TEB3K/ocaml.lang.best-practice.mutex.mutex-lock-exn
+        origin: community

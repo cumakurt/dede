@@ -1,0 +1,75 @@
+{% from "_macros.html.j2" import page_chrome with context %}
+{{ page_chrome('08 / Hotspots & Taxonomy') }}
+<section class="section" id="hotspots-taxonomy">
+  <p class="section-kicker">08 / Hotspots &amp; Taxonomy</p>
+  <h2>Where risk accumulates</h2>
+
+  <h3>Security Hotspots by Module</h3>
+  {% if hotspot_folders %}
+    {% for row in hotspot_folders %}
+    <div class="hbar">
+      <div class="hbar-label">
+        <span class="mono">{{ row.path }}</span>
+        <span><span class="badge {{ row.max_severity }}">{{ row.max_severity }}</span> · {{ row.count }}</span>
+      </div>
+      <div class="hbar-track"><div class="hbar-fill {{ row.max_severity }}" style="width:{{ row.bar }}%"></div></div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <p class="muted">No hotspot concentration calculated.</p>
+  {% endif %}
+
+  {% if hotspot_files %}
+  <h3>Top Files</h3>
+  <table class="data">
+    <thead><tr><th>File</th><th>Findings</th><th>Weighted risk</th></tr></thead>
+    <tbody>
+      {% for row in hotspot_files %}
+      <tr>
+        <td class="mono">{{ row.path }}</td>
+        <td>{{ row.count }}</td>
+        <td>{{ row.weight }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+
+  {% if cwe_distribution %}
+  <h3>CWE Distribution</h3>
+  <table class="data">
+    <thead><tr><th>CWE</th><th>Count</th><th>Share</th></tr></thead>
+    <tbody>
+      {% for row in cwe_distribution %}
+      <tr>
+        <td class="mono">{{ row.id }}</td>
+        <td>{{ row.count }}</td>
+        <td>{{ row.pct }}%</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+
+  {% if owasp_distribution %}
+  <h3>OWASP Top 10 Mapping</h3>
+  <p class="muted">Only findings with engine-supplied OWASP metadata are shown.</p>
+  <table class="data">
+    <thead><tr><th>OWASP Category</th><th>Count</th><th>Share</th></tr></thead>
+    <tbody>
+      {% for row in owasp_distribution %}
+      <tr>
+        <td>{{ row.id }}</td>
+        <td>{{ row.count }}</td>
+        <td>{{ row.pct }}%</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+
+  <p class="footer-note">
+    Taxonomy mapping supports governance and trend analysis; remediation remains finding-specific.
+    A CWE or OWASP category alone does not establish exploitability.
+  </p>
+</section>

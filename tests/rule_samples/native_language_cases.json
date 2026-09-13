@@ -1,0 +1,200 @@
+[
+  {
+    "rule_id": "dede.native.jvm.ecb",
+    "filename": "Unsafe.kt",
+    "unsafe": "val c = Cipher.getInstance(\"AES/ECB/PKCS5Padding\")",
+    "safe": "val c = Cipher.getInstance(\"AES/GCM/NoPadding\")"
+  },
+  {
+    "rule_id": "dede.native.kotlin.webview-file-access",
+    "filename": "Unsafe.kt",
+    "unsafe": "settings.allowUniversalAccessFromFileURLs = true",
+    "safe": "settings.allowUniversalAccessFromFileURLs = false"
+  },
+  {
+    "rule_id": "dede.native.groovy.dynamic-evaluation",
+    "filename": "Unsafe.groovy",
+    "unsafe": "Eval.me(userCode)",
+    "safe": "JSON.parse(userCode)"
+  },
+  {
+    "rule_id": "dede.native.rust.invalid-certificates",
+    "filename": "unsafe.rs",
+    "unsafe": "builder.danger_accept_invalid_certs(true);",
+    "safe": "builder.danger_accept_invalid_certs(false);"
+  },
+  {
+    "rule_id": "dede.native.rust.invalid-hostnames",
+    "filename": "unsafe.rs",
+    "unsafe": "builder.danger_accept_invalid_hostnames(true);",
+    "safe": "builder.danger_accept_invalid_hostnames(false);"
+  },
+  {
+    "rule_id": "dede.native.swift.disabled-trust",
+    "filename": "Unsafe.swift",
+    "unsafe": "let trust = DisabledTrustEvaluator()",
+    "safe": "let trust = DefaultTrustEvaluator()"
+  },
+  {
+    "rule_id": "dede.native.swift.insecure-unarchiver",
+    "filename": "Unsafe.swift",
+    "unsafe": "unarchiver.requiresSecureCoding = false",
+    "safe": "unarchiver.requiresSecureCoding = true"
+  },
+  {
+    "rule_id": "dede.native.objc.weak-md5",
+    "filename": "Unsafe.m",
+    "unsafe": "CC_MD5(data, length, digest);",
+    "safe": "CC_SHA256(data, length, digest);"
+  },
+  {
+    "rule_id": "dede.native.dart.accept-bad-certificate",
+    "filename": "unsafe.dart",
+    "unsafe": "client.badCertificateCallback = (cert, host, port) => true;",
+    "safe": "client.badCertificateCallback = (cert, host, port) => false;"
+  },
+  {
+    "rule_id": "dede.native.powershell.skip-certificate",
+    "filename": "unsafe.ps1",
+    "unsafe": "Invoke-WebRequest -Uri https://example.test -SkipCertificateCheck",
+    "safe": "Invoke-WebRequest -Uri https://example.test"
+  },
+  {
+    "rule_id": "dede.native.powershell.dynamic-expression",
+    "filename": "unsafe.ps1",
+    "unsafe": "Invoke-Expression $userCode",
+    "safe": "& \"fixed-tool\" $argument"
+  },
+  {
+    "rule_id": "dede.native.perl.tls-verification-disabled",
+    "filename": "unsafe.pl",
+    "unsafe": "my $ua = LWP::UserAgent->new(ssl_opts => { verify_hostname => 0 });",
+    "safe": "my $ua = LWP::UserAgent->new(ssl_opts => { verify_hostname => 1 });"
+  },
+  {
+    "rule_id": "dede.native.perl.string-eval",
+    "filename": "unsafe.pl",
+    "unsafe": "eval $code;",
+    "safe": "decode_json($code);"
+  },
+  {
+    "rule_id": "dede.native.lua.dynamic-load",
+    "filename": "unsafe.lua",
+    "unsafe": "local fn = load(userCode)",
+    "safe": "local fn = load(\"return 42\")"
+  },
+  {
+    "rule_id": "dede.native.r.dynamic-eval",
+    "filename": "unsafe.R",
+    "unsafe": "eval(parse(text = user_code))",
+    "safe": "jsonlite::fromJSON(user_code)"
+  },
+  {
+    "rule_id": "dede.native.r.tls-verification-disabled",
+    "filename": "unsafe.R",
+    "unsafe": "httr::config(ssl_verifypeer = 0)",
+    "safe": "httr::config(ssl_verifypeer = 1)"
+  },
+  {
+    "rule_id": "dede.native.julia.dynamic-eval",
+    "filename": "unsafe.jl",
+    "unsafe": "eval(Meta.parse(user_code))",
+    "safe": "JSON.parse(user_code)"
+  },
+  {
+    "rule_id": "dede.native.elixir.dynamic-eval",
+    "filename": "unsafe.ex",
+    "unsafe": "Code.eval_string(user_code)",
+    "safe": "Jason.decode(user_code)"
+  },
+  {
+    "rule_id": "dede.native.erlang.unsafe-binary-term",
+    "filename": "unsafe.erl",
+    "unsafe": "binary_to_term(Data).",
+    "safe": "binary_to_term(Data, [safe])."
+  },
+  {
+    "rule_id": "dede.native.clojure.reader-eval",
+    "filename": "unsafe.clj",
+    "unsafe": "(binding [*read-eval* true] (read-string data))",
+    "safe": "(binding [*read-eval* false] (read-string data))"
+  },
+  {
+    "rule_id": "dede.native.haskell.shell-command",
+    "filename": "unsafe.hs",
+    "unsafe": "main = callCommand command",
+    "safe": "main = callProcess \"/usr/bin/fixed\" [argument]"
+  },
+  {
+    "rule_id": "dede.native.ocaml.shell-command",
+    "filename": "unsafe.ml",
+    "unsafe": "let run command = Sys.command command",
+    "safe": "let run argument = Unix.create_process \"/bin/fixed\" [|\"fixed\"; argument|] stdin stdout stderr"
+  },
+  {
+    "rule_id": "dede.native.solidity.tx-origin-auth",
+    "filename": "Unsafe.sol",
+    "unsafe": "require(tx.origin == owner);",
+    "safe": "require(msg.sender == owner);"
+  },
+  {
+    "rule_id": "dede.native.apex.dynamic-soql",
+    "filename": "Unsafe.cls",
+    "unsafe": "Database.query('SELECT Id FROM Account WHERE Name = ' + name);",
+    "safe": "Database.queryWithBinds(query, bindValues, AccessLevel.USER_MODE);"
+  },
+  {
+    "rule_id": "dede.native.sql.xp-cmdshell",
+    "filename": "unsafe.sql",
+    "unsafe": "EXEC sp_configure 'xp_cmdshell', 1;",
+    "safe": "EXEC sp_configure 'xp_cmdshell', 0;"
+  },
+  {
+    "rule_id": "dede.native.sql.trustworthy",
+    "filename": "unsafe.sql",
+    "unsafe": "ALTER DATABASE app SET TRUSTWORTHY ON;",
+    "safe": "ALTER DATABASE app SET TRUSTWORTHY OFF;"
+  },
+  {
+    "rule_id": "dede.native.frontend.vue-raw-html",
+    "filename": "Unsafe.vue",
+    "unsafe": "<div v-html=\"userHtml\"></div>",
+    "safe": "<div>{{ userHtml }}</div>"
+  },
+  {
+    "rule_id": "dede.native.frontend.svelte-raw-html",
+    "filename": "Unsafe.svelte",
+    "unsafe": "<div>{@html userHtml}</div>",
+    "safe": "<div>{userHtml}</div>"
+  },
+  {
+    "rule_id": "dede.native.html.angular-trusted-html",
+    "filename": "unsafe.html",
+    "unsafe": "<div ng-bind-html-unsafe=\"value\"></div>",
+    "safe": "<div ng-bind=\"value\"></div>"
+  },
+  {
+    "rule_id": "dede.native.json.npm-tls-disabled",
+    "filename": "package.json",
+    "unsafe": "{\"strict-ssl\": false}",
+    "safe": "{\"strict-ssl\": true}"
+  },
+  {
+    "rule_id": "dede.native.toml.poetry-tls-disabled",
+    "filename": "config.toml",
+    "unsafe": "[certificates.internal]\ncert = false",
+    "safe": "[certificates.internal]\ncert = \"/trusted/ca.pem\""
+  },
+  {
+    "rule_id": "dede.native.ini.npm-tls-disabled",
+    "filename": ".npmrc",
+    "unsafe": "strict-ssl=false",
+    "safe": "strict-ssl=true"
+  },
+  {
+    "rule_id": "dede.native.zig.runtime-safety-disabled",
+    "filename": "unsafe.zig",
+    "unsafe": "@setRuntimeSafety(false);",
+    "safe": "@setRuntimeSafety(true);"
+  }
+]

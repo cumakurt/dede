@@ -1,0 +1,471 @@
+{
+  "schema": 1,
+  "rules": [
+    {
+      "id": "dede.java.jndi.lookup-user-input",
+      "message": "JNDI lookup with user-controlled name; Log4Shell-style RCE / SSRF risk.",
+      "severity": "CRITICAL",
+      "category": "security",
+      "languages": [
+        "java"
+      ],
+      "when": [
+        {
+          "regex": "(?i)\\.lookup\\s*\\(",
+          "same_line": true
+        },
+        {
+          "regex": "(?i)(request\\.getParameter|request\\.getHeader|getQueryString|getBody|readLine|getInputStream)",
+          "same_line": true,
+          "not_regex": "(?i)(?://\\ dede:\\ safe)"
+        }
+      ],
+      "if": [
+        {
+          "contains_any": [
+            "javax.naming",
+            "InitialContext",
+            "NamingContext"
+          ]
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-74"
+      ],
+      "owasp": [
+        "A03:2025"
+      ],
+      "asvs": [
+        "v5.0.0-5.3.3"
+      ],
+      "recommendation": "Never pass user-controlled data to JNDI lookup; use environment variables for resource names.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/74.html",
+        "https://logging.apache.org/log4j/2.x/security.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.java.spring.csrf-disabled",
+      "message": "Spring Security CSRF protection disabled; cross-site request forgery attacks become possible.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "java"
+      ],
+      "when": [
+        {
+          "regex": "(?i)\\.csrf\\(.*disable\\(|csrf\\.disable\\(\\)|csrf\\(\\)\\.disable\\(\\)",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-352"
+      ],
+      "owasp": [
+        "A01:2025"
+      ],
+      "asvs": [
+        "v5.0.0-4.2.2"
+      ],
+      "recommendation": "Keep CSRF protection enabled for all state-changing endpoints; use stateless JWT for REST APIs if CSRF must be disabled.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/352.html",
+        "https://docs.spring.io/spring-security/reference/features/exploits/csrf.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.java.spring.permitall-all-requests",
+      "message": "Spring Security configured to permit all requests; authentication is bypassed for every endpoint.",
+      "severity": "CRITICAL",
+      "category": "security",
+      "languages": [
+        "java"
+      ],
+      "when": [
+        {
+          "regex": "(?i)anyRequest\\(\\)\\.permitAll\\(\\)|requestMatchers\\(\"\\*\\*\"\\)\\.permitAll\\(\\)",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-306"
+      ],
+      "owasp": [
+        "A01:2025"
+      ],
+      "asvs": [
+        "v5.0.0-4.1.1"
+      ],
+      "recommendation": "Use anyRequest().authenticated() as the default; explicitly permit only public endpoints.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/306.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.java.xxe.external-entity-enabled",
+      "message": "XML parser configured to allow external entity (XXE) processing; file read / SSRF risk.",
+      "severity": "CRITICAL",
+      "category": "security",
+      "languages": [
+        "java"
+      ],
+      "when": [
+        {
+          "regex": "(?i)setFeature\\s*\\(\\s*\"[^\"]*external.*(entities|features)[^\"]*\"\\s*,\\s*true\\)",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-611"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "asvs": [
+        "v5.0.0-5.5.3"
+      ],
+      "recommendation": "Disable all external entity features: set FEATURE_EXTERNAL_GENERAL_ENTITIES and DISALLOW_DOCTYPE_DECL to true.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/611.html",
+        "https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.java.xxe.doctype-not-disabled",
+      "message": "XML parser without DOCTYPE declaration disabled; XXE risk if the parser processes attacker-supplied XML.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "java"
+      ],
+      "when": [
+        {
+          "regex": "(?i)(DocumentBuilderFactory|SAXParserFactory|XMLInputFactory)\\.newInstance\\s*\\(",
+          "same_line": true
+        }
+      ],
+      "if": [
+        {
+          "not_regex": "(?i)(disallow_doctype_decl|external-general-entities|external-parameter-entities|FEATURE_SECURE_PROCESSING)"
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-611"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "asvs": [
+        "v5.0.0-5.5.3"
+      ],
+      "recommendation": "Disable DOCTYPE declarations and external entities immediately after factory creation.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/611.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.java.ssrf.url-user-input",
+      "message": "URL opened from user-controlled input; Server-Side Request Forgery (SSRF) risk.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "java"
+      ],
+      "when": [
+        {
+          "regex": "(?i)new\\s+URL\\s*\\(",
+          "same_line": true
+        },
+        {
+          "regex": "(?i)(getParameter|getHeader|getQueryString|readLine)",
+          "same_line": true,
+          "not_regex": "(?i)(?:allowedHosts|ALLOWED_URLS|//\\ dede:\\ safe)"
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-918"
+      ],
+      "owasp": [
+        "A10:2025"
+      ],
+      "asvs": [
+        "v5.0.0-12.6.1"
+      ],
+      "recommendation": "Validate URL host against an allowlist; deny requests to internal IP ranges.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/918.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.java.ognl.injection",
+      "message": "OGNL expression evaluated with user-controlled input; remote code execution risk (Struts-style).",
+      "severity": "CRITICAL",
+      "category": "security",
+      "languages": [
+        "java"
+      ],
+      "when": [
+        {
+          "regex": "(?i)(Ognl\\.getValue|Ognl\\.parseExpression|evaluateExpression)\\s*\\(",
+          "same_line": true
+        },
+        {
+          "regex": "(?i)(getParameter|getHeader|getBody|readLine|request\\.)",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-917"
+      ],
+      "owasp": [
+        "A03:2025"
+      ],
+      "asvs": [
+        "v5.0.0-5.3.3"
+      ],
+      "recommendation": "Never evaluate OGNL expressions derived from user input; use strict allowlists for expression roots.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/917.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.java.el.expression-injection",
+      "message": "EL/SpEL expression string built from user input; expression injection risk.",
+      "severity": "CRITICAL",
+      "category": "security",
+      "languages": [
+        "java"
+      ],
+      "when": [
+        {
+          "regex": "(?i)(ExpressionParser|ELProcessor|ELManager).*parseExpression|getValue\\s*\\(",
+          "same_line": true
+        },
+        {
+          "regex": "(?i)(getParameter|getHeader|request\\.|readLine)",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-94"
+      ],
+      "owasp": [
+        "A03:2025"
+      ],
+      "asvs": [
+        "v5.0.0-5.3.3"
+      ],
+      "recommendation": "Never build SpEL/EL expressions from user input; use data-binding instead.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/94.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.java.crypto.des-3des",
+      "message": "DES or 3DES encryption used; both are deprecated and breakable.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "java"
+      ],
+      "when": [
+        {
+          "regex": "(?i)Cipher\\.getInstance\\s*\\(\\s*\"(DES|DESede|TripleDES)[/\"]",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-327"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "asvs": [
+        "v5.0.0-6.2.1"
+      ],
+      "recommendation": "Replace DES/3DES with AES-GCM (Cipher.getInstance(\"AES/GCM/NoPadding\")).",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/327.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.java.crypto.rsa-no-padding",
+      "message": "RSA encryption without OAEP padding; vulnerable to padding oracle attacks.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "java"
+      ],
+      "when": [
+        {
+          "regex": "(?i)Cipher\\.getInstance\\s*\\(\\s*\"RSA/ECB/NoPadding\"",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-780"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "asvs": [
+        "v5.0.0-6.2.1"
+      ],
+      "recommendation": "Use RSA/ECB/OAEPWithSHA-256AndMGF1Padding instead of NoPadding.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/780.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.java.log.sensitive-data-logging",
+      "message": "Password or credential value logged; sensitive data may appear in log files.",
+      "severity": "MEDIUM",
+      "category": "security",
+      "languages": [
+        "java"
+      ],
+      "when": [
+        {
+          "regex": "(?i)(log|logger)\\.(info|debug|warn|error|trace)\\s*\\(",
+          "same_line": true
+        },
+        {
+          "regex": "(?i)(password|passwd|secret|token|apiKey|api_key|credential)",
+          "same_line": true,
+          "not_regex": "(?i)(?:REDACTED|\"\\*\\*\\*\"|'\\*\\*\\*'|//\\ dede:\\ safe)"
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-532"
+      ],
+      "owasp": [
+        "A09:2025"
+      ],
+      "asvs": [
+        "v5.0.0-7.1.1"
+      ],
+      "recommendation": "Mask or omit sensitive fields before logging; never log plaintext passwords or tokens.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/532.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.java.jdbc.raw-concat-query",
+      "message": "JDBC statement built by string concatenation with user data; SQL injection risk.",
+      "severity": "CRITICAL",
+      "category": "security",
+      "languages": [
+        "java"
+      ],
+      "when": [
+        {
+          "regex": "(?i)(createStatement|executeQuery|executeUpdate|execute)\\s*\\(\\s*\"[^\"]*\"\\s*\\+",
+          "same_line": true,
+          "not_regex": "(?i)(?:PreparedStatement|prepareStatement|//\\ dede:\\ safe)"
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-89"
+      ],
+      "owasp": [
+        "A03:2025"
+      ],
+      "asvs": [
+        "v5.0.0-5.3.4"
+      ],
+      "recommendation": "Always use PreparedStatement with parameter placeholders (?) instead of string concatenation.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/89.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.java.cmd.runtime-exec-concat",
+      "message": "Runtime.exec called with a concatenated command string; command injection risk.",
+      "severity": "CRITICAL",
+      "category": "security",
+      "languages": [
+        "java"
+      ],
+      "when": [
+        {
+          "regex": "(?i)Runtime\\.getRuntime\\(\\)\\.exec\\s*\\(\\s*\"[^\"]*\"\\s*\\+",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-78"
+      ],
+      "owasp": [
+        "A03:2025"
+      ],
+      "asvs": [
+        "v5.0.0-5.3.4"
+      ],
+      "recommendation": "Use ProcessBuilder with separate arguments array; never concatenate user data into shell commands.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/78.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.java.path.traversal-user-input",
+      "message": "File path constructed from user-controlled request parameter; path traversal risk.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "java"
+      ],
+      "when": [
+        {
+          "regex": "(?i)new\\s+File\\s*\\(",
+          "same_line": true
+        },
+        {
+          "regex": "(?i)(getParameter|getHeader|getPathInfo|getQueryString)",
+          "same_line": true,
+          "not_regex": "(?i)(?:getCanonicalPath|normalize|//\\ dede:\\ safe)"
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-22"
+      ],
+      "owasp": [
+        "A01:2025"
+      ],
+      "asvs": [
+        "v5.0.0-12.3.1"
+      ],
+      "recommendation": "Canonicalize the path with getCanonicalPath() and verify it starts with the intended base directory.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/22.html"
+      ],
+      "exclude_comments": true
+    }
+  ]
+}

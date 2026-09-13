@@ -1,0 +1,1011 @@
+{
+  "schema": 1,
+  "rules": [
+    {
+      "id": "dede.py.secrets.hardcoded-credential",
+      "message": "Possible hardcoded credential assigned to a secret-looking variable.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "python"
+      ],
+      "when": [
+        {
+          "regex": "(?i)^\\s*(?:[a-z_]\\w*\\.)?[a-z_]*(?:password|passwd|secret|api_key|apikey|auth_token|access_token|private_key)[a-z_]*(?:\\s*:\\s*[^=]+)?\\s*=\\s*(?:[rub]{0,2})?[\"'][^\"'\\r\\n]{4,}[\"']",
+          "same_line": true
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-798"
+      ],
+      "owasp": [
+        "A07:2025"
+      ],
+      "asvs": [
+        "v5.0.0-6.4.1"
+      ],
+      "recommendation": "Load secrets from environment variables or a secret manager; never commit literal credentials.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/798.html",
+        "https://owasp.org/Top10/2025/"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.py.injection.sql-format-string",
+      "message": "SQL query built with str.format/f-string; possible SQL injection.",
+      "severity": "CRITICAL",
+      "category": "security",
+      "languages": [
+        "python"
+      ],
+      "when": [
+        {
+          "pattern": "select ",
+          "same_line": true
+        },
+        {
+          "pattern": ".format(",
+          "same_line": true,
+          "not_regex": "(?i)(?:placeholder|%s|\\?|paramstyle)"
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-89"
+      ],
+      "owasp": [
+        "A03:2025"
+      ],
+      "asvs": [
+        "v5.0.0-15.5.1"
+      ],
+      "recommendation": "Use parameterized queries (cursor.execute with placeholders) instead of string formatting.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/89.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.py.cmd.subprocess-shell-true",
+      "message": "subprocess call with shell=True; command injection risk.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "python"
+      ],
+      "when": [
+        {
+          "pattern": "subprocess.",
+          "same_line": true
+        },
+        {
+          "pattern": "shell=true",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-78"
+      ],
+      "owasp": [
+        "A03:2025"
+      ],
+      "asvs": [
+        "v5.0.0-5.3.4"
+      ],
+      "recommendation": "Prefer shell=False with an argument list; validate any dynamic values.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/78.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.py.cmd.eval-exec",
+      "message": "eval/exec on dynamic content can execute attacker-controlled code.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "python"
+      ],
+      "when": [
+        {
+          "regex": "^\\s*(eval|exec)\\s*\\(",
+          "same_line": true,
+          "not_regex": "(?i)(?:\\#\\ dede:\\ safe|literal_eval)"
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-95"
+      ],
+      "owasp": [
+        "A03:2025"
+      ],
+      "asvs": [
+        "v5.0.0-5.3.3"
+      ],
+      "recommendation": "Parse data with ast.literal_eval or an explicit parser instead of eval/exec.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/95.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.py.crypto.weak-hash",
+      "message": "MD5/SHA1 used for security purposes; weak hash algorithm.",
+      "severity": "MEDIUM",
+      "category": "security",
+      "languages": [
+        "python"
+      ],
+      "when": [
+        {
+          "pattern": "hashlib.md5(",
+          "same_line": true,
+          "not_regex": "(?i)(?:usedforsecurity=false|checksum|\\#\\ dede:\\ non\\-crypto)"
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-327"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "asvs": [
+        "v5.0.0-6.2.1"
+      ],
+      "recommendation": "Use SHA-256 or better (or blake2) for security-sensitive hashing; MD5 only for non-crypto checksums.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/327.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.py.verify.tls-verification-disabled",
+      "message": "TLS certificate verification disabled (verify=False).",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "python"
+      ],
+      "when": [
+        {
+          "pattern": "verify=false",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-295"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "asvs": [
+        "v5.0.0-12.1.1"
+      ],
+      "recommendation": "Keep certificate verification enabled; trust a proper CA bundle instead.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/295.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.py.deserialize.unsafe-pickle-load",
+      "message": "pickle.load on untrusted data can execute arbitrary code.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "python"
+      ],
+      "when": [
+        {
+          "regex": "pickle\\.loads?\\s*\\(",
+          "same_line": true,
+          "not_regex": "(?i)(?:\\#\\ dede:\\ trusted|json\\.load)"
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-502"
+      ],
+      "owasp": [
+        "A08:2025"
+      ],
+      "asvs": [
+        "v5.0.0-13.3.1"
+      ],
+      "recommendation": "Prefer JSON or another data format; restrict unpickling to trusted, integrity-checked data.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/502.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.py.yaml.unsafe-load",
+      "message": "yaml.load without SafeLoader can construct arbitrary objects.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "python"
+      ],
+      "when": [
+        {
+          "pattern": "yaml.load(",
+          "not_pattern": "safeloader",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-502"
+      ],
+      "owasp": [
+        "A08:2025"
+      ],
+      "asvs": [
+        "v5.0.0-13.3.1"
+      ],
+      "recommendation": "Use yaml.safe_load or pass Loader=yaml.SafeLoader.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/502.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.py.random.insecure-random",
+      "message": "random module used; not cryptographically secure.",
+      "severity": "MEDIUM",
+      "category": "security",
+      "languages": [
+        "python"
+      ],
+      "when": [
+        {
+          "regex": "\\brandom\\.(choice|randint|random|randrange|uniform)\\s*\\(",
+          "same_line": true
+        }
+      ],
+      "if": [
+        {
+          "contains_any": [
+            "token",
+            "password",
+            "secret",
+            "session",
+            "otp",
+            "nonce",
+            "salt",
+            "api_key"
+          ]
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-338"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "asvs": [
+        "v5.0.0-6.2.2"
+      ],
+      "recommendation": "Use the secrets module or os.urandom for security-relevant randomness.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/338.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.py.debug.flask-debug-true",
+      "message": "Flask debug mode enabled in deployment code; exposes interactive debugger.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "python"
+      ],
+      "when": [
+        {
+          "pattern": "app.run(",
+          "same_line": true
+        },
+        {
+          "pattern": "debug=true",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-489"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "asvs": [
+        "v5.0.0-14.1.1"
+      ],
+      "recommendation": "Run production with debug=False and a real WSGI server.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/489.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.py.temp.predictable-tempfile",
+      "message": "tempfile.mktemp is racy; use NamedTemporaryFile or mkstemp.",
+      "severity": "MEDIUM",
+      "category": "security",
+      "languages": [
+        "python"
+      ],
+      "when": [
+        {
+          "pattern": "tempfile.mktemp(",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-377"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "asvs": [
+        "v5.0.0-12.3.1"
+      ],
+      "recommendation": "Use tempfile.NamedTemporaryFile or mkstemp with exclusive creation.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/377.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.js.dom.innerHTML-assignment",
+      "message": "Assignment to innerHTML with dynamic content; XSS risk.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "when": [
+        {
+          "pattern": ".innerhtml =",
+          "same_line": true,
+          "not_regex": "(?i)(?:dompurify|sanitize|textcontent|\\#\\ dede:\\ static)"
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-79"
+      ],
+      "owasp": [
+        "A03:2025"
+      ],
+      "asvs": [
+        "v5.0.0-50.2.1"
+      ],
+      "recommendation": "Use textContent or sanitize HTML with DOMPurify before assignment.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/79.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.js.execution.new-function",
+      "message": "new Function() compiles and runs arbitrary code; injection risk.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "when": [
+        {
+          "pattern": "new function(",
+          "same_line": true
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-95"
+      ],
+      "owasp": [
+        "A03:2025"
+      ],
+      "asvs": [
+        "v5.0.0-5.3.3"
+      ],
+      "recommendation": "Avoid dynamic code generation; parse data explicitly instead.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/95.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.js.request.axios-ssrf-url",
+      "message": "HTTP request URL built from user-controlled input; SSRF risk.",
+      "severity": "MEDIUM",
+      "category": "security",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "when": [
+        {
+          "pattern": "axios.",
+          "same_line": true
+        },
+        {
+          "regex": "(req\\.(query|params|body)|searchParams\\.get)",
+          "same_line": true,
+          "not_regex": "(?i)(?:allowlist|whitelist|urlvalidate|allowed_hosts|\\#\\ dede:\\ validated)"
+        }
+      ],
+      "confidence": "LOW",
+      "cwe": [
+        "CWE-918"
+      ],
+      "owasp": [
+        "A10:2025"
+      ],
+      "asvs": [
+        "v5.0.0-12.6.1"
+      ],
+      "recommendation": "Validate the destination against an allowlist of hosts before requesting it.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/918.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.js.crypto.math-random-token",
+      "message": "Math.random() used where a token/password/secret is generated.",
+      "severity": "MEDIUM",
+      "category": "security",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "when": [
+        {
+          "pattern": "math.random(",
+          "same_line": true
+        }
+      ],
+      "if": [
+        {
+          "contains_any": [
+            "token",
+            "password",
+            "secret",
+            "session",
+            "otp",
+            "nonce",
+            "salt"
+          ]
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-338"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "asvs": [
+        "v5.0.0-6.2.2"
+      ],
+      "recommendation": "Use crypto.getRandomValues (Web Crypto) for security-relevant randomness.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/338.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.go.crypto.weak-hash-md5",
+      "message": "md5.New() used; weak hash for security purposes.",
+      "severity": "MEDIUM",
+      "category": "security",
+      "languages": [
+        "go"
+      ],
+      "when": [
+        {
+          "pattern": "md5.new()",
+          "same_line": true,
+          "not_regex": "(?i)(?:checksum|non\\-crypto|//\\ dede:\\ safe)"
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-327"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "asvs": [
+        "v5.0.0-6.2.1"
+      ],
+      "recommendation": "Use crypto/sha256 or stronger for security-sensitive hashing.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/327.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.go.crypto.des-usage",
+      "message": "DES cipher usage; broken legacy encryption.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "go"
+      ],
+      "when": [
+        {
+          "pattern": "des.new(",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-327"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "asvs": [
+        "v5.0.0-6.2.1"
+      ],
+      "recommendation": "Use AES-GCM (crypto/aes + cipher.NewGCM) instead of DES.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/327.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.go.exec.exec-command-context",
+      "message": "exec.Command with concatenated input; command injection risk.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "go"
+      ],
+      "when": [
+        {
+          "pattern": "exec.command(",
+          "same_line": true
+        },
+        {
+          "regex": "(\\+|fmt\\.sprintf)",
+          "same_line": true
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-78"
+      ],
+      "owasp": [
+        "A03:2025"
+      ],
+      "asvs": [
+        "v5.0.0-5.3.4"
+      ],
+      "recommendation": "Pass arguments as separate exec.Command parameters; never build command strings by concatenation.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/78.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.go.tls.insecure-skip-verify",
+      "message": "InsecureSkipVerify:true disables TLS certificate validation.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "go"
+      ],
+      "when": [
+        {
+          "pattern": "insecureskipverify:true",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-295"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "asvs": [
+        "v5.0.0-12.1.1"
+      ],
+      "recommendation": "Keep TLS verification enabled; configure a proper root CA pool.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/295.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.go.sql.string-concat-query",
+      "message": "SQL query built with string concatenation; SQL injection risk.",
+      "severity": "CRITICAL",
+      "category": "security",
+      "languages": [
+        "go"
+      ],
+      "when": [
+        {
+          "pattern": "query :=",
+          "same_line": true
+        },
+        {
+          "pattern": "+",
+          "same_line": true
+        }
+      ],
+      "if": [
+        {
+          "contains_any": [
+            "select ",
+            "insert ",
+            "update ",
+            "delete "
+          ]
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-89"
+      ],
+      "owasp": [
+        "A03:2025"
+      ],
+      "asvs": [
+        "v5.0.0-15.5.1"
+      ],
+      "recommendation": "Use parameterized queries ($1, ?) instead of concatenating SQL.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/89.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.java.crypto.ecb-mode",
+      "message": "AES/ECB mode usage; identical blocks leak patterns.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "java"
+      ],
+      "when": [
+        {
+          "pattern": "cipher.getinstance(\"aes/ecb/",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-327"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "asvs": [
+        "v5.0.0-6.2.1"
+      ],
+      "recommendation": "Use AES-GCM with a random nonce; never ECB.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/327.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.java.crypto.static-iv",
+      "message": "IvParameterSpec built from a constant; static IV weakens CBC mode.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "java"
+      ],
+      "when": [
+        {
+          "pattern": "new ivparameterspec(",
+          "same_line": true
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-329"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "asvs": [
+        "v5.0.0-6.2.1"
+      ],
+      "recommendation": "Generate a fresh random IV per encryption and store it alongside the ciphertext.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/329.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.java.rnd.random-for-security",
+      "message": "java.util.Random used in security-sensitive code; predictable.",
+      "severity": "MEDIUM",
+      "category": "security",
+      "languages": [
+        "java"
+      ],
+      "when": [
+        {
+          "pattern": "new random(",
+          "same_line": true
+        }
+      ],
+      "if": [
+        {
+          "contains_any": [
+            "token",
+            "password",
+            "secret",
+            "session",
+            "otp",
+            "nonce",
+            "salt"
+          ]
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-338"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "asvs": [
+        "v5.0.0-6.2.2"
+      ],
+      "recommendation": "Use java.security.SecureRandom for security-relevant randomness.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/338.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.java.serialization.native-readobject",
+      "message": "ObjectInputStream.readObject on untrusted input; unsafe deserialization.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "java"
+      ],
+      "when": [
+        {
+          "pattern": ".readobject()",
+          "same_line": true
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-502"
+      ],
+      "owasp": [
+        "A08:2025"
+      ],
+      "asvs": [
+        "v5.0.0-13.3.1"
+      ],
+      "recommendation": "Prefer JSON/protobuf; if required, use look-ahead filtering with an allowlist.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/502.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.go.lock.race-prone-counter",
+      "message": "Shared map/counter incremented in goroutine context without visible locking; possible data race.",
+      "severity": "LOW",
+      "category": "bug",
+      "languages": [
+        "go"
+      ],
+      "when": [
+        {
+          "pattern": "go func()",
+          "same_line": true
+        },
+        {
+          "pattern": "++",
+          "same_line": true
+        }
+      ],
+      "confidence": "LOW",
+      "cwe": [
+        "CWE-362"
+      ],
+      "owasp": [
+        "A04:2025"
+      ],
+      "recommendation": "Protect shared state with sync.Mutex/atomic, or use channels for ownership.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/362.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.py.quality.exception-pass",
+      "message": "except block only passes; errors are silently swallowed.",
+      "severity": "LOW",
+      "category": "bug",
+      "languages": [
+        "python"
+      ],
+      "when": [
+        {
+          "pattern": "except ",
+          "same_line": true
+        },
+        {
+          "pattern": "pass",
+          "same_line": true
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-703"
+      ],
+      "recommendation": "Log the exception or handle it explicitly; at minimum narrow the exception type.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/703.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.js.quality.legacy-var",
+      "message": "var declaration; prefer const/let to avoid scoping bugs.",
+      "severity": "INFO",
+      "category": "quality",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "when": [
+        {
+          "regex": "^\\s*var\\s+\\w",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "recommendation": "Replace var with const (or let when reassignment is needed).",
+      "references": [
+        "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/var"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.any.secrets.private-key-block",
+      "message": "A PEM private key block is committed to the repository.",
+      "severity": "CRITICAL",
+      "category": "secret",
+      "languages": [
+        "*"
+      ],
+      "when": [
+        {
+          "pattern": "-----begin rsa private key-----",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-321"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "asvs": [
+        "v5.0.0-6.4.1"
+      ],
+      "recommendation": "Remove the key from source control, rotate it, and load keys from a secret manager.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/321.html"
+      ]
+    },
+    {
+      "id": "dede.any.secrets.aws-access-key",
+      "message": "AWS access key id committed in source.",
+      "severity": "CRITICAL",
+      "category": "secret",
+      "languages": [
+        "*"
+      ],
+      "when": [
+        {
+          "regex": "AKIA[0-9A-Z]{16}",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-798"
+      ],
+      "owasp": [
+        "A07:2025"
+      ],
+      "asvs": [
+        "v5.0.0-6.4.1"
+      ],
+      "recommendation": "Revoke and rotate the key; load credentials from environment or a secret manager.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/798.html"
+      ]
+    },
+    {
+      "id": "dede.any.secrets.generic-api-key",
+      "message": "Assignment of a long literal to an API key style variable.",
+      "severity": "HIGH",
+      "category": "secret",
+      "languages": [
+        "*"
+      ],
+      "when": [
+        {
+          "regex": "(?i)\\b(api[_-]?key|api[_-]?secret|secret[_-]?key|auth[_-]?token)\\b['\"]?\\s*[:=]\\s*['\"][a-z0-9_\\-/+=]{20,}['\"]",
+          "same_line": true,
+          "not_regex": "(?i)(?:process\\.env|os\\.environ|getenv|your_|xxx|example|changeme|<|\\$\\{)"
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-798"
+      ],
+      "owasp": [
+        "A07:2025"
+      ],
+      "asvs": [
+        "v5.0.0-6.4.1"
+      ],
+      "recommendation": "Move keys out of source into environment variables or a secret manager; rotate exposed values.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/798.html"
+      ]
+    },
+    {
+      "id": "dede.any.secrets.bearer-literal",
+      "message": "Hardcoded Authorization bearer token literal.",
+      "severity": "HIGH",
+      "category": "secret",
+      "languages": [
+        "*"
+      ],
+      "when": [
+        {
+          "regex": "(?i)(authorization['\"]?\\s*[:=]\\s*['\"]?bearer\\s+)[a-z0-9._\\-/+=]{16,}",
+          "same_line": true,
+          "not_regex": "(?i)(?:process\\.env|os\\.environ|getenv|your_|\\$\\{)"
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-798"
+      ],
+      "owasp": [
+        "A07:2025"
+      ],
+      "asvs": [
+        "v5.0.0-6.4.1"
+      ],
+      "recommendation": "Fetch tokens from configuration/secret storage at runtime instead of embedding them.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/798.html"
+      ]
+    }
+  ]
+}

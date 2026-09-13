@@ -1,0 +1,105 @@
+{
+  "bundle_count": 13,
+  "bundles": {
+    "advanced-dotnet.json": {
+      "modes": {
+        "document": 55
+      },
+      "rules": 55,
+      "sha256": "263e1f6464b9f6990376fa5c0d0e0d7920935a2b89512846e3df9168dda032cd"
+    },
+    "advanced-go.json": {
+      "modes": {
+        "line": 12
+      },
+      "rules": 12,
+      "sha256": "63900a6c98e6ef3a736a0d2f0db0c93c2dc42ceb96bfba0cad8ce1b8f4f92e65"
+    },
+    "advanced-infra.json": {
+      "modes": {
+        "line": 13
+      },
+      "rules": 13,
+      "sha256": "c2592c6357ad50d501fb1aa4828b0ff3232b1cf1042c8b34876add32d5163ffe"
+    },
+    "advanced-java.json": {
+      "modes": {
+        "line": 14
+      },
+      "rules": 14,
+      "sha256": "65af4c57e858dd3fbe03aafc4502b9811a7bd1c52899bbbab8a02d50472a1e05"
+    },
+    "advanced-javascript.json": {
+      "modes": {
+        "line": 15
+      },
+      "rules": 15,
+      "sha256": "23101418f363e61fa3ff72e081f0e269bc7514f9703e0b07b11e957ddfa4bcf1"
+    },
+    "advanced-languages.json": {
+      "modes": {
+        "document": 33
+      },
+      "rules": 33,
+      "sha256": "0570560d8bf9322c9b3e3a73bc306876b5740023c4d10e8490b0565ef577a632"
+    },
+    "advanced-platforms.json": {
+      "modes": {
+        "document": 1,
+        "line": 13
+      },
+      "rules": 14,
+      "sha256": "fc37997875ebfcbfa0ccfe57520b5c6e43a7417256003ed2ca04c746429c8e56"
+    },
+    "advanced-python.json": {
+      "modes": {
+        "line": 20
+      },
+      "rules": 20,
+      "sha256": "24c6a996aa613c7e6288d0b24ee921ddc8ea4ca064ad3ac1cad606217be0bc1e"
+    },
+    "advanced-secrets.json": {
+      "modes": {
+        "line": 14
+      },
+      "rules": 14,
+      "sha256": "9f177d4aabab710422c49452a40fc8349d3b1379612bcf43b8a308de971ef3cf"
+    },
+    "core.json": {
+      "modes": {
+        "line": 31
+      },
+      "rules": 31,
+      "sha256": "c9f29e1c3311db8f6bf3bdf1eec7fb2256a0032131e23a94393330be00e7dfb1"
+    },
+    "dotnet-flow.json": {
+      "modes": {
+        "taint": 11
+      },
+      "rules": 11,
+      "sha256": "facb3df877937892656fb1eed2ba917b4016037e2f28705fc599a9eaf1189cba"
+    },
+    "infra.json": {
+      "modes": {
+        "line": 11
+      },
+      "rules": 11,
+      "sha256": "b334d6a011a183323f63923476b02b0df7ae0c1df78ac37aa0b067e9875b084f"
+    },
+    "security-hardening.json": {
+      "modes": {
+        "line": 44
+      },
+      "rules": 44,
+      "sha256": "5b669e52c2aecc45073a81b981a85ce1e31c5a38daa60af3d15e5b1e2e2d2f5f"
+    }
+  },
+  "engine_version": "0.5.0",
+  "mode_counts": {
+    "document": 89,
+    "line": 187,
+    "taint": 11
+  },
+  "rule_count": 287,
+  "schema": 1
+}

@@ -1,0 +1,23 @@
+rules:
+  - id: dede.cpp.security.gets
+    message: "gets() is unsafe and can cause buffer overflows (CWE-120)."
+    languages: [c, cpp]
+    severity: ERROR
+    metadata:
+      cwe: ["CWE-120"]
+      owasp: ["A01:2021"]
+      category: security
+    pattern: gets(...)
+
+  - id: dede.cpp.security.strcpy
+    message: "strcpy/sprintf without bounds checking may overflow buffers (CWE-120)."
+    languages: [c, cpp]
+    severity: WARNING
+    metadata:
+      cwe: ["CWE-120"]
+      owasp: ["A01:2021"]
+      category: security
+    pattern-either:
+      - pattern: strcpy(...)
+      - pattern: sprintf(...)
+      - pattern: strcat(...)

@@ -1,0 +1,217 @@
+{% set f = view.finding %}
+{% from "_macros.html.j2" import source_tag %}
+<div class="finding-meta">
+  <div class="meta-item"><span class="meta-label">CWE</span>{{ view.cwe_display }}</div>
+  <div class="meta-item"><span class="meta-label">Confidence · Static analysis</span>{{ f.confidence.value }}</div>
+  <div class="meta-item"><span class="meta-label">OWASP</span>{{ view.owasp_display }}</div>
+  {% for standard, controls in f.standards|dictsort %}
+  <div class="meta-item"><span class="meta-label">{{ standard }}</span>{{ controls|join(', ') }}</div>
+  {% endfor %}
+  <div class="meta-item"><span class="meta-label">Status</span>{{ view.status }}</div>
+  <div class="meta-item"><span class="meta-label">File</span><span class="mono">{{ f.file }}</span></div>
+  <div class="meta-item"><span class="meta-label">Line</span>{{ f.start_line }}{% if f.end_line and f.end_line != f.start_line %}–{{ f.end_line }}{% endif %}</div>
+  <div class="meta-item"><span class="meta-label">Rule</span><span class="mono">{{ f.rule_id }}</span></div>
+  {% if f.analysis_kind %}
+  <div class="meta-item"><span class="meta-label">Detection method</span>{{ f.analysis_kind }}</div>
+  {% endif %}
+  <div class="meta-item"><span class="meta-label">Tools</span>{{ f.detected_by|join(', ') }}</div>
+  {% if f.precision %}<div class="meta-item"><span class="meta-label">Precision</span>{{ f.precision.value }}</div>{% endif %}
+  {% if f.confidence_score is not none %}<div class="meta-item"><span class="meta-label">Confidence score</span>{{ '%.0f'|format(f.confidence_score * 100) }}%</div>{% endif %}
+  {% if f.exploitability_score is not none %}<div class="meta-item"><span class="meta-label">Exploitability</span>{{ '%.0f'|format(f.exploitability_score) }}/100</div>{% endif %}
+  {% if f.reachable is not none %}<div class="meta-item"><span class="meta-label">Reachable</span>{{ 'YES' if f.reachable else 'NO' }}</div>{% endif %}
+  {% if f.source_kind %}<div class="meta-item"><span class="meta-label">Source</span>{{ f.source_kind }}</div>{% endif %}
+  {% if f.sink_kind %}<div class="meta-item"><span class="meta-label">Sink</span>{{ f.sink_kind }}</div>{% endif %}
+  {% if f.endpoint %}<div class="meta-item"><span class="meta-label">Endpoint</span>{{ f.http_method ~ ' ' if f.http_method else '' }}{{ f.endpoint }}</div>{% endif %}
+  {% if f.authentication_required is not none %}<div class="meta-item"><span class="meta-label">Authentication</span>{{ 'Required' if f.authentication_required else 'Not detected' }}</div>{% endif %}
+  {% if f.attack_surface %}<div class="meta-item"><span class="meta-label">Attack surface</span>{{ f.attack_surface|join(', ') }}</div>{% endif %}
+  {% if f.lifecycle_status %}<div class="meta-item"><span class="meta-label">Lifecycle</span>{{ f.lifecycle_status }}</div>{% endif %}
+  {% if f.query_matches %}<div class="meta-item"><span class="meta-label">DedeQL</span>{{ f.query_matches|join(', ') }}</div>{% endif %}
+  {% if f.feedback_verdict %}<div class="meta-item"><span class="meta-label">Organization feedback</span>{{ f.feedback_verdict }}{% if f.feedback_similarity %} · {{ '%.0f'|format(f.feedback_similarity * 100) }}% match{% endif %}</div>{% endif %}
+  {% if f.secret_occurrence_count %}<div class="meta-item"><span class="meta-label">Secret occurrences</span>{{ f.secret_occurrence_count }}</div>{% endif %}
+</div>
+
+{% if f.feedback_verdict %}
+<div class="callout neutral"><strong>Organization feedback:</strong> {{ f.feedback_verdict }}{% if f.feedback_reason %} · {{ f.feedback_reason }}{% endif %}. Feedback is advisory unless explicit auto-suppression policy is enabled.</div>
+{% endif %}
+
+{% if f.detected_by|length > 1 %}
+<div class="callout neutral consensus-callout"><strong>Multi-engine corroboration:</strong> {{ f.detected_by|join(', ') }}{% if f.correlation_score %} · correlation {{ '%.0f'|format(f.correlation_score * 100) }}%{% endif %}</div>
+{% endif %}
+
+{% if f.endpoint %}
+<div class="attack-surface-card">
+  <span class="method-pill">{{ f.http_method or 'ANY' }}</span>
+  <strong class="mono">{{ f.endpoint }}</strong>
+  <span>Auth: {% if f.authentication_required is sameas true %}required{% elif f.authentication_required is sameas false %}<strong>not detected</strong>{% else %}unknown{% endif %}</span>
+  <span>Exposure: {% if f.internet_exposed is sameas true %}<strong>internet</strong>{% elif f.internet_exposed is sameas false %}not asserted{% else %}unknown{% endif %}</span>
+</div>
+{% endif %}
+
+{% if f.attack_path %}
+<h3>Attack Path {{ source_tag('Static analysis') }}</h3>
+<ol class="attack-flow" aria-label="Attack path">
+  {% for step in f.attack_path %}<li><span class="attack-node mono">{{ step }}</span></li>{% endfor %}
+</ol>
+{% endif %}
+
+<h3>Engine Finding {{ source_tag('Static analysis') }}</h3>
+<p>{{ f.message }}</p>
+
+{% if f.ai_generated %}
+<h3>Application Static Verification {{ source_tag('Static analysis') }}</h3>
+<div class="callout {% if f.ai_validation_status == 'CORROBORATED' %}neutral{% else %}warn{% endif %}">
+  <strong>Review check: {{ f.ai_validation_status }}</strong>
+  <ul class="compact">{% for note in f.ai_validation_notes %}<li>{{ note }}</li>{% endfor %}</ul>
+  <strong>Proposed example check: {{ f.ai_fix_status }}</strong>
+  <ul class="compact">{% for note in f.ai_fix_notes %}<li>{{ note }}</li>{% endfor %}</ul>
+  <p>These are static checks, not proof of safety. Generated code and tests were not executed.</p>
+</div>
+<h3>AI Review — Advisory {{ source_tag('AI') }}</h3>
+<div class="callout warn">
+  <strong>{{ f.ai_verdict or 'Narrative enrichment' }}</strong>
+  {% if f.ai_model %} · Model: {{ f.ai_model }}{% endif %}
+  {% if f.ai_confidence is not none %} · Self-reported confidence: {{ '%.0f'|format(f.ai_confidence * 100) }}% (not calibrated){% endif %}
+  <p>AI-generated explanations and fixes require human validation. Engine severity, evidence and CI thresholds are unchanged.</p>
+</div>
+{% if f.ai_rationale %}<p>{{ f.ai_rationale }}</p>{% endif %}
+{% if f.false_positive_probability %}<p>AI-estimated false-positive likelihood: {{ f.false_positive_probability }}</p>{% endif %}
+{% if f.ai_assumptions %}<p><strong>Assumptions / missing context:</strong> {{ f.ai_assumptions }}</p>{% endif %}
+{% elif f.ai_status and f.ai_status != 'disabled' %}
+<p class="muted">AI review status: {{ f.ai_status }}. Static analyzer evidence remains available.</p>
+{% endif %}
+
+<h3>Risk {{ source_tag(view.risk_origin) }}</h3>
+{% if view.needs_review and not view.has_technical and not f.summary %}
+<div class="callout warn">
+  <strong>Needs Review</strong> — Narrative enrichment is not available for this finding.
+  Engine message: {{ f.message }}
+</div>
+{% else %}
+<p>{{ view.risk_text }}</p>
+{% endif %}
+
+{% if f.dataflow %}
+<h3>Data Flow Evidence {{ source_tag('Static analysis') }}</h3>
+<p class="muted">Locations supplied by the analysis engine. Static flow does not establish runtime exploitability.</p>
+<table class="data">
+  <thead><tr><th>Step</th><th>Location</th><th>Expression</th></tr></thead>
+  <tbody>
+  {% for step in f.dataflow %}
+    <tr><td>{{ step.kind }}</td><td class="mono">{{ step.file }}:{{ step.start_line }}</td><td class="mono">{{ step.content }}</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% elif f.analysis_kind == 'taint' %}
+<p class="muted">Detected by taint analysis. This engine output did not include a source-to-sink trace.</p>
+{% endif %}
+
+{% if f.evidence %}
+<h3>Structured Evidence {{ source_tag('Static analysis') }}</h3>
+<div class="evidence-grid">
+  {% for evidence in f.evidence %}
+  <div class="evidence-card"><span class="evidence-kind">{{ evidence.kind }}</span><span class="mono break-text">{{ evidence.value }}</span><span class="muted">{{ evidence.source }} · {{ '%.0f'|format(evidence.confidence * 100) }}%</span></div>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% if view.has_why %}
+<h3>Why This Matters {{ source_tag(view.why_origin) }}</h3>
+<p>{{ view.why_text }}</p>
+{% endif %}
+
+{% if view.code_lines %}
+<h3>Evidence {{ source_tag('Static analysis') }}</h3>
+<div class="code-panel">
+  <div class="code-panel-header">
+    <span>{{ f.file }}</span>
+    <span>lines around {{ f.start_line }}</span>
+  </div>
+  <table class="code-table">
+    {% for line in view.code_lines %}
+    <tr class="{% if line.vulnerable %}vuln{% endif %}">
+      <td class="ln">{{ line.number }}</td>
+      <td class="code">{{ line.text }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% elif f.code_snippet %}
+<h3>Evidence {{ source_tag('Static analysis') }}</h3>
+<pre>{{ f.code_snippet }}</pre>
+{% endif %}
+
+{% if view.has_technical %}
+<h3>Technical Analysis {{ source_tag(view.technical_origin) }}</h3>
+<p>{{ view.technical_text }}</p>
+{% endif %}
+
+{% if view.has_impact %}
+<h3>Impact {{ source_tag(view.impact_origin) }}</h3>
+<p>{{ view.impact_text }}</p>
+{% endif %}
+
+{% if f.attack_scenario %}
+<h3>Attack Scenario {{ source_tag('AI' if f.ai_generated else 'Static analysis') }}</h3>
+<div class="callout warn">
+  <p>{{ f.attack_scenario }}</p>
+  {% if f.ai_generated %}<p class="muted">This scenario is AI-generated and advisory only. It does not establish confirmed exploitability.</p>{% endif %}
+</div>
+{% endif %}
+
+{% if view.has_remediation %}
+<h3>Recommended Fix {{ source_tag(view.remediation_origin) }}</h3>
+<p>{{ view.remediation_text }}</p>
+{% if view.remediation_origin == 'AI' and f.recommendation %}
+<p>{{ source_tag('Static analysis') }} <strong>Engine recommendation:</strong> {{ f.recommendation }}</p>
+{% endif %}
+{% else %}
+<h3>Recommended Fix</h3>
+<div class="callout warn">
+  Specific remediation guidance was not generated for this finding. Review the rule documentation and apply a framework-appropriate fix, then re-scan.
+</div>
+{% endif %}
+
+{% if view.secure_example %}
+{% if view.secure_example_is_ai and f.ai_fix_status != 'CHECKS_PASSED' %}
+<p class="callout warn">AI proposal · Static check: {{ f.ai_fix_status }}. Displayed for review, not an approved fix.</p>
+{% endif %}
+<div class="code-panel">
+  <div class="code-panel-header">
+    <span>Code example {{ source_tag('AI' if view.secure_example_is_ai else 'Static analysis') }}</span>
+    <span>{% if view.secure_example_is_ai %}{{ f.ai_fix_status }} · model proposal{% else %}engine recommendation{% endif %}</span>
+  </div>
+  <table class="code-table">
+    {% if view.secure_lines %}
+      {% for line in view.secure_lines %}
+      <tr{% if not view.secure_example_is_ai or f.ai_fix_status == 'CHECKS_PASSED' %} class="secure"{% endif %}>
+        <td class="ln">{{ loop.index }}</td>
+        <td class="code">{{ line.text }}</td>
+      </tr>
+      {% endfor %}
+    {% else %}
+      <tr{% if not view.secure_example_is_ai or f.ai_fix_status == 'CHECKS_PASSED' %} class="secure"{% endif %}><td class="code">{{ view.secure_example }}</td></tr>
+    {% endif %}
+  </table>
+</div>
+{% endif %}
+
+<h3>Verification</h3>
+{% if f.ai_verification %}<p>{{ source_tag('AI') }} <strong>AI-suggested regression test:</strong> {{ f.ai_verification }}</p>{% endif %}
+<ol class="compact">
+  <li>Apply the recommended fix in the affected module.</li>
+  <li>Add or update tests covering the vulnerable input path where applicable.</li>
+  <li>Re-run Dede and confirm fingerprint <span class="mono">{{ f.fingerprint[:16] }}…</span> is absent or resolved.</li>
+</ol>
+
+{% if view.references %}
+<h3>References</h3>
+<ul class="compact">
+  {% for ref in view.references %}<li>{{ ref }}</li>{% endfor %}
+</ul>
+{% elif f.cwe or f.owasp %}
+<h3>References</h3>
+<ul class="compact">
+  {% for cwe in f.cwe %}<li>{{ cwe }}</li>{% endfor %}
+  {% for owasp in f.owasp %}<li>{{ owasp }}</li>{% endfor %}
+</ul>
+{% endif %}

@@ -1,0 +1,148 @@
+rules:
+  - id: dede.javascript.taint.command-injection
+    languages: [javascript, typescript]
+    mode: taint
+    severity: ERROR
+    message: "Request input reaches a shell command."
+    metadata:
+      cwe: ["CWE-78"]
+      category: security
+      confidence: HIGH
+      analysis: taint
+      recommendation: "Use execFile or spawn with a fixed executable and shell disabled."
+    pattern-sources:
+      - pattern-either:
+          - pattern: $REQ.query.$KEY
+          - pattern: $REQ.query[$KEY]
+          - pattern: $REQ.body.$KEY
+          - pattern: $REQ.body[$KEY]
+          - pattern: $REQ.params.$KEY
+          - pattern: $REQ.params[$KEY]
+        exact: true
+    pattern-sinks:
+      - patterns:
+          - pattern-either:
+              - pattern: child_process.exec($CMD, ...)
+              - pattern: child_process.execSync($CMD, ...)
+          - focus-metavariable: $CMD
+
+  - id: dede.javascript.taint.sql-injection
+    languages: [javascript, typescript]
+    mode: taint
+    severity: ERROR
+    message: "Request input reaches SQL query text."
+    metadata:
+      cwe: ["CWE-89"]
+      category: security
+      confidence: HIGH
+      analysis: taint
+      recommendation: "Use a constant SQL statement with bound parameters."
+    pattern-sources:
+      - pattern-either:
+          - pattern: $REQ.query.$KEY
+          - pattern: $REQ.query[$KEY]
+          - pattern: $REQ.body.$KEY
+          - pattern: $REQ.body[$KEY]
+          - pattern: $REQ.params.$KEY
+          - pattern: $REQ.params[$KEY]
+        exact: true
+    pattern-sinks:
+      - patterns:
+          - pattern-either:
+              - pattern: $DB.query($QUERY, ...)
+              - pattern: $DB.execute($QUERY, ...)
+          - focus-metavariable: $QUERY
+
+  - id: dede.javascript.taint.xss
+    languages: [javascript, typescript]
+    mode: taint
+    severity: ERROR
+    message: "Request input reaches an HTML response."
+    metadata:
+      cwe: ["CWE-79"]
+      category: security
+      confidence: HIGH
+      analysis: taint
+      recommendation: "Escape HTML output or use a maintained HTML sanitizer."
+    pattern-sources:
+      - pattern-either:
+          - pattern: $REQ.query.$KEY
+          - pattern: $REQ.query[$KEY]
+          - pattern: $REQ.body.$KEY
+          - pattern: $REQ.body[$KEY]
+          - pattern: $REQ.params.$KEY
+          - pattern: $REQ.params[$KEY]
+        exact: true
+    pattern-sinks:
+      - patterns:
+          - pattern-either:
+              - pattern: $RES.send($HTML)
+              - pattern: $RES.end($HTML)
+              - pattern: $ELEMENT.innerHTML = $HTML
+          - focus-metavariable: $HTML
+    pattern-sanitizers:
+      - patterns:
+          - pattern: DOMPurify.sanitize(...)
+          # Sanitization must not hide an HTML write evaluated inside its arguments.
+          - pattern-not: DOMPurify.sanitize(<... $RES.send(...) ...>, ...)
+          - pattern-not: DOMPurify.sanitize(<... $RES.end(...) ...>, ...)
+          - pattern-not: DOMPurify.sanitize(<... $ELEMENT.innerHTML = $HTML ...>, ...)
+        exact: false
+
+  - id: dede.javascript.taint.path-traversal
+    languages: [javascript, typescript]
+    mode: taint
+    severity: ERROR
+    message: "Request input reaches a filesystem path."
+    metadata:
+      cwe: ["CWE-22"]
+      category: security
+      confidence: HIGH
+      analysis: taint
+      recommendation: "Resolve the path and verify containment in an allowed base directory."
+    pattern-sources:
+      - pattern-either:
+          - pattern: $REQ.query.$KEY
+          - pattern: $REQ.query[$KEY]
+          - pattern: $REQ.body.$KEY
+          - pattern: $REQ.body[$KEY]
+          - pattern: $REQ.params.$KEY
+          - pattern: $REQ.params[$KEY]
+        exact: true
+    pattern-sinks:
+      - patterns:
+          - pattern-either:
+              - pattern: fs.readFile($PATH, ...)
+              - pattern: fs.readFileSync($PATH, ...)
+              - pattern: $RES.sendFile($PATH, ...)
+          - focus-metavariable: $PATH
+
+  - id: dede.javascript.taint.ssrf
+    languages: [javascript, typescript]
+    mode: taint
+    severity: ERROR
+    message: "Request input controls an outbound request URL."
+    metadata:
+      cwe: ["CWE-918"]
+      category: security
+      confidence: HIGH
+      analysis: taint
+      recommendation: "Allowlist destinations and schemes before making outbound requests."
+    pattern-sources:
+      - pattern-either:
+          - pattern: $REQ.query.$KEY
+          - pattern: $REQ.query[$KEY]
+          - pattern: $REQ.body.$KEY
+          - pattern: $REQ.body[$KEY]
+          - pattern: $REQ.params.$KEY
+          - pattern: $REQ.params[$KEY]
+        exact: true
+    pattern-sinks:
+      - patterns:
+          - pattern-either:
+              - pattern: fetch($URL, ...)
+              - pattern: axios.get($URL, ...)
+              - pattern: axios.post($URL, ...)
+              - pattern: http.get($URL, ...)
+              - pattern: https.get($URL, ...)
+          - focus-metavariable: $URL

@@ -1,0 +1,1085 @@
+rules:
+- id: dede.python.advanced.jinja-autoescape-disabled
+  languages:
+  - python
+  severity: WARNING
+  message: Jinja template autoescaping is explicitly disabled.
+  metadata:
+    category: security
+    confidence: MEDIUM
+    cwe:
+    - CWE-79
+    owasp:
+    - A05:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-1.2.1
+    recommendation: Enable select_autoescape for HTML/XML templates.
+    references:
+    - https://cwe.mitre.org/data/definitions/79.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+  pattern: jinja2.Environment(..., autoescape=False, ...)
+- id: dede.python.advanced.tar-unfiltered-extraction
+  languages:
+  - python
+  severity: ERROR
+  message: Tar extraction explicitly permits unrestricted paths and links.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-22
+    owasp:
+    - A01:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-5.3.3
+    recommendation: Use the data extraction filter and bounded archive handling.
+    references:
+    - https://cwe.mitre.org/data/definitions/22.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+  pattern: $TAR.extractall(..., filter="fully_trusted", ...)
+- id: dede.javascript.advanced.jwt-expiration-ignored
+  languages:
+  - javascript
+  - typescript
+  severity: ERROR
+  message: JWT verification ignores expiration.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-613
+    owasp:
+    - A07:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-9.2.1
+    recommendation: Keep expiration validation enabled.
+    references:
+    - https://cwe.mitre.org/data/definitions/613.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+  pattern: '$JWT.verify($TOKEN, $KEY, { ..., ignoreExpiration: true, ... }, ...)'
+- id: dede.javascript.advanced.session-cookie-insecure
+  languages:
+  - javascript
+  - typescript
+  severity: ERROR
+  message: Express session cookies explicitly disable Secure.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-614
+    owasp:
+    - A02:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-3.3.1
+    recommendation: Set Secure on session cookies and configure trusted proxies for HTTPS deployments.
+    references:
+    - https://cwe.mitre.org/data/definitions/614.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+  pattern: 'session({ ..., cookie: { ..., secure: false, ... }, ... })'
+- id: dede.java.advanced.ecb-cipher
+  languages:
+  - java
+  severity: ERROR
+  message: Java cipher uses ECB mode.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-327
+    owasp:
+    - A04:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-11.3.1
+    recommendation: Use AES/GCM/NoPadding with a unique nonce.
+    references:
+    - https://cwe.mitre.org/data/definitions/327.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+  pattern: javax.crypto.Cipher.getInstance("AES/ECB/PKCS5Padding")
+- id: dede.java.advanced.spring-csrf-disabled
+  languages:
+  - java
+  severity: WARNING
+  message: Spring CSRF protection is explicitly disabled.
+  metadata:
+    category: security
+    confidence: MEDIUM
+    cwe:
+    - CWE-352
+    owasp:
+    - A01:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-3.5.1
+    recommendation: Keep CSRF protection for browser-authenticated endpoints; review stateless API exemptions.
+    references:
+    - https://cwe.mitre.org/data/definitions/352.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+  pattern-either:
+  - pattern: $HTTP.csrf().disable()
+  - pattern: $HTTP.csrf($CSRF -> $CSRF.disable())
+- id: dede.go.advanced.tls-verification-disabled
+  languages:
+  - go
+  severity: ERROR
+  message: Go TLS certificate verification is disabled.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-295
+    owasp:
+    - A04:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-12.3.2
+    recommendation: Keep InsecureSkipVerify false; use trusted RootCAs for private services.
+    references:
+    - https://cwe.mitre.org/data/definitions/295.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+  pattern: 'tls.Config { ..., InsecureSkipVerify: true, ... }'
+- id: dede.go.advanced.ssh-host-key-unverified
+  languages:
+  - go
+  severity: ERROR
+  message: SSH host key verification accepts any host.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-295
+    owasp:
+    - A04:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-12.3.2
+    recommendation: Use knownhosts.New or an explicitly pinned host key.
+    references:
+    - https://cwe.mitre.org/data/definitions/295.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+  pattern: ssh.InsecureIgnoreHostKey()
+- id: dede.php.advanced.tls-peer-verification-disabled
+  languages:
+  - php
+  severity: ERROR
+  message: cURL TLS peer verification is disabled.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-295
+    owasp:
+    - A04:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-12.3.2
+    recommendation: Keep CURLOPT_SSL_VERIFYPEER enabled and validate hostnames.
+    references:
+    - https://cwe.mitre.org/data/definitions/295.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+  pattern-either:
+  - pattern: curl_setopt($C, CURLOPT_SSL_VERIFYPEER, false)
+  - pattern: curl_setopt($C, CURLOPT_SSL_VERIFYPEER, 0)
+- id: dede.php.advanced.session-httponly-disabled
+  languages:
+  - php
+  severity: ERROR
+  message: Session cookies are accessible to JavaScript.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-1004
+    owasp:
+    - A02:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-3.3.4
+    recommendation: Enable session.cookie_httponly.
+    references:
+    - https://cwe.mitre.org/data/definitions/1004.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+  pattern-either:
+  - pattern: ini_set("session.cookie_httponly", "0")
+  - pattern: ini_set("session.cookie_httponly", 0)
+- id: dede.ruby.advanced.tls-verification-disabled
+  languages:
+  - ruby
+  severity: ERROR
+  message: Ruby TLS verification is disabled.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-295
+    owasp:
+    - A04:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-12.3.2
+    recommendation: Use VERIFY_PEER and a trusted certificate store.
+    references:
+    - https://cwe.mitre.org/data/definitions/295.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+  pattern: $CLIENT.verify_mode = OpenSSL::SSL::VERIFY_NONE
+- id: dede.ruby.advanced.rails-mass-assignment
+  languages:
+  - ruby
+  severity: WARNING
+  message: Rails parameters bypass field allowlisting.
+  metadata:
+    category: security
+    confidence: MEDIUM
+    cwe:
+    - CWE-915
+    owasp:
+    - A01:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-15.3.3
+    recommendation: Use require and permit with an explicit field allowlist.
+    references:
+    - https://cwe.mitre.org/data/definitions/915.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+  pattern: params.permit!
+- id: dede.rust.advanced.tls-verification-disabled
+  languages:
+  - rust
+  severity: ERROR
+  message: Rust HTTP client accepts invalid TLS certificates.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-295
+    owasp:
+    - A04:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-12.3.2
+    recommendation: Keep certificate verification enabled.
+    references:
+    - https://cwe.mitre.org/data/definitions/295.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+  pattern: $B.danger_accept_invalid_certs(true)
+- id: dede.rust.advanced.hostname-verification-disabled
+  languages:
+  - rust
+  severity: ERROR
+  message: Rust HTTP client accepts invalid TLS hostnames.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-297
+    owasp:
+    - A04:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-12.3.2
+    recommendation: Keep hostname verification enabled.
+    references:
+    - https://cwe.mitre.org/data/definitions/297.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+  pattern: $B.danger_accept_invalid_hostnames(true)
+- id: dede.c.advanced.unbounded-input
+  languages:
+  - c
+  - cpp
+  severity: ERROR
+  message: scanf string input has no width limit and can overflow its destination.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-120
+    owasp:
+    - A05:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-1.4.1
+    recommendation: Specify a width smaller than the buffer or use bounded line input.
+    references:
+    - https://cwe.mitre.org/data/definitions/120.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+  pattern: scanf("%s", $BUFFER)
+- id: dede.c.advanced.uncontrolled-format-string
+  languages:
+  - c
+  - cpp
+  severity: ERROR
+  message: A command-line value controls printf format text.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-134
+    owasp:
+    - A05:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-1.3.10
+    recommendation: Use a constant format string such as %s.
+    references:
+    - https://cwe.mitre.org/data/definitions/134.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+    analysis: taint
+  mode: taint
+  pattern-sources:
+  - pattern: argv[$INDEX]
+    exact: true
+  pattern-sinks:
+  - patterns:
+    - pattern: printf($INPUT, ...)
+    - focus-metavariable: $INPUT
+- id: dede.kotlin.advanced.webview-file-access
+  languages:
+  - kotlin
+  severity: ERROR
+  message: Android WebView permits file-origin access to arbitrary origins.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-749
+    owasp:
+    - A02:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-3.5.4
+    recommendation: Disable universal access from file URLs.
+    references:
+    - https://cwe.mitre.org/data/definitions/749.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+  pattern-either:
+  - pattern: $S.setAllowUniversalAccessFromFileURLs(true)
+  - pattern: $S.allowUniversalAccessFromFileURLs = true
+- id: dede.kotlin.advanced.ecb-cipher
+  languages:
+  - kotlin
+  severity: ERROR
+  message: Kotlin cipher uses ECB mode.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-327
+    owasp:
+    - A04:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-11.3.1
+    recommendation: Use authenticated AES-GCM encryption.
+    references:
+    - https://cwe.mitre.org/data/definitions/327.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+  pattern: javax.crypto.Cipher.getInstance("AES/ECB/PKCS5Padding")
+- id: dede.scala.advanced.ecb-cipher
+  languages:
+  - scala
+  severity: ERROR
+  message: Scala cipher uses ECB mode.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-327
+    owasp:
+    - A04:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-11.3.1
+    recommendation: Use authenticated AES-GCM encryption.
+    references:
+    - https://cwe.mitre.org/data/definitions/327.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+  pattern: javax.crypto.Cipher.getInstance("AES/ECB/PKCS5Padding")
+- id: dede.swift.advanced.webview-file-access
+  languages:
+  - swift
+  severity: ERROR
+  message: WebKit preferences enable unrestricted file access.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-749
+    owasp:
+    - A02:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-3.5.4
+    recommendation: Avoid enabling private WebKit file-access preferences.
+    references:
+    - https://cwe.mitre.org/data/definitions/749.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+  pattern: '$P.setValue(true, forKey: "allowUniversalAccessFromFileURLs")'
+- id: dede.bash.advanced.curl-tls-unverified
+  languages:
+  - bash
+  severity: ERROR
+  message: curl disables certificate verification.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-295
+    owasp:
+    - A04:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-12.3.2
+    recommendation: Remove insecure flags and configure the correct CA bundle.
+    references:
+    - https://cwe.mitre.org/data/definitions/295.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+  pattern-either:
+  - pattern: curl ... --insecure ...
+  - pattern: curl ... -k ...
+- id: dede.lua.advanced.request-code-execution
+  languages:
+  - lua
+  severity: ERROR
+  message: An Nginx request argument is compiled as Lua code.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-94
+    owasp:
+    - A05:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-1.3.2
+    recommendation: Replace dynamic compilation with explicit allowed operations.
+    references:
+    - https://cwe.mitre.org/data/definitions/94.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+  pattern-either:
+  - pattern: loadstring(ngx.var.arg_code, ...)
+  - pattern: load(ngx.var.arg_code, ...)
+- id: dede.elixir.advanced.request-code-execution
+  languages:
+  - generic
+  severity: WARNING
+  message: Phoenix request parameters are passed directly to code evaluation.
+  metadata:
+    category: security
+    confidence: MEDIUM
+    cwe:
+    - CWE-94
+    owasp:
+    - A05:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-1.3.2
+    recommendation: Use an allowlist of operations instead of evaluating user code.
+    references:
+    - https://cwe.mitre.org/data/definitions/94.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+    analysis: regex
+  pattern-regex: (?m)^[ \t]*Code\.eval_string\(conn\.params\[
+  paths:
+    include:
+    - '*.ex'
+    - '*.exs'
+- id: dede.clojure.advanced.reader-eval-enabled
+  languages:
+  - clojure
+  severity: ERROR
+  message: Clojure reader evaluation is explicitly enabled.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-94
+    owasp:
+    - A05:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-1.3.2
+    recommendation: Use clojure.edn/read-string for data and keep *read-eval* false.
+    references:
+    - https://cwe.mitre.org/data/definitions/94.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+  pattern: (binding [*read-eval* true] ...)
+- id: dede.ocaml.advanced.untrusted-command
+  languages:
+  - ocaml
+  severity: ERROR
+  message: Command-line input reaches a shell command.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-78
+    owasp:
+    - A05:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-1.2.5
+    recommendation: Use a fixed executable with a separate validated argument array.
+    references:
+    - https://cwe.mitre.org/data/definitions/78.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+    analysis: taint
+  mode: taint
+  pattern-sources:
+  - pattern: Sys.argv.($INDEX)
+    exact: true
+  pattern-sinks:
+  - patterns:
+    - pattern: Sys.command $INPUT
+    - focus-metavariable: $INPUT
+- id: dede.solidity.advanced.tx-origin-auth
+  languages:
+  - solidity
+  severity: ERROR
+  message: Authorization compares tx.origin, allowing intermediary contract abuse.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-807
+    owasp:
+    - A01:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-8.3.1
+    recommendation: Authorize the immediate caller with msg.sender and explicit roles.
+    references:
+    - https://cwe.mitre.org/data/definitions/807.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+  pattern-either:
+  - pattern: require(tx.origin == $OWNER, ...)
+  - pattern: require($OWNER == tx.origin, ...)
+- id: dede.apex.advanced.soql-injection
+  languages:
+  - generic
+  severity: WARNING
+  message: Visualforce request parameters are concatenated directly into a SOQL query.
+  metadata:
+    category: security
+    confidence: MEDIUM
+    cwe:
+    - CWE-89
+    owasp:
+    - A05:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-1.2.4
+    recommendation: Use bind variables or Database.queryWithBinds with enforced access checks.
+    references:
+    - https://cwe.mitre.org/data/definitions/89.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+    analysis: regex
+  pattern-regex: (?m)^[ \t]*Database\.query\([^;\n]*\+\s*ApexPages\.currentPage\(\)\.getParameters\(\)\.get\(
+  paths:
+    include:
+    - '*.cls'
+- id: dede.powershell.advanced.tls-check-skipped
+  languages:
+  - generic
+  severity: WARNING
+  message: PowerShell web requests skip TLS certificate checks.
+  metadata:
+    category: security
+    confidence: MEDIUM
+    cwe:
+    - CWE-295
+    owasp:
+    - A04:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-12.3.2
+    recommendation: Remove SkipCertificateCheck and configure trusted CAs.
+    references:
+    - https://cwe.mitre.org/data/definitions/295.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+    analysis: regex
+  pattern-regex: (?im)^[ \t]*(?:Invoke-WebRequest|Invoke-RestMethod|iwr|irm)\b[^\n]*[ \t]-SkipCertificateCheck\b(?![
+    \t]*:[ \t]*\$false\b)
+  paths:
+    include:
+    - '*.ps1'
+    - '*.psm1'
+- id: dede.powershell.advanced.download-execute
+  languages:
+  - generic
+  severity: WARNING
+  message: Downloaded content is piped into PowerShell evaluation.
+  metadata:
+    category: security
+    confidence: MEDIUM
+    cwe:
+    - CWE-94
+    owasp:
+    - A05:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-1.3.2
+    recommendation: Download separately and verify provenance and integrity before any execution.
+    references:
+    - https://cwe.mitre.org/data/definitions/94.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+    analysis: regex
+  pattern-regex: (?im)^[ \t]*(?:Invoke-WebRequest|Invoke-RestMethod|iwr|irm)\b[^\n]*\|\s*(?:Invoke-Expression|iex)\b
+  paths:
+    include:
+    - '*.ps1'
+    - '*.psm1'
+- id: dede.vbnet.advanced.vb-json-type-handling
+  languages:
+  - generic
+  severity: WARNING
+  message: Visual Basic enables polymorphic Json.NET deserialization.
+  metadata:
+    category: security
+    confidence: MEDIUM
+    cwe:
+    - CWE-502
+    owasp:
+    - A08:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-1.5.2
+    recommendation: Prefer TypeNameHandling.None; review strict type allowlists where polymorphism is
+      required.
+    references:
+    - https://cwe.mitre.org/data/definitions/502.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+    analysis: regex
+  pattern-regex: (?im)^[ \t]*(?:\w+\.)?TypeNameHandling\s*=\s*(?:Newtonsoft\.Json\.)?TypeNameHandling\.(?:All|Auto|Objects|Arrays)\b
+  paths:
+    include:
+    - '*.vb'
+- id: dede.vbnet.advanced.vb-jwt-signature-disabled
+  languages:
+  - generic
+  severity: WARNING
+  message: Visual Basic disables JWT signature requirements.
+  metadata:
+    category: security
+    confidence: MEDIUM
+    cwe:
+    - CWE-347
+    owasp:
+    - A07:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-9.1.1
+    recommendation: Require signed tokens and validate trusted issuer signatures.
+    references:
+    - https://cwe.mitre.org/data/definitions/347.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+    analysis: regex
+  pattern-regex: (?im)^[ \t]*(?:\w+\.)?RequireSignedTokens\s*=\s*False\b
+  paths:
+    include:
+    - '*.vb'
+- id: dede.fsharp.advanced.fsharp-tls-validation-disabled
+  languages:
+  - generic
+  severity: WARNING
+  message: F# accepts any server TLS certificate.
+  metadata:
+    category: security
+    confidence: MEDIUM
+    cwe:
+    - CWE-295
+    owasp:
+    - A04:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-12.3.2
+    recommendation: Retain certificate chain and hostname validation.
+    references:
+    - https://cwe.mitre.org/data/definitions/295.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+    analysis: regex
+  pattern-regex: (?m)^[ \t]*\w+\.ServerCertificateCustomValidationCallback\s*<-\s*HttpClientHandler\.DangerousAcceptAnyServerCertificateValidator\b
+  paths:
+    include:
+    - '*.fs'
+    - '*.fsx'
+- id: dede.fsharp.advanced.fsharp-json-type-handling
+  languages:
+  - generic
+  severity: WARNING
+  message: F# enables polymorphic Json.NET deserialization.
+  metadata:
+    category: security
+    confidence: MEDIUM
+    cwe:
+    - CWE-502
+    owasp:
+    - A08:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-1.5.2
+    recommendation: Prefer TypeNameHandling.None and use a strict type binder for intentional polymorphism.
+    references:
+    - https://cwe.mitre.org/data/definitions/502.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+    analysis: regex
+  pattern-regex: (?m)^[ \t]*\w+\.TypeNameHandling\s*<-\s*TypeNameHandling\.(?:All|Auto|Objects|Arrays)\b
+  paths:
+    include:
+    - '*.fs'
+    - '*.fsx'
+- id: dede.dart.advanced.dart-tls-validation-disabled
+  languages:
+  - generic
+  severity: WARNING
+  message: Dart certificate validation callback accepts all certificates.
+  metadata:
+    category: security
+    confidence: MEDIUM
+    cwe:
+    - CWE-295
+    owasp:
+    - A04:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-12.3.2
+    recommendation: Retain platform TLS verification.
+    references:
+    - https://cwe.mitre.org/data/definitions/295.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+    analysis: regex
+  pattern-regex: (?m)^[ \t]*\w+\.badCertificateCallback\s*=\s*\([^\n)]*\)\s*=>\s*true\s*;
+  paths:
+    include:
+    - '*.dart'
+- id: dede.dart.advanced.dart-webview-unrestricted-js
+  languages:
+  - generic
+  severity: WARNING
+  message: Dart WebView enables unrestricted JavaScript; review loaded content and bridges.
+  metadata:
+    category: security
+    confidence: MEDIUM
+    cwe:
+    - CWE-749
+    owasp:
+    - A02:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-3.5.4
+    recommendation: Disable JavaScript unless required and allowlist navigations and native bridges.
+    references:
+    - https://cwe.mitre.org/data/definitions/749.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+    analysis: regex
+  pattern-regex: (?m)^[ \t]*\w+\.setJavaScriptMode\(JavaScriptMode\.unrestricted\)
+  paths:
+    include:
+    - '*.dart'
+- id: dede.sql.advanced.sql-command-shell-enabled
+  languages:
+  - generic
+  severity: WARNING
+  message: SQL Server enables the operating system command shell.
+  metadata:
+    category: security
+    confidence: MEDIUM
+    cwe:
+    - CWE-78
+    owasp:
+    - A02:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-1.2.5
+    recommendation: Keep xp_cmdshell disabled and use narrowly privileged job services.
+    references:
+    - https://cwe.mitre.org/data/definitions/78.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+    analysis: regex
+  pattern-regex: (?im)^[ \t]*EXEC(?:UTE)?[ \t]+(?:sys\.)?sp_configure[ \t]+'xp_cmdshell'[ \t]*,[ \t]*1\b
+  paths:
+    include:
+    - '*.sql'
+- id: dede.sql.advanced.sql-trustworthy-enabled
+  languages:
+  - generic
+  severity: WARNING
+  message: SQL Server database TRUSTWORTHY is enabled.
+  metadata:
+    category: security
+    confidence: MEDIUM
+    cwe:
+    - CWE-269
+    owasp:
+    - A02:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-8.2.1
+    recommendation: Keep TRUSTWORTHY off and use signed modules with minimal permissions.
+    references:
+    - https://cwe.mitre.org/data/definitions/269.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+    analysis: regex
+  pattern-regex: (?im)^[ \t]*ALTER[ \t]+DATABASE[ \t]+(?:\[[^\]\n]+\]|\w+)[ \t]+SET[ \t]+TRUSTWORTHY[
+    \t]+ON\b
+  paths:
+    include:
+    - '*.sql'
+- id: dede.perl.advanced.perl-tls-verification-disabled
+  languages:
+  - generic
+  severity: WARNING
+  message: Perl HTTP client disables hostname verification.
+  metadata:
+    category: security
+    confidence: MEDIUM
+    cwe:
+    - CWE-295
+    owasp:
+    - A04:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-12.3.2
+    recommendation: Enable TLS hostname and certificate verification.
+    references:
+    - https://cwe.mitre.org/data/definitions/295.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+    analysis: regex
+  pattern-regex: (?m)^[ \t]*\$\w+->ssl_opts\([^\n]*verify_hostname\s*=>\s*0\b
+  paths:
+    include:
+    - '*.pl'
+    - '*.pm'
+- id: dede.hcl.advanced.terraform-public-ssh
+  languages:
+  - hcl
+  severity: ERROR
+  message: Security group exposes SSH to every IPv4 address.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-284
+    owasp:
+    - A01:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-8.2.1
+    recommendation: Restrict administrative access to authorized networks.
+    references:
+    - https://cwe.mitre.org/data/definitions/284.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+  patterns:
+  - pattern: resource "aws_security_group" $NAME { ... ingress { ... from_port = 22 ... to_port = 22 ...
+      cidr_blocks = [..., "0.0.0.0/0", ...] ... } ... }
+- id: dede.yaml.advanced.kubernetes-host-pid
+  languages:
+  - yaml
+  severity: ERROR
+  message: Kubernetes pod shares the host process namespace.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-250
+    owasp:
+    - A02:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-8.2.1
+    recommendation: Keep hostPID false and enforce a restricted pod security policy.
+    references:
+    - https://cwe.mitre.org/data/definitions/250.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+  patterns:
+  - pattern-inside: 'apiVersion: $VERSION
+
+      kind: Pod
+
+      ...'
+  - pattern: 'hostPID: true'
+- id: dede.dockerfile.advanced.docker-tls-unverified
+  languages:
+  - dockerfile
+  severity: ERROR
+  message: Docker build downloads disable TLS validation.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-295
+    owasp:
+    - A04:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-12.3.2
+    recommendation: Use verified HTTPS downloads with trusted CAs and pinned integrity checks.
+    references:
+    - https://cwe.mitre.org/data/definitions/295.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+  pattern: RUN curl ... --insecure ...
+- id: dede.xml.advanced.aspnet-debug-enabled
+  languages:
+  - generic
+  severity: WARNING
+  message: ASP.NET compilation debugging is explicitly enabled.
+  metadata:
+    category: security
+    confidence: MEDIUM
+    cwe:
+    - CWE-489
+    owasp:
+    - A02:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-13.4.2
+    recommendation: Disable compilation debug mode in deployed configurations.
+    references:
+    - https://cwe.mitre.org/data/definitions/489.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+    analysis: regex
+  pattern-regex: (?im)^[ \t]*<compilation\b[^>\n]*\bdebug\s*=\s*[\'"]true[\'"]
+  paths:
+    include:
+    - '*.config'
+    - '*.xml'
+- id: dede.xml.advanced.aspnet-viewstate-mac-disabled
+  languages:
+  - generic
+  severity: WARNING
+  message: ASP.NET ViewState integrity validation is disabled.
+  metadata:
+    category: security
+    confidence: MEDIUM
+    cwe:
+    - CWE-345
+    owasp:
+    - A08:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-9.1.1
+    recommendation: Keep ViewState MAC validation enabled.
+    references:
+    - https://cwe.mitre.org/data/definitions/345.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+    analysis: regex
+  pattern-regex: (?im)^[ \t]*<pages\b[^>\n]*\benableViewStateMac\s*=\s*[\'"]false[\'"]
+  paths:
+    include:
+    - '*.config'
+    - '*.xml'
+- id: dede.json.advanced.npm-tls-disabled
+  languages:
+  - json
+  severity: ERROR
+  message: npm configuration disables strict TLS verification.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-295
+    owasp:
+    - A04:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-12.3.2
+    recommendation: Keep strict-ssl enabled and configure the trusted CA.
+    references:
+    - https://cwe.mitre.org/data/definitions/295.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+  pattern: '"strict-ssl": false'
+- id: dede.toml.advanced.poetry-tls-disabled
+  languages:
+  - generic
+  severity: WARNING
+  message: Poetry repository certificate verification is disabled.
+  metadata:
+    category: security
+    confidence: MEDIUM
+    cwe:
+    - CWE-295
+    owasp:
+    - A04:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-12.3.2
+    recommendation: Configure the repository CA instead of disabling verification.
+    references:
+    - https://cwe.mitre.org/data/definitions/295.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+    analysis: regex
+  pattern-regex: (?m)^\[certificates\.[\w.-]+\][ \t]*\r?\n(?:[ \t]*(?:#[^\n]*)?\r?\n)*[ \t]*cert[ \t]*=[
+    \t]*false\b
+  paths:
+    include:
+    - '*.toml'
+- id: dede.html.advanced.angular-trusted-html
+  languages:
+  - html
+  severity: WARNING
+  message: AngularJS template disables sanitization for HTML binding.
+  metadata:
+    category: security
+    confidence: MEDIUM
+    cwe:
+    - CWE-79
+    owasp:
+    - A05:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-1.2.1
+    recommendation: Use sanitized HTML binding or escaped text content.
+    references:
+    - https://cwe.mitre.org/data/definitions/79.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+  pattern: < $TAG ... ng-bind-html-unsafe=$VALUE ... > ... </ $TAG >

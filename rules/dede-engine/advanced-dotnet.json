@@ -1,0 +1,1712 @@
+{
+  "schema": 1,
+  "rules": [
+    {
+      "id": "dede.dotnet.deserialization.losformatter",
+      "message": "Deserialization losformatter requires security review.",
+      "languages": [
+        "c#",
+        "visual basic",
+        "f#",
+        "razor"
+      ],
+      "severity": "HIGH",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)\\b(?:new|New)\\s+(?:[\\w]+\\.)*LosFormatter\\s*\\("
+        }
+      ],
+      "cwe": [
+        "CWE-502"
+      ],
+      "owasp": [
+        "A08:2025"
+      ],
+      "recommendation": "Replace this object-graph deserializer with a schema-bound format such as System.Text.Json; never deserialize attacker-controlled object graphs.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca2305"
+      ],
+      "standards": {
+        "microsoft-dotnet": [
+          "CA2305"
+        ]
+      }
+    },
+    {
+      "id": "dede.dotnet.deserialization.objectstateformatter",
+      "message": "Deserialization objectstateformatter requires security review.",
+      "languages": [
+        "c#",
+        "visual basic",
+        "f#",
+        "razor"
+      ],
+      "severity": "HIGH",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)\\b(?:new|New)\\s+(?:[\\w]+\\.)*ObjectStateFormatter\\s*\\("
+        }
+      ],
+      "cwe": [
+        "CWE-502"
+      ],
+      "owasp": [
+        "A08:2025"
+      ],
+      "recommendation": "Replace this object-graph deserializer with a schema-bound format such as System.Text.Json; never deserialize attacker-controlled object graphs.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca2310"
+      ],
+      "standards": {
+        "microsoft-dotnet": [
+          "CA2310"
+        ]
+      }
+    },
+    {
+      "id": "dede.dotnet.deserialization.netdatacontractserializer",
+      "message": "Deserialization netdatacontractserializer requires security review.",
+      "languages": [
+        "c#",
+        "visual basic",
+        "f#",
+        "razor"
+      ],
+      "severity": "HIGH",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)\\b(?:new|New)\\s+(?:[\\w]+\\.)*NetDataContractSerializer\\s*\\("
+        }
+      ],
+      "cwe": [
+        "CWE-502"
+      ],
+      "owasp": [
+        "A08:2025"
+      ],
+      "recommendation": "Replace this object-graph deserializer with a schema-bound format such as System.Text.Json; never deserialize attacker-controlled object graphs.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca2315"
+      ],
+      "standards": {
+        "microsoft-dotnet": [
+          "CA2315"
+        ]
+      }
+    },
+    {
+      "id": "dede.dotnet.deserialization.simple-type-resolver",
+      "message": "Deserialization simple type resolver requires security review.",
+      "languages": [
+        "c#",
+        "visual basic",
+        "f#",
+        "razor"
+      ],
+      "severity": "HIGH",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)\\bnew\\s+(?:[\\w]+\\.)*SimpleTypeResolver\\s*\\("
+        }
+      ],
+      "cwe": [
+        "CWE-502"
+      ],
+      "owasp": [
+        "A08:2025"
+      ],
+      "recommendation": "Avoid runtime type resolution from input. Deserialize into a fixed application type.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca2321"
+      ],
+      "standards": {
+        "microsoft-dotnet": [
+          "CA2321"
+        ]
+      }
+    },
+    {
+      "id": "dede.dotnet.deserialization.json-type-name",
+      "message": "Deserialization json type name requires security review.",
+      "languages": [
+        "c#",
+        "visual basic",
+        "f#",
+        "razor"
+      ],
+      "severity": "HIGH",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)\\bTypeNameHandling\\s*(?:=|<-)\\s*(?:(?:[\\w]+\\.)*TypeNameHandling\\s*\\.\\s*(?:All|Auto|Objects|Arrays)|[1-4])\\b"
+        }
+      ],
+      "cwe": [
+        "CWE-502"
+      ],
+      "owasp": [
+        "A08:2025"
+      ],
+      "recommendation": "Keep TypeNameHandling.None for untrusted JSON. If legacy polymorphism is essential, use a restrictive type binder and authenticate the source.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca2326"
+      ],
+      "standards": {
+        "microsoft-dotnet": [
+          "CA2326"
+        ]
+      }
+    },
+    {
+      "id": "dede.dotnet.jwt.require-signed-tokens",
+      "message": "Jwt require signed tokens requires security review.",
+      "languages": [
+        "c#",
+        "visual basic",
+        "f#",
+        "razor"
+      ],
+      "severity": "HIGH",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)\\bRequireSignedTokens\\s*(?:=|<-)\\s*false\\b"
+        }
+      ],
+      "cwe": [
+        "CWE-347"
+      ],
+      "owasp": [
+        "A07:2025"
+      ],
+      "recommendation": "Enable RequireSignedTokens and configure trusted signing keys, issuer, audience and appropriate token lifetime validation.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/api/microsoft.identitymodel.tokens.tokenvalidationparameters"
+      ]
+    },
+    {
+      "id": "dede.dotnet.jwt.validate-issuer-signing-key",
+      "message": "Jwt validate issuer signing key requires security review.",
+      "languages": [
+        "c#",
+        "visual basic",
+        "f#",
+        "razor"
+      ],
+      "severity": "HIGH",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)\\bValidateIssuerSigningKey\\s*(?:=|<-)\\s*false\\b"
+        }
+      ],
+      "cwe": [
+        "CWE-347"
+      ],
+      "owasp": [
+        "A07:2025"
+      ],
+      "recommendation": "Enable ValidateIssuerSigningKey and configure trusted signing keys, issuer, audience and appropriate token lifetime validation.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/api/microsoft.identitymodel.tokens.tokenvalidationparameters"
+      ]
+    },
+    {
+      "id": "dede.dotnet.jwt.validate-lifetime",
+      "message": "Jwt validate lifetime requires security review.",
+      "languages": [
+        "c#",
+        "visual basic",
+        "f#",
+        "razor"
+      ],
+      "severity": "HIGH",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)\\bValidateLifetime\\s*(?:=|<-)\\s*false\\b"
+        }
+      ],
+      "cwe": [
+        "CWE-287"
+      ],
+      "owasp": [
+        "A07:2025"
+      ],
+      "recommendation": "Enable ValidateLifetime and configure trusted signing keys, issuer, audience and appropriate token lifetime validation.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/api/microsoft.identitymodel.tokens.tokenvalidationparameters"
+      ]
+    },
+    {
+      "id": "dede.dotnet.jwt.validate-audience",
+      "message": "Jwt validate audience requires security review.",
+      "languages": [
+        "c#",
+        "visual basic",
+        "f#",
+        "razor"
+      ],
+      "severity": "HIGH",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)\\bValidateAudience\\s*(?:=|<-)\\s*false\\b"
+        }
+      ],
+      "cwe": [
+        "CWE-287"
+      ],
+      "owasp": [
+        "A07:2025"
+      ],
+      "recommendation": "Enable ValidateAudience and configure trusted signing keys, issuer, audience and appropriate token lifetime validation.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/api/microsoft.identitymodel.tokens.tokenvalidationparameters"
+      ]
+    },
+    {
+      "id": "dede.dotnet.jwt.validate-issuer",
+      "message": "Jwt validate issuer requires security review.",
+      "languages": [
+        "c#",
+        "visual basic",
+        "f#",
+        "razor"
+      ],
+      "severity": "HIGH",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)\\bValidateIssuer\\s*(?:=|<-)\\s*false\\b"
+        }
+      ],
+      "cwe": [
+        "CWE-287"
+      ],
+      "owasp": [
+        "A07:2025"
+      ],
+      "recommendation": "Enable ValidateIssuer and configure trusted signing keys, issuer, audience and appropriate token lifetime validation.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/api/microsoft.identitymodel.tokens.tokenvalidationparameters"
+      ]
+    },
+    {
+      "id": "dede.dotnet.jwt.require-expiration-time",
+      "message": "Jwt require expiration time requires security review.",
+      "languages": [
+        "c#",
+        "visual basic",
+        "f#",
+        "razor"
+      ],
+      "severity": "HIGH",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)\\bRequireExpirationTime\\s*(?:=|<-)\\s*false\\b"
+        }
+      ],
+      "cwe": [
+        "CWE-287"
+      ],
+      "owasp": [
+        "A07:2025"
+      ],
+      "recommendation": "Enable RequireExpirationTime and configure trusted signing keys, issuer, audience and appropriate token lifetime validation.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/api/microsoft.identitymodel.tokens.tokenvalidationparameters"
+      ]
+    },
+    {
+      "id": "dede.dotnet.tls.accept-any-certificate",
+      "message": "Tls accept any certificate requires security review.",
+      "languages": [
+        "c#",
+        "visual basic",
+        "f#",
+        "razor"
+      ],
+      "severity": "HIGH",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)\\bDangerousAcceptAnyServerCertificateValidator\\b"
+        }
+      ],
+      "cwe": [
+        "CWE-295"
+      ],
+      "owasp": [
+        "A04:2025"
+      ],
+      "recommendation": "Use platform certificate chain and hostname validation; trust development certificates explicitly instead of accepting all certificates.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca5359"
+      ],
+      "standards": {
+        "microsoft-dotnet": [
+          "CA5359"
+        ]
+      }
+    },
+    {
+      "id": "dede.dotnet.tls.callback-always-true",
+      "message": "Tls callback always true requires security review.",
+      "languages": [
+        "c#",
+        "visual basic",
+        "f#",
+        "razor"
+      ],
+      "severity": "HIGH",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)\\b(?:ServerCertificateValidationCallback|ServerCertificateCustomValidationCallback|RemoteCertificateValidationCallback)\\s*(?:\\+?=|<-)\\s*(?:\\([^;{}]*?\\)\\s*=>\\s*(?:true\\b|\\{\\s*return\\s+true\\s*;)|Function\\s*\\([^\\n]*\\)\\s*True\\b|\\(?\\s*fun\\b[^;\\n]*->\\s*true\\b)"
+        }
+      ],
+      "cwe": [
+        "CWE-295"
+      ],
+      "owasp": [
+        "A04:2025"
+      ],
+      "recommendation": "Preserve certificate-chain and hostname checks; a callback must reject validation errors.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca5359"
+      ],
+      "standards": {
+        "microsoft-dotnet": [
+          "CA5359"
+        ]
+      }
+    },
+    {
+      "id": "dede.dotnet.tls.revocation-disabled",
+      "message": "Tls revocation disabled requires security review.",
+      "languages": [
+        "c#",
+        "visual basic",
+        "f#",
+        "razor"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)\\bCheckCertificateRevocationList\\s*(?:=|<-)\\s*false\\b"
+        }
+      ],
+      "cwe": [
+        "CWE-295"
+      ],
+      "owasp": [
+        "A04:2025"
+      ],
+      "recommendation": "Enable certificate revocation checking where supported and make revocation failures visible.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca5399"
+      ],
+      "standards": {
+        "microsoft-dotnet": [
+          "CA5399"
+        ]
+      }
+    },
+    {
+      "id": "dede.dotnet.tls.obsolete-protocol",
+      "message": "Tls obsolete protocol requires security review.",
+      "languages": [
+        "c#",
+        "visual basic",
+        "f#",
+        "razor"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)\\b(?:SslProtocols|SecurityProtocolType)\\s*\\.\\s*(?:Ssl2|Ssl3|Tls|Tls11)\\b"
+        }
+      ],
+      "cwe": [
+        "CWE-327"
+      ],
+      "owasp": [
+        "A04:2025"
+      ],
+      "recommendation": "Use system-default modern TLS policy or explicitly require TLS 1.2/1.3 when the deployment requires a fixed policy.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca5364"
+      ],
+      "standards": {
+        "microsoft-dotnet": [
+          "CA5364"
+        ]
+      }
+    },
+    {
+      "id": "dede.dotnet.crypto.ecb",
+      "message": "Crypto ecb requires security review.",
+      "languages": [
+        "c#",
+        "visual basic",
+        "f#",
+        "razor"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)\\bCipherMode\\s*\\.\\s*ECB\\b"
+        }
+      ],
+      "cwe": [
+        "CWE-327"
+      ],
+      "owasp": [
+        "A04:2025"
+      ],
+      "recommendation": "Use authenticated encryption, such as AES-GCM, with a fresh nonce for every encryption.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca5358"
+      ],
+      "standards": {
+        "microsoft-dotnet": [
+          "CA5358"
+        ]
+      }
+    },
+    {
+      "id": "dede.dotnet.crypto.broken-algorithm",
+      "message": "Crypto broken algorithm requires security review.",
+      "languages": [
+        "c#",
+        "visual basic",
+        "f#",
+        "razor"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)\\b(?:(?:MD5|DES|RC2)\\s*\\.\\s*Create|new\\s+(?:MD5CryptoServiceProvider|DESCryptoServiceProvider|RC2CryptoServiceProvider))\\s*\\("
+        }
+      ],
+      "cwe": [
+        "CWE-327"
+      ],
+      "owasp": [
+        "A04:2025"
+      ],
+      "recommendation": "Use SHA-256 or stronger for integrity and authenticated encryption for confidentiality; use a password-specific KDF for passwords.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca5351"
+      ],
+      "standards": {
+        "microsoft-dotnet": [
+          "CA5351"
+        ]
+      }
+    },
+    {
+      "id": "dede.dotnet.crypto.weak-algorithm",
+      "message": "Crypto weak algorithm requires security review.",
+      "languages": [
+        "c#",
+        "visual basic",
+        "f#",
+        "razor"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)\\b(?:(?:SHA1|TripleDES|RIPEMD160)\\s*\\.\\s*Create|new\\s+(?:SHA1Managed|TripleDESCryptoServiceProvider))\\s*\\("
+        }
+      ],
+      "cwe": [
+        "CWE-327"
+      ],
+      "owasp": [
+        "A04:2025"
+      ],
+      "recommendation": "Migrate security-sensitive uses to current hash/encryption primitives, accounting for stored-data compatibility.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca5350"
+      ],
+      "standards": {
+        "microsoft-dotnet": [
+          "CA5350"
+        ]
+      }
+    },
+    {
+      "id": "dede.dotnet.crypto.zero-iv",
+      "message": "Crypto zero iv requires security review.",
+      "languages": [
+        "c#",
+        "visual basic",
+        "f#",
+        "razor"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)\\.\\s*IV\\s*(?:=|<-)\\s*new\\s+byte\\s*\\[\\s*(?:8|16)\\s*\\]"
+        }
+      ],
+      "cwe": [
+        "CWE-329"
+      ],
+      "owasp": [
+        "A04:2025"
+      ],
+      "recommendation": "Generate a fresh unpredictable IV for CBC, or use an authenticated mode with unique nonces; never reuse a zero IV.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/security-warnings"
+      ]
+    },
+    {
+      "id": "dede.dotnet.crypto.obsolete-kdf",
+      "message": "Crypto obsolete kdf requires security review.",
+      "languages": [
+        "c#",
+        "visual basic",
+        "f#",
+        "razor"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)\\bnew\\s+(?:[\\w]+\\.)*PasswordDeriveBytes\\s*\\("
+        }
+      ],
+      "cwe": [
+        "CWE-327"
+      ],
+      "owasp": [
+        "A04:2025"
+      ],
+      "recommendation": "Use a password-specific modern KDF with a unique salt and a workload-appropriate cost.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca5373"
+      ],
+      "standards": {
+        "microsoft-dotnet": [
+          "CA5373"
+        ]
+      }
+    },
+    {
+      "id": "dede.dotnet.crypto.small-rsa-key",
+      "message": "Crypto small rsa key requires security review.",
+      "languages": [
+        "c#",
+        "visual basic",
+        "f#",
+        "razor"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)\\b(?:new\\s+RSACryptoServiceProvider|RSA\\.Create)\\s*\\(\\s*(?:512|768|1024)\\s*\\)"
+        }
+      ],
+      "cwe": [
+        "CWE-326"
+      ],
+      "owasp": [
+        "A04:2025"
+      ],
+      "recommendation": "Use RSA keys of at least 2048 bits, with the size chosen for the required protection lifetime.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/security-warnings"
+      ]
+    },
+    {
+      "id": "dede.dotnet.xml.dtd-enabled",
+      "message": "Xml dtd enabled requires security review.",
+      "languages": [
+        "c#",
+        "visual basic",
+        "f#",
+        "razor"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)\\bDtdProcessing\\s*(?:=|<-)\\s*(?:[\\w]+\\.)*DtdProcessing\\s*\\.\\s*Parse\\b"
+        }
+      ],
+      "cwe": [
+        "CWE-611"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "recommendation": "Prohibit DTDs for untrusted XML and disable external resolution. DTD parsing requires a carefully restricted resolver and resource limits.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca3075"
+      ],
+      "standards": {
+        "microsoft-dotnet": [
+          "CA3075"
+        ]
+      }
+    },
+    {
+      "id": "dede.dotnet.xml.external-resolver",
+      "message": "Xml external resolver requires security review.",
+      "languages": [
+        "c#",
+        "visual basic",
+        "f#",
+        "razor"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)\\bXmlResolver\\s*(?:=|<-)\\s*new\\s+(?:[\\w]+\\.)*XmlUrlResolver\\s*\\("
+        }
+      ],
+      "cwe": [
+        "CWE-611"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "recommendation": "Set XmlResolver to null for untrusted XML or use a resolver restricted to approved local resources.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca3075"
+      ],
+      "standards": {
+        "microsoft-dotnet": [
+          "CA3075"
+        ]
+      }
+    },
+    {
+      "id": "dede.dotnet.xml.xslt-script",
+      "message": "Xml xslt script requires security review.",
+      "languages": [
+        "c#",
+        "visual basic",
+        "f#",
+        "razor"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)\\b(?:EnableScript\\s*(?:=|<-)\\s*true\\b|XsltSettings\\s*\\.\\s*TrustedXslt\\b)"
+        }
+      ],
+      "cwe": [
+        "CWE-94"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Disable XSLT scripts and document access for untrusted stylesheets; use XsltSettings.Default with a restricted resolver.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca3076"
+      ],
+      "standards": {
+        "microsoft-dotnet": [
+          "CA3076"
+        ]
+      }
+    },
+    {
+      "id": "dede.dotnet.xml.xslt-script-constructor",
+      "message": "Xml xslt script constructor requires security review.",
+      "languages": [
+        "c#",
+        "visual basic",
+        "f#",
+        "razor"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)\\bnew\\s+XsltSettings\\s*\\(\\s*(?:true|false)\\s*,\\s*true\\s*\\)"
+        }
+      ],
+      "cwe": [
+        "CWE-94"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Set enableScript to false and disable access to external documents for untrusted XSLT.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca3076"
+      ],
+      "standards": {
+        "microsoft-dotnet": [
+          "CA3076"
+        ]
+      }
+    },
+    {
+      "id": "dede.dotnet.cookie.httponly-disabled",
+      "message": "Cookie httponly disabled requires security review.",
+      "languages": [
+        "c#",
+        "visual basic",
+        "f#",
+        "razor"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)\\bHttpOnly\\s*(?:=|<-)\\s*false\\b"
+        }
+      ],
+      "cwe": [
+        "CWE-1004"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "recommendation": "Set HttpOnly to true for sensitive cookies; review any intentional exception in the actual HTTPS/authentication deployment.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca5396"
+      ],
+      "standards": {
+        "microsoft-dotnet": [
+          "CA5396"
+        ]
+      }
+    },
+    {
+      "id": "dede.dotnet.cookie.secure-disabled",
+      "message": "Cookie secure disabled requires security review.",
+      "languages": [
+        "c#",
+        "visual basic",
+        "f#",
+        "razor"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)\\bSecure\\s*(?:=|<-)\\s*false\\b"
+        }
+      ],
+      "cwe": [
+        "CWE-614"
+      ],
+      "owasp": [
+        "A04:2025"
+      ],
+      "recommendation": "Set Secure to true for sensitive cookies; review any intentional exception in the actual HTTPS/authentication deployment.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca5382"
+      ],
+      "standards": {
+        "microsoft-dotnet": [
+          "CA5382"
+        ]
+      }
+    },
+    {
+      "id": "dede.dotnet.cookie.insecure-policy",
+      "message": "Cookie insecure policy requires security review.",
+      "languages": [
+        "c#",
+        "visual basic",
+        "f#",
+        "razor"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)\\bCookieSecurePolicy\\s*\\.\\s*None\\b"
+        }
+      ],
+      "cwe": [
+        "CWE-614"
+      ],
+      "owasp": [
+        "A04:2025"
+      ],
+      "recommendation": "Use CookieSecurePolicy.Always for authentication and other sensitive cookies served over HTTPS.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca5382"
+      ],
+      "standards": {
+        "microsoft-dotnet": [
+          "CA5382"
+        ]
+      }
+    },
+    {
+      "id": "dede.dotnet.cors.credentials-any-origin",
+      "message": "Cors credentials any origin requires security review.",
+      "languages": [
+        "c#",
+        "visual basic",
+        "f#",
+        "razor"
+      ],
+      "severity": "HIGH",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)\\.\\s*(?:AllowAnyOrigin\\s*\\(\\s*\\)\\s*\\.\\s*AllowCredentials|AllowCredentials\\s*\\(\\s*\\)\\s*\\.\\s*AllowAnyOrigin)\\s*\\("
+        }
+      ],
+      "cwe": [
+        "CWE-942"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "recommendation": "Allow only specific trusted origins with credentials. ASP.NET Core rejects the AllowAnyOrigin/AllowCredentials combination; do not replace it with a predicate that accepts every origin.",
+      "references": [
+        "https://learn.microsoft.com/en-us/aspnet/core/security/cors"
+      ]
+    },
+    {
+      "id": "dede.dotnet.cors.origin-predicate-all",
+      "message": "Cors origin predicate all requires security review.",
+      "languages": [
+        "c#",
+        "visual basic",
+        "f#",
+        "razor"
+      ],
+      "severity": "HIGH",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)\\.\\s*SetIsOriginAllowed\\s*\\(\\s*\\w+\\s*=>\\s*true\\s*\\)\\s*\\.\\s*AllowCredentials\\s*\\("
+        }
+      ],
+      "cwe": [
+        "CWE-942"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "recommendation": "Check origins against an explicit allowlist before allowing credentialed cross-origin requests.",
+      "references": [
+        "https://learn.microsoft.com/en-us/aspnet/core/security/cors"
+      ]
+    },
+    {
+      "id": "dede.dotnet.csrf.antiforgery-optout",
+      "message": "Csrf antiforgery optout requires security review.",
+      "languages": [
+        "c#",
+        "visual basic",
+        "f#",
+        "razor"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)\\b(?:IgnoreAntiforgeryToken(?:Attribute)?\\b|DisableAntiforgery\\s*\\()"
+        }
+      ],
+      "cwe": [
+        "CWE-352"
+      ],
+      "owasp": [
+        "A01:2025"
+      ],
+      "recommendation": "Require antiforgery validation for cookie-authenticated state-changing requests, or document why an endpoint uses a CSRF-resistant authentication mechanism.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca5391"
+      ],
+      "standards": {
+        "microsoft-dotnet": [
+          "CA5391"
+        ]
+      }
+    },
+    {
+      "id": "dede.dotnet.xss.request-validation-disabled",
+      "message": "Xss request validation disabled requires security review.",
+      "languages": [
+        "c#",
+        "visual basic",
+        "f#",
+        "razor"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)\\bValidateInput\\s*\\(\\s*false\\s*\\)"
+        }
+      ],
+      "cwe": [
+        "CWE-79"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Keep request validation enabled where applicable and apply contextual output encoding. Rich HTML requires an explicit allowlist sanitizer.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca5363"
+      ],
+      "standards": {
+        "microsoft-dotnet": [
+          "CA5363"
+        ]
+      }
+    },
+    {
+      "id": "dede.dotnet.logging.sensitive-ef-data",
+      "message": "Logging sensitive ef data requires security review.",
+      "languages": [
+        "c#",
+        "visual basic",
+        "f#",
+        "razor"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)\\.\\s*EnableSensitiveDataLogging\\s*\\(\\s*(?:true\\s*)?\\)"
+        }
+      ],
+      "cwe": [
+        "CWE-532"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "recommendation": "Keep sensitive data logging disabled outside controlled development and redact database parameter values in diagnostic output.",
+      "references": [
+        "https://learn.microsoft.com/en-us/ef/core/logging-events-diagnostics/simple-logging"
+      ]
+    },
+    {
+      "id": "dede.dotnet.config.debug",
+      "message": "Config debug requires security review.",
+      "languages": [
+        "xml"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)<compilation\\b[^>]*\\bdebug\\s*=\\s*[\\\"\\']true[\\\"\\']"
+        }
+      ],
+      "cwe": [
+        "CWE-215"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "recommendation": "Avoid compilation debug mode in deployed ASP.NET applications.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/security-warnings"
+      ]
+    },
+    {
+      "id": "dede.dotnet.config.viewstate-mac",
+      "message": "Config viewstate mac requires security review.",
+      "languages": [
+        "xml"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)<pages\\b[^>]*\\benableViewStateMac\\s*=\\s*[\\\"\\']false[\\\"\\']"
+        }
+      ],
+      "cwe": [
+        "CWE-347"
+      ],
+      "owasp": [
+        "A07:2025"
+      ],
+      "recommendation": "Keep ViewState MAC validation enabled; use a securely managed machine key in a server farm.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/security-warnings"
+      ]
+    },
+    {
+      "id": "dede.dotnet.config.request-validation",
+      "message": "Config request validation requires security review.",
+      "languages": [
+        "xml"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)<pages\\b[^>]*\\bvalidateRequest\\s*=\\s*[\\\"\\']false[\\\"\\']"
+        }
+      ],
+      "cwe": [
+        "CWE-79"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Keep request validation enabled and apply contextual encoding on every output boundary.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/security-warnings"
+      ]
+    },
+    {
+      "id": "dede.dotnet.config.custom-errors",
+      "message": "Config custom errors requires security review.",
+      "languages": [
+        "xml"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)<customErrors\\b[^>]*\\bmode\\s*=\\s*[\\\"\\']Off[\\\"\\']"
+        }
+      ],
+      "cwe": [
+        "CWE-209"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "recommendation": "Serve generic errors remotely and log detailed exceptions only to protected server logs.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/security-warnings"
+      ]
+    },
+    {
+      "id": "dede.dotnet.config.detailed-errors",
+      "message": "Config detailed errors requires security review.",
+      "languages": [
+        "xml"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)<httpErrors\\b[^>]*\\berrorMode\\s*=\\s*[\\\"\\']Detailed[\\\"\\']"
+        }
+      ],
+      "cwe": [
+        "CWE-209"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "recommendation": "Avoid exposing detailed IIS errors to remote clients.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/security-warnings"
+      ]
+    },
+    {
+      "id": "dede.dotnet.config.cookie-httponly",
+      "message": "Config cookie httponly requires security review.",
+      "languages": [
+        "xml"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)<httpCookies\\b[^>]*\\bhttpOnlyCookies\\s*=\\s*[\\\"\\']false[\\\"\\']"
+        }
+      ],
+      "cwe": [
+        "CWE-1004"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "recommendation": "Require HttpOnly on sensitive cookies.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/security-warnings"
+      ]
+    },
+    {
+      "id": "dede.dotnet.config.cookie-ssl",
+      "message": "Config cookie ssl requires security review.",
+      "languages": [
+        "xml"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)<httpCookies\\b[^>]*\\brequireSSL\\s*=\\s*[\\\"\\']false[\\\"\\']"
+        }
+      ],
+      "cwe": [
+        "CWE-614"
+      ],
+      "owasp": [
+        "A04:2025"
+      ],
+      "recommendation": "Require HTTPS-only sensitive cookies.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/security-warnings"
+      ]
+    },
+    {
+      "id": "dede.dotnet.config.forms-ssl",
+      "message": "Config forms ssl requires security review.",
+      "languages": [
+        "xml"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)<forms\\b[^>]*\\brequireSSL\\s*=\\s*[\\\"\\']false[\\\"\\']"
+        }
+      ],
+      "cwe": [
+        "CWE-614"
+      ],
+      "owasp": [
+        "A04:2025"
+      ],
+      "recommendation": "Require SSL for forms authentication and serve the application over HTTPS.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/security-warnings"
+      ]
+    },
+    {
+      "id": "dede.dotnet.config.session-in-url",
+      "message": "Config session in url requires security review.",
+      "languages": [
+        "xml"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)<sessionState\\b[^>]*\\bcookieless\\s*=\\s*[\\\"\\']UseUri[\\\"\\']"
+        }
+      ],
+      "cwe": [
+        "CWE-598"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "recommendation": "Keep session identifiers out of URLs; use protected cookies.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/security-warnings"
+      ]
+    },
+    {
+      "id": "dede.dotnet.config.forms-in-url",
+      "message": "Config forms in url requires security review.",
+      "languages": [
+        "xml"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)<forms\\b[^>]*\\bcookieless\\s*=\\s*[\\\"\\']UseUri[\\\"\\']"
+        }
+      ],
+      "cwe": [
+        "CWE-598"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "recommendation": "Use cookies for authentication tickets instead of placing credentials in URLs.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/security-warnings"
+      ]
+    },
+    {
+      "id": "dede.dotnet.config.header-checking",
+      "message": "Config header checking requires security review.",
+      "languages": [
+        "xml"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)<httpRuntime\\b[^>]*\\benableHeaderChecking\\s*=\\s*[\\\"\\']false[\\\"\\']"
+        }
+      ],
+      "cwe": [
+        "CWE-113"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Keep response header checking enabled to reject CR/LF injection.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/security-warnings"
+      ]
+    },
+    {
+      "id": "dede.dotnet.project.binaryformatter-enabled",
+      "message": "Project binaryformatter enabled requires security review.",
+      "languages": [
+        "xml"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)<EnableUnsafeBinaryFormatterSerialization\\s*>\\s*true\\s*</EnableUnsafeBinaryFormatterSerialization\\s*>"
+        }
+      ],
+      "cwe": [
+        "CWE-502"
+      ],
+      "owasp": [
+        "A08:2025"
+      ],
+      "recommendation": "Remove unsafe BinaryFormatter serialization support and migrate stored payloads to a safe schema-bound format.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/security-warnings"
+      ]
+    },
+    {
+      "id": "dede.dotnet.project.nuget-audit-disabled",
+      "message": "Project nuget audit disabled requires security review.",
+      "languages": [
+        "xml"
+      ],
+      "severity": "MEDIUM",
+      "category": "quality",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)<NuGetAudit\\s*>\\s*false\\s*</NuGetAudit\\s*>"
+        }
+      ],
+      "cwe": [
+        "CWE-1104"
+      ],
+      "owasp": [
+        "A03:2025"
+      ],
+      "recommendation": "Keep NuGet auditing enabled in the trusted build pipeline; this setting check does not itself query a vulnerability database.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/security-warnings"
+      ]
+    },
+    {
+      "id": "dede.dotnet.project.analyzers-disabled",
+      "message": "Project analyzers disabled requires security review.",
+      "languages": [
+        "xml"
+      ],
+      "severity": "MEDIUM",
+      "category": "quality",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)<EnableNETAnalyzers\\s*>\\s*false\\s*</EnableNETAnalyzers\\s*>"
+        }
+      ],
+      "cwe": [
+        "CWE-710"
+      ],
+      "owasp": [],
+      "recommendation": "Enable .NET analyzers and select an appropriate analysis level in the trusted build pipeline.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/security-warnings"
+      ]
+    },
+    {
+      "id": "dede.dotnet.project.build-analysis-disabled",
+      "message": "Project build analysis disabled requires security review.",
+      "languages": [
+        "xml"
+      ],
+      "severity": "MEDIUM",
+      "category": "quality",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)<RunAnalyzersDuringBuild\\s*>\\s*false\\s*</RunAnalyzersDuringBuild\\s*>"
+        }
+      ],
+      "cwe": [
+        "CWE-710"
+      ],
+      "owasp": [],
+      "recommendation": "Run analyzers during CI builds so IDE-only analysis cannot hide build-time regressions.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/security-warnings"
+      ]
+    },
+    {
+      "id": "dede.dotnet.project.nullable-disabled",
+      "message": "Project nullable disabled requires security review.",
+      "languages": [
+        "xml"
+      ],
+      "severity": "MEDIUM",
+      "category": "quality",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)<Nullable\\s*>\\s*disable\\s*</Nullable\\s*>"
+        }
+      ],
+      "cwe": [
+        "CWE-476"
+      ],
+      "owasp": [],
+      "recommendation": "Enable nullable reference analysis in supported C# projects and resolve actionable nullability warnings.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/security-warnings"
+      ]
+    },
+    {
+      "id": "dede.dotnet.nuget.insecure-source",
+      "message": "Nuget insecure source requires security review.",
+      "languages": [
+        "xml"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "(?i)\\ballowInsecureConnections\\s*=\\s*[\\\"\\']true[\\\"\\']"
+        }
+      ],
+      "cwe": [
+        "CWE-319"
+      ],
+      "owasp": [
+        "A04:2025"
+      ],
+      "recommendation": "Use HTTPS package feeds with normal certificate validation in the trusted restore environment.",
+      "references": [
+        "https://learn.microsoft.com/en-us/nuget/reference/nuget-config-file"
+      ]
+    },
+    {
+      "id": "dede.dotnet.razor.raw-model-output",
+      "message": "Razor raw model output requires security review.",
+      "languages": [
+        "razor"
+      ],
+      "severity": "MEDIUM",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "when": [
+        {
+          "regex": "@Html\\s*\\.\\s*Raw\\s*\\(\\s*Model\\s*\\.\\s*\\w+"
+        }
+      ],
+      "cwe": [
+        "CWE-79"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Keep Razor automatic encoding. If model content contains rich HTML, sanitize it with a maintained allowlist HTML sanitizer before rendering.",
+      "references": [
+        "https://learn.microsoft.com/en-us/aspnet/core/security/cross-site-scripting"
+      ]
+    },
+    {
+      "id": "dede.dotnet.connection.tls-trust-bypass",
+      "message": "Connection tls trust bypass requires security review.",
+      "languages": [
+        "json",
+        "xml",
+        "ini",
+        "c#",
+        "visual basic",
+        "f#"
+      ],
+      "severity": "HIGH",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "match_in_strings": true,
+      "when": [
+        {
+          "regex": "(?i)\\bTrustServerCertificate\\s*=\\s*(?:true|yes)\\b"
+        }
+      ],
+      "cwe": [
+        "CWE-295"
+      ],
+      "owasp": [
+        "A04:2025"
+      ],
+      "recommendation": "Use a verifiable server certificate and disable TrustServerCertificate bypass.",
+      "references": [
+        "https://learn.microsoft.com/en-us/sql/connect/ado-net/connection-string-syntax"
+      ]
+    },
+    {
+      "id": "dede.dotnet.connection.encryption-disabled",
+      "message": "Connection encryption disabled requires security review.",
+      "languages": [
+        "json",
+        "xml",
+        "ini",
+        "c#",
+        "visual basic",
+        "f#"
+      ],
+      "severity": "HIGH",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "match_in_strings": true,
+      "when": [
+        {
+          "regex": "(?i)\\bEncrypt\\s*=\\s*(?:false|no)\\b"
+        }
+      ],
+      "cwe": [
+        "CWE-319"
+      ],
+      "owasp": [
+        "A04:2025"
+      ],
+      "recommendation": "Require encrypted database connections and validate the server certificate.",
+      "references": [
+        "https://learn.microsoft.com/en-us/sql/connect/ado-net/connection-string-syntax"
+      ]
+    },
+    {
+      "id": "dede.dotnet.aspnet.page-validation-disabled",
+      "message": "Aspnet page validation disabled requires security review.",
+      "languages": [
+        "asp.net"
+      ],
+      "severity": "HIGH",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "match_in_strings": true,
+      "when": [
+        {
+          "regex": "(?i)<%@\\s*Page\\b[^>]*\\bValidateRequest\\s*=\\s*[\\\"\\']false[\\\"\\']"
+        }
+      ],
+      "cwe": [
+        "CWE-79"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Keep page request validation enabled and contextually encode output.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca5363"
+      ],
+      "standards": {
+        "microsoft-dotnet": [
+          "CA5363"
+        ]
+      }
+    },
+    {
+      "id": "dede.dotnet.aspnet.page-mac-disabled",
+      "message": "Aspnet page mac disabled requires security review.",
+      "languages": [
+        "asp.net"
+      ],
+      "severity": "HIGH",
+      "category": "security",
+      "confidence": "MEDIUM",
+      "mode": "document",
+      "exclude_comments": true,
+      "match_in_strings": true,
+      "when": [
+        {
+          "regex": "(?i)<%@\\s*Page\\b[^>]*\\bEnableViewStateMac\\s*=\\s*[\\\"\\']false[\\\"\\']"
+        }
+      ],
+      "cwe": [
+        "CWE-347"
+      ],
+      "owasp": [
+        "A07:2025"
+      ],
+      "recommendation": "Keep ViewState message authentication enabled and use securely managed validation keys.",
+      "references": [
+        "https://learn.microsoft.com/en-us/dotnet/api/system.web.ui.page.enableviewstatemac"
+      ]
+    }
+  ]
+}

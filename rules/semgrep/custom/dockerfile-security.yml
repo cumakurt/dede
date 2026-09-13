@@ -1,0 +1,23 @@
+rules:
+  - id: dede.dockerfile.security.privileged
+    message: "Container runs with --privileged or privileged: true which weakens isolation."
+    languages: [dockerfile, yaml]
+    severity: ERROR
+    metadata:
+      cwe: ["CWE-250"]
+      owasp: ["A05:2021"]
+      category: security
+      technology: [docker]
+    pattern-either:
+      - pattern-regex: (?i)--privileged
+      - pattern-regex: (?i)privileged:\s*true
+
+  - id: dede.dockerfile.security.add-instead-of-copy
+    message: "Prefer COPY over ADD unless URL/archive extraction is required."
+    languages: [dockerfile]
+    severity: INFO
+    metadata:
+      category: security
+      technology: [docker]
+      owasp: ["A05:2021"]
+    pattern-regex: (?i)^ADD\s+

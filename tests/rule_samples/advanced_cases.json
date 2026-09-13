@@ -1,0 +1,560 @@
+[
+  {
+    "rule_id": "dede.csharp.advanced.sql-injection",
+    "extension": "cs",
+    "unsafe": "using System;\nusing System.IO;\nusing System.Diagnostics;\nusing System.Data.SqlClient;\nusing System.Net.Http;\nclass Endpoint { void Run() {\nvar input = Request.Query[\"q\"].ToString();\nvar sql = \"SELECT * FROM users WHERE name = \" + input;\nvar cmd = new SqlCommand(sql, connection);\n} }\n",
+    "safe": "using System;\nusing System.IO;\nusing System.Diagnostics;\nusing System.Data.SqlClient;\nusing System.Net.Http;\nclass Endpoint { void Run() {\nvar input = Request.Query[\"q\"].ToString();\nvar cmd = new SqlCommand(\"SELECT * FROM users WHERE name = @name\", connection);\ncmd.Parameters.AddWithValue(\"@name\", input);\n} }\n"
+  },
+  {
+    "rule_id": "dede.csharp.advanced.command-injection",
+    "extension": "cs",
+    "unsafe": "using System;\nusing System.IO;\nusing System.Diagnostics;\nusing System.Data.SqlClient;\nusing System.Net.Http;\nclass Endpoint { void Run() {\nvar value = Request.Query[\"cmd\"].ToString();\nProcess.Start(\"/bin/sh\", \"-c \" + value);\n} }\n",
+    "safe": "using System;\nusing System.IO;\nusing System.Diagnostics;\nusing System.Data.SqlClient;\nusing System.Net.Http;\nclass Endpoint { void Run() {\nvar value = Request.Query[\"value\"].ToString();\nvar psi = new ProcessStartInfo(\"/usr/bin/printf\");\npsi.ArgumentList.Add(\"%s\");\npsi.ArgumentList.Add(value);\n} }\n"
+  },
+  {
+    "rule_id": "dede.csharp.advanced.path-traversal",
+    "extension": "cs",
+    "unsafe": "using System;\nusing System.IO;\nusing System.Diagnostics;\nusing System.Data.SqlClient;\nusing System.Net.Http;\nclass Endpoint { void Run() {\nvar path = Path.Combine(\"/srv/files\", Request.Query[\"file\"].ToString());\nvar body = File.ReadAllText(Path.GetFullPath(path));\n} }\n",
+    "safe": "using System;\nusing System.IO;\nusing System.Diagnostics;\nusing System.Data.SqlClient;\nusing System.Net.Http;\nclass Endpoint { void Run() {\nvar body = File.ReadAllText(\"/srv/files/help.txt\");\n} }\n"
+  },
+  {
+    "rule_id": "dede.csharp.advanced.ssrf",
+    "extension": "cs",
+    "unsafe": "using System;\nusing System.IO;\nusing System.Diagnostics;\nusing System.Data.SqlClient;\nusing System.Net.Http;\nclass Endpoint { void Run() {\nvar destination = Request.Query[\"url\"].ToString();\nvar client = new HttpClient();\nvar response = client.GetAsync(destination);\n} }\n",
+    "safe": "using System;\nusing System.IO;\nusing System.Diagnostics;\nusing System.Data.SqlClient;\nusing System.Net.Http;\nclass Endpoint { void Run() {\nvar client = new HttpClient();\nvar response = client.GetAsync(\"https://example.invalid/status\");\n} }\n"
+  },
+  {
+    "rule_id": "dede.csharp.advanced.xss",
+    "extension": "cs",
+    "unsafe": "using System;\nusing System.IO;\nusing System.Diagnostics;\nusing System.Data.SqlClient;\nusing System.Net.Http;\nclass Endpoint { void Run() {\nvar value = Request.Query[\"name\"].ToString();\nHtml.Raw(value);\n} }\n",
+    "safe": "using System;\nusing System.IO;\nusing System.Diagnostics;\nusing System.Data.SqlClient;\nusing System.Net.Http;\nclass Endpoint { void Run() {\nvar value = Request.Query[\"name\"].ToString();\nHtml.Raw(System.Net.WebUtility.HtmlEncode(value));\n} }\n"
+  },
+  {
+    "rule_id": "dede.csharp.advanced.open-redirect",
+    "extension": "cs",
+    "unsafe": "using System;\nusing System.IO;\nusing System.Diagnostics;\nusing System.Data.SqlClient;\nusing System.Net.Http;\nclass Endpoint { void Run() {\nvar next = Request.Query[\"next\"].ToString();\nRedirect(next);\n} }\n",
+    "safe": "using System;\nusing System.IO;\nusing System.Diagnostics;\nusing System.Data.SqlClient;\nusing System.Net.Http;\nclass Endpoint { void Run() {\nvar next = Request.Query[\"next\"].ToString();\nLocalRedirect(next);\n} }\n"
+  },
+  {
+    "rule_id": "dede.csharp.advanced.xpath-injection",
+    "extension": "cs",
+    "unsafe": "using System;\nusing System.IO;\nusing System.Diagnostics;\nusing System.Data.SqlClient;\nusing System.Net.Http;\nclass Endpoint { void Run() {\nvar user = Request.Query[\"user\"].ToString();\nvar node = document.SelectSingleNode(\"//user[@name=\" + user + \"]\");\n} }\n",
+    "safe": "using System;\nusing System.IO;\nusing System.Diagnostics;\nusing System.Data.SqlClient;\nusing System.Net.Http;\nclass Endpoint { void Run() {\nvar node = document.SelectSingleNode(\"//user[@name=$name]\", context);\n} }\n"
+  },
+  {
+    "rule_id": "dede.csharp.advanced.regex-injection",
+    "extension": "cs",
+    "unsafe": "using System;\nusing System.IO;\nusing System.Diagnostics;\nusing System.Data.SqlClient;\nusing System.Net.Http;\nclass Endpoint { void Run() {\nvar pattern = Request.Query[\"pattern\"].ToString();\nvar regex = new System.Text.RegularExpressions.Regex(pattern);\n} }\n",
+    "safe": "using System;\nusing System.IO;\nusing System.Diagnostics;\nusing System.Data.SqlClient;\nusing System.Net.Http;\nclass Endpoint { void Run() {\nvar pattern = Request.Query[\"pattern\"].ToString();\nvar regex = new System.Text.RegularExpressions.Regex(System.Text.RegularExpressions.Regex.Escape(pattern));\n} }\n"
+  },
+  {
+    "rule_id": "dede.csharp.advanced.json-type-handling",
+    "extension": "cs",
+    "unsafe": "using Newtonsoft.Json;\nusing System.Xml;\nusing System.Net.Http;\nusing System.Security.Cryptography;\nclass Configuration { void Run() {\nvar options = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto };\n} }\n",
+    "safe": "using Newtonsoft.Json;\nusing System.Xml;\nusing System.Net.Http;\nusing System.Security.Cryptography;\nclass Configuration { void Run() {\nvar options = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.None };\n} }\n"
+  },
+  {
+    "rule_id": "dede.csharp.advanced.tls-validation-disabled",
+    "extension": "cs",
+    "unsafe": "using Newtonsoft.Json;\nusing System.Xml;\nusing System.Net.Http;\nusing System.Security.Cryptography;\nclass Configuration { void Run() {\nvar handler = new HttpClientHandler { ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator };\n} }\n",
+    "safe": "using Newtonsoft.Json;\nusing System.Xml;\nusing System.Net.Http;\nusing System.Security.Cryptography;\nclass Configuration { void Run() {\nvar handler = new HttpClientHandler();\n} }\n"
+  },
+  {
+    "rule_id": "dede.csharp.advanced.jwt-signature-disabled",
+    "extension": "cs",
+    "unsafe": "using Newtonsoft.Json;\nusing System.Xml;\nusing System.Net.Http;\nusing System.Security.Cryptography;\nclass Configuration { void Run() {\nvar options = new TokenValidationParameters { RequireSignedTokens = false };\n} }\n",
+    "safe": "using Newtonsoft.Json;\nusing System.Xml;\nusing System.Net.Http;\nusing System.Security.Cryptography;\nclass Configuration { void Run() {\nvar options = new TokenValidationParameters { RequireSignedTokens = true };\n} }\n"
+  },
+  {
+    "rule_id": "dede.csharp.advanced.jwt-lifetime-disabled",
+    "extension": "cs",
+    "unsafe": "using Newtonsoft.Json;\nusing System.Xml;\nusing System.Net.Http;\nusing System.Security.Cryptography;\nclass Configuration { void Run() {\nvar options = new TokenValidationParameters { ValidateLifetime = false };\n} }\n",
+    "safe": "using Newtonsoft.Json;\nusing System.Xml;\nusing System.Net.Http;\nusing System.Security.Cryptography;\nclass Configuration { void Run() {\nvar options = new TokenValidationParameters { ValidateLifetime = true };\n} }\n"
+  },
+  {
+    "rule_id": "dede.csharp.advanced.jwt-audience-disabled",
+    "extension": "cs",
+    "unsafe": "using Newtonsoft.Json;\nusing System.Xml;\nusing System.Net.Http;\nusing System.Security.Cryptography;\nclass Configuration { void Run() {\nvar options = new TokenValidationParameters { ValidateAudience = false };\n} }\n",
+    "safe": "using Newtonsoft.Json;\nusing System.Xml;\nusing System.Net.Http;\nusing System.Security.Cryptography;\nclass Configuration { void Run() {\nvar options = new TokenValidationParameters { ValidateAudience = true };\n} }\n"
+  },
+  {
+    "rule_id": "dede.csharp.advanced.xml-dtd-enabled",
+    "extension": "cs",
+    "unsafe": "using Newtonsoft.Json;\nusing System.Xml;\nusing System.Net.Http;\nusing System.Security.Cryptography;\nclass Configuration { void Run() {\nvar options = new XmlReaderSettings { DtdProcessing = DtdProcessing.Parse };\n} }\n",
+    "safe": "using Newtonsoft.Json;\nusing System.Xml;\nusing System.Net.Http;\nusing System.Security.Cryptography;\nclass Configuration { void Run() {\nvar options = new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit };\n} }\n"
+  },
+  {
+    "rule_id": "dede.csharp.advanced.xslt-script-enabled",
+    "extension": "cs",
+    "unsafe": "using Newtonsoft.Json;\nusing System.Xml;\nusing System.Net.Http;\nusing System.Security.Cryptography;\nclass Configuration { void Run() {\nvar options = new XsltSettings(false, true);\n} }\n",
+    "safe": "using Newtonsoft.Json;\nusing System.Xml;\nusing System.Net.Http;\nusing System.Security.Cryptography;\nclass Configuration { void Run() {\nvar options = new XsltSettings(false, false);\n} }\n"
+  },
+  {
+    "rule_id": "dede.csharp.advanced.ecb-mode",
+    "extension": "cs",
+    "unsafe": "using Newtonsoft.Json;\nusing System.Xml;\nusing System.Net.Http;\nusing System.Security.Cryptography;\nclass Configuration { void Run() {\ncipher.Mode = CipherMode.ECB;\n} }\n",
+    "safe": "using Newtonsoft.Json;\nusing System.Xml;\nusing System.Net.Http;\nusing System.Security.Cryptography;\nclass Configuration { void Run() {\ncipher.Mode = CipherMode.CBC;\n} }\n"
+  },
+  {
+    "rule_id": "dede.csharp.advanced.cors-credentials-any-origin",
+    "extension": "cs",
+    "unsafe": "using Newtonsoft.Json;\nusing System.Xml;\nusing System.Net.Http;\nusing System.Security.Cryptography;\nclass Configuration { void Run() {\nbuilder.SetIsOriginAllowed(origin => true).AllowCredentials();\n} }\n",
+    "safe": "using Newtonsoft.Json;\nusing System.Xml;\nusing System.Net.Http;\nusing System.Security.Cryptography;\nclass Configuration { void Run() {\nbuilder.WithOrigins(\"https://example.invalid\").AllowCredentials();\n} }\n"
+  },
+  {
+    "rule_id": "dede.csharp.advanced.antiforgery-disabled",
+    "extension": "cs",
+    "unsafe": "using Newtonsoft.Json;\nusing System.Xml;\nusing System.Net.Http;\nusing System.Security.Cryptography;\nclass Configuration { void Run() {\napp.MapPost(\"/transfer\", Handle).DisableAntiforgery();\n} }\n",
+    "safe": "using Newtonsoft.Json;\nusing System.Xml;\nusing System.Net.Http;\nusing System.Security.Cryptography;\nclass Configuration { void Run() {\napp.MapPost(\"/transfer\", Handle);\n} }\n"
+  },
+  {
+    "rule_id": "dede.python.advanced.jinja-autoescape-disabled",
+    "extension": "py",
+    "unsafe": "import jinja2\nenv = jinja2.Environment(autoescape=False)",
+    "safe": "import jinja2\nenv = jinja2.Environment(autoescape=True)"
+  },
+  {
+    "rule_id": "dede.python.advanced.tar-unfiltered-extraction",
+    "extension": "py",
+    "unsafe": "archive.extractall(path=target, filter=\"fully_trusted\")",
+    "safe": "archive.extractall(path=target, filter=\"data\")"
+  },
+  {
+    "rule_id": "dede.javascript.advanced.jwt-expiration-ignored",
+    "extension": "js",
+    "unsafe": "jwt.verify(token, key, {ignoreExpiration: true});",
+    "safe": "jwt.verify(token, key, {ignoreExpiration: false});"
+  },
+  {
+    "rule_id": "dede.javascript.advanced.jwt-expiration-ignored",
+    "extension": "ts",
+    "unsafe": "jwt.verify(token, key, {ignoreExpiration: true});",
+    "safe": "jwt.verify(token, key, {ignoreExpiration: false});"
+  },
+  {
+    "rule_id": "dede.javascript.advanced.session-cookie-insecure",
+    "extension": "js",
+    "unsafe": "const session = require(\"express-session\");\napp.use(session({secret: process.env.SESSION_SECRET, cookie: {secure: false}}));",
+    "safe": "const session = require(\"express-session\");\napp.use(session({secret: process.env.SESSION_SECRET, cookie: {secure: true}}));"
+  },
+  {
+    "rule_id": "dede.javascript.advanced.session-cookie-insecure",
+    "extension": "ts",
+    "unsafe": "const session = require(\"express-session\");\napp.use(session({secret: process.env.SESSION_SECRET, cookie: {secure: false}}));",
+    "safe": "const session = require(\"express-session\");\napp.use(session({secret: process.env.SESSION_SECRET, cookie: {secure: true}}));"
+  },
+  {
+    "rule_id": "dede.java.advanced.ecb-cipher",
+    "extension": "java",
+    "unsafe": "class Sample { void run() throws Exception {\nObject c = javax.crypto.Cipher.getInstance(\"AES/ECB/PKCS5Padding\");\n} }",
+    "safe": "class Sample { void run() throws Exception {\nObject c = javax.crypto.Cipher.getInstance(\"AES/GCM/NoPadding\");\n} }"
+  },
+  {
+    "rule_id": "dede.java.advanced.spring-csrf-disabled",
+    "extension": "java",
+    "unsafe": "class Sample { void run() {\nhttp.csrf(csrf -> csrf.disable());\n} }",
+    "safe": "class Sample { void run() {\nhttp.csrf(Customizer.withDefaults());\n} }"
+  },
+  {
+    "rule_id": "dede.go.advanced.tls-verification-disabled",
+    "extension": "go",
+    "unsafe": "package main\nimport \"crypto/tls\"\nfunc main() {\nconfig := &tls.Config{InsecureSkipVerify: true}\n_ = config\n}\n",
+    "safe": "package main\nimport \"crypto/tls\"\nfunc main() {\nconfig := &tls.Config{InsecureSkipVerify: false}\n_ = config\n}\n"
+  },
+  {
+    "rule_id": "dede.go.advanced.ssh-host-key-unverified",
+    "extension": "go",
+    "unsafe": "package main\nimport \"golang.org/x/crypto/ssh\"\nfunc main() {\ncallback := ssh.InsecureIgnoreHostKey()\n_ = callback\n}\n",
+    "safe": "package main\nimport \"golang.org/x/crypto/ssh\"\nfunc main() {\ncallback := ssh.FixedHostKey(hostKey)\n_ = callback\n}\n"
+  },
+  {
+    "rule_id": "dede.php.advanced.tls-peer-verification-disabled",
+    "extension": "php",
+    "unsafe": "<?php\ncurl_setopt($client, CURLOPT_SSL_VERIFYPEER, false);",
+    "safe": "<?php\ncurl_setopt($client, CURLOPT_SSL_VERIFYPEER, true);"
+  },
+  {
+    "rule_id": "dede.php.advanced.session-httponly-disabled",
+    "extension": "php",
+    "unsafe": "<?php\nini_set(\"session.cookie_httponly\", \"0\");",
+    "safe": "<?php\nini_set(\"session.cookie_httponly\", \"1\");"
+  },
+  {
+    "rule_id": "dede.ruby.advanced.tls-verification-disabled",
+    "extension": "rb",
+    "unsafe": "client.verify_mode = OpenSSL::SSL::VERIFY_NONE",
+    "safe": "client.verify_mode = OpenSSL::SSL::VERIFY_PEER"
+  },
+  {
+    "rule_id": "dede.ruby.advanced.rails-mass-assignment",
+    "extension": "rb",
+    "unsafe": "attributes = params.permit!",
+    "safe": "attributes = params.require(:user).permit(:name)"
+  },
+  {
+    "rule_id": "dede.rust.advanced.tls-verification-disabled",
+    "extension": "rs",
+    "unsafe": "fn main() {\nlet client = reqwest::Client::builder().danger_accept_invalid_certs(true).build();\n}",
+    "safe": "fn main() {\nlet client = reqwest::Client::builder().danger_accept_invalid_certs(false).build();\n}"
+  },
+  {
+    "rule_id": "dede.rust.advanced.hostname-verification-disabled",
+    "extension": "rs",
+    "unsafe": "fn main() {\nlet client = reqwest::Client::builder().danger_accept_invalid_hostnames(true).build();\n}",
+    "safe": "fn main() {\nlet client = reqwest::Client::builder().danger_accept_invalid_hostnames(false).build();\n}"
+  },
+  {
+    "rule_id": "dede.c.advanced.unbounded-input",
+    "extension": "c",
+    "unsafe": "#include <stdio.h>\nvoid run() { char buffer[128];\nscanf(\"%s\", buffer);\n}",
+    "safe": "#include <stdio.h>\nvoid run() { char buffer[128];\nscanf(\"%127s\", buffer);\n}"
+  },
+  {
+    "rule_id": "dede.c.advanced.unbounded-input",
+    "extension": "cpp",
+    "unsafe": "#include <stdio.h>\nvoid run() { char buffer[128];\nscanf(\"%s\", buffer);\n}",
+    "safe": "#include <stdio.h>\nvoid run() { char buffer[128];\nscanf(\"%127s\", buffer);\n}"
+  },
+  {
+    "rule_id": "dede.c.advanced.uncontrolled-format-string",
+    "extension": "c",
+    "unsafe": "#include <stdio.h>\nint main(int argc, char **argv) {\nchar *message = argv[1];\nprintf(message);\n}",
+    "safe": "#include <stdio.h>\nint main(int argc, char **argv) {\nchar *message = argv[1];\nprintf(\"%s\", message);\n}"
+  },
+  {
+    "rule_id": "dede.c.advanced.uncontrolled-format-string",
+    "extension": "cpp",
+    "unsafe": "#include <stdio.h>\nint main(int argc, char **argv) {\nchar *message = argv[1];\nprintf(message);\n}",
+    "safe": "#include <stdio.h>\nint main(int argc, char **argv) {\nchar *message = argv[1];\nprintf(\"%s\", message);\n}"
+  },
+  {
+    "rule_id": "dede.kotlin.advanced.webview-file-access",
+    "extension": "kt",
+    "unsafe": "fun run() {\nsettings.allowUniversalAccessFromFileURLs = true\n}",
+    "safe": "fun run() {\nsettings.allowUniversalAccessFromFileURLs = false\n}"
+  },
+  {
+    "rule_id": "dede.kotlin.advanced.ecb-cipher",
+    "extension": "kt",
+    "unsafe": "fun run() {\nval cipher = javax.crypto.Cipher.getInstance(\"AES/ECB/PKCS5Padding\")\n}",
+    "safe": "fun run() {\nval cipher = javax.crypto.Cipher.getInstance(\"AES/GCM/NoPadding\")\n}"
+  },
+  {
+    "rule_id": "dede.scala.advanced.ecb-cipher",
+    "extension": "scala",
+    "unsafe": "object Example { def run(): Unit = {\nval cipher = javax.crypto.Cipher.getInstance(\"AES/ECB/PKCS5Padding\")\n} }",
+    "safe": "object Example { def run(): Unit = {\nval cipher = javax.crypto.Cipher.getInstance(\"AES/GCM/NoPadding\")\n} }"
+  },
+  {
+    "rule_id": "dede.swift.advanced.webview-file-access",
+    "extension": "swift",
+    "unsafe": "func run() {\npreferences.setValue(true, forKey: \"allowUniversalAccessFromFileURLs\")\n}",
+    "safe": "func run() {\npreferences.setValue(false, forKey: \"allowUniversalAccessFromFileURLs\")\n}"
+  },
+  {
+    "rule_id": "dede.bash.advanced.curl-tls-unverified",
+    "extension": "sh",
+    "unsafe": "#!/bin/sh\ncurl --insecure https://example.invalid",
+    "safe": "#!/bin/sh\ncurl --cacert ca.pem https://example.invalid"
+  },
+  {
+    "rule_id": "dede.lua.advanced.request-code-execution",
+    "extension": "lua",
+    "unsafe": "local fn = loadstring(ngx.var.arg_code)\n",
+    "safe": "local code = ngx.var.arg_code\nlocal fn = loadstring(\"return 1\")"
+  },
+  {
+    "rule_id": "dede.elixir.advanced.request-code-execution",
+    "extension": "ex",
+    "unsafe": "defmodule Example do\ndef run(conn) do\nCode.eval_string(conn.params[\"code\"])\nend\nend\n",
+    "safe": "defmodule Example do\ndef run(conn) do\ncode = conn.params[\"code\"]\nCode.eval_string(\"1 + 1\")\nend\nend\n"
+  },
+  {
+    "rule_id": "dede.clojure.advanced.reader-eval-enabled",
+    "extension": "clj",
+    "unsafe": "(binding [*read-eval* true] (read-string input))",
+    "safe": "(binding [*read-eval* false] (read-string input))"
+  },
+  {
+    "rule_id": "dede.ocaml.advanced.untrusted-command",
+    "extension": "ml",
+    "unsafe": "let () =\nlet command = Sys.argv.(1) in\nignore (Sys.command command)",
+    "safe": "let () =\nlet value = Sys.argv.(1) in\nignore (Sys.command \"date\")"
+  },
+  {
+    "rule_id": "dede.solidity.advanced.tx-origin-auth",
+    "extension": "sol",
+    "unsafe": "pragma solidity ^0.8.0;\ncontract Example { address owner; function run() public {\nrequire(tx.origin == owner, \"denied\");\n} }",
+    "safe": "pragma solidity ^0.8.0;\ncontract Example { address owner; function run() public {\nrequire(msg.sender == owner, \"denied\");\n} }"
+  },
+  {
+    "rule_id": "dede.apex.advanced.soql-injection",
+    "extension": "cls",
+    "unsafe": "public class Example { public void run() {\nDatabase.query('SELECT Id FROM Account WHERE Name = ' + ApexPages.currentPage().getParameters().get('name'));\n} }\n",
+    "safe": "public class Example { public void run() {\nString name = ApexPages.currentPage().getParameters().get('name');\nDatabase.query('SELECT Id FROM Account WHERE Name = :name');\n} }"
+  },
+  {
+    "rule_id": "dede.powershell.advanced.tls-check-skipped",
+    "extension": "ps1",
+    "unsafe": "Invoke-WebRequest -Uri $url -SkipCertificateCheck\n",
+    "safe": "Invoke-WebRequest -Uri $url -SkipCertificateCheck:$false\n"
+  },
+  {
+    "rule_id": "dede.powershell.advanced.tls-check-skipped",
+    "extension": "psm1",
+    "unsafe": "Invoke-WebRequest -Uri $url -SkipCertificateCheck\n",
+    "safe": "Invoke-WebRequest -Uri $url -SkipCertificateCheck:$false\n"
+  },
+  {
+    "rule_id": "dede.powershell.advanced.download-execute",
+    "extension": "ps1",
+    "unsafe": "Invoke-RestMethod -Uri $url | Invoke-Expression\n",
+    "safe": "Invoke-RestMethod -Uri $url | ConvertTo-Json\n"
+  },
+  {
+    "rule_id": "dede.powershell.advanced.download-execute",
+    "extension": "psm1",
+    "unsafe": "Invoke-RestMethod -Uri $url | Invoke-Expression\n",
+    "safe": "Invoke-RestMethod -Uri $url | ConvertTo-Json\n"
+  },
+  {
+    "rule_id": "dede.vbnet.advanced.vb-json-type-handling",
+    "extension": "vb",
+    "unsafe": "settings.TypeNameHandling = TypeNameHandling.All\n",
+    "safe": "settings.TypeNameHandling = TypeNameHandling.None\n"
+  },
+  {
+    "rule_id": "dede.vbnet.advanced.vb-jwt-signature-disabled",
+    "extension": "vb",
+    "unsafe": "options.RequireSignedTokens = False\n",
+    "safe": "options.RequireSignedTokens = True\n"
+  },
+  {
+    "rule_id": "dede.fsharp.advanced.fsharp-tls-validation-disabled",
+    "extension": "fs",
+    "unsafe": "handler.ServerCertificateCustomValidationCallback <- HttpClientHandler.DangerousAcceptAnyServerCertificateValidator\n",
+    "safe": "handler.ServerCertificateCustomValidationCallback <- validateCertificate\n"
+  },
+  {
+    "rule_id": "dede.fsharp.advanced.fsharp-tls-validation-disabled",
+    "extension": "fsx",
+    "unsafe": "handler.ServerCertificateCustomValidationCallback <- HttpClientHandler.DangerousAcceptAnyServerCertificateValidator\n",
+    "safe": "handler.ServerCertificateCustomValidationCallback <- validateCertificate\n"
+  },
+  {
+    "rule_id": "dede.fsharp.advanced.fsharp-json-type-handling",
+    "extension": "fs",
+    "unsafe": "settings.TypeNameHandling <- TypeNameHandling.Auto\n",
+    "safe": "settings.TypeNameHandling <- TypeNameHandling.None\n"
+  },
+  {
+    "rule_id": "dede.fsharp.advanced.fsharp-json-type-handling",
+    "extension": "fsx",
+    "unsafe": "settings.TypeNameHandling <- TypeNameHandling.Auto\n",
+    "safe": "settings.TypeNameHandling <- TypeNameHandling.None\n"
+  },
+  {
+    "rule_id": "dede.dart.advanced.dart-tls-validation-disabled",
+    "extension": "dart",
+    "unsafe": "client.badCertificateCallback = (cert, host, port) => true;\n",
+    "safe": "client.badCertificateCallback = (cert, host, port) => false;\n"
+  },
+  {
+    "rule_id": "dede.dart.advanced.dart-webview-unrestricted-js",
+    "extension": "dart",
+    "unsafe": "controller.setJavaScriptMode(JavaScriptMode.unrestricted);\n",
+    "safe": "controller.setJavaScriptMode(JavaScriptMode.disabled);\n"
+  },
+  {
+    "rule_id": "dede.sql.advanced.sql-command-shell-enabled",
+    "extension": "sql",
+    "unsafe": "EXEC sp_configure 'xp_cmdshell', 1;\n",
+    "safe": "EXEC sp_configure 'xp_cmdshell', 0;\n"
+  },
+  {
+    "rule_id": "dede.sql.advanced.sql-trustworthy-enabled",
+    "extension": "sql",
+    "unsafe": "ALTER DATABASE app SET TRUSTWORTHY ON;\n",
+    "safe": "ALTER DATABASE app SET TRUSTWORTHY OFF;\n"
+  },
+  {
+    "rule_id": "dede.perl.advanced.perl-tls-verification-disabled",
+    "extension": "pl",
+    "unsafe": "$client->ssl_opts(verify_hostname => 0);\n",
+    "safe": "$client->ssl_opts(verify_hostname => 1);\n"
+  },
+  {
+    "rule_id": "dede.perl.advanced.perl-tls-verification-disabled",
+    "extension": "pm",
+    "unsafe": "$client->ssl_opts(verify_hostname => 0);\n",
+    "safe": "$client->ssl_opts(verify_hostname => 1);\n"
+  },
+  {
+    "rule_id": "dede.hcl.advanced.terraform-public-ssh",
+    "extension": "tf",
+    "unsafe": "resource \"aws_security_group\" \"admin\" {\ningress {\nfrom_port = 22\nto_port = 22\nprotocol = \"tcp\"\ncidr_blocks = [\"0.0.0.0/0\"]\n}\n}",
+    "safe": "resource \"aws_security_group\" \"admin\" {\ningress {\nfrom_port = 22\nto_port = 22\nprotocol = \"tcp\"\ncidr_blocks = [\"10.0.0.0/24\"]\n}\n}"
+  },
+  {
+    "rule_id": "dede.yaml.advanced.kubernetes-host-pid",
+    "extension": "yml",
+    "unsafe": "apiVersion: v1\nkind: Pod\nspec:\n  hostPID: true\n",
+    "safe": "apiVersion: v1\nkind: Pod\nspec:\n  hostPID: false\n"
+  },
+  {
+    "rule_id": "dede.dockerfile.advanced.docker-tls-unverified",
+    "extension": "Dockerfile",
+    "unsafe": "FROM alpine:3.20\nRUN curl --insecure https://example.invalid/file\n",
+    "safe": "FROM alpine:3.20\nRUN curl --cacert ca.pem https://example.invalid/file\n"
+  },
+  {
+    "rule_id": "dede.xml.advanced.aspnet-debug-enabled",
+    "extension": "config",
+    "unsafe": "<configuration>\n<system.web>\n<compilation debug=\"true\" />\n</system.web>\n</configuration>\n",
+    "safe": "<configuration>\n<system.web>\n<compilation debug=\"false\" />\n</system.web>\n</configuration>\n"
+  },
+  {
+    "rule_id": "dede.xml.advanced.aspnet-debug-enabled",
+    "extension": "xml",
+    "unsafe": "<configuration>\n<system.web>\n<compilation debug=\"true\" />\n</system.web>\n</configuration>\n",
+    "safe": "<configuration>\n<system.web>\n<compilation debug=\"false\" />\n</system.web>\n</configuration>\n"
+  },
+  {
+    "rule_id": "dede.xml.advanced.aspnet-viewstate-mac-disabled",
+    "extension": "config",
+    "unsafe": "<configuration>\n<system.web>\n<pages enableViewStateMac=\"false\" />\n</system.web>\n</configuration>\n",
+    "safe": "<configuration>\n<system.web>\n<pages enableViewStateMac=\"true\" />\n</system.web>\n</configuration>\n"
+  },
+  {
+    "rule_id": "dede.xml.advanced.aspnet-viewstate-mac-disabled",
+    "extension": "xml",
+    "unsafe": "<configuration>\n<system.web>\n<pages enableViewStateMac=\"false\" />\n</system.web>\n</configuration>\n",
+    "safe": "<configuration>\n<system.web>\n<pages enableViewStateMac=\"true\" />\n</system.web>\n</configuration>\n"
+  },
+  {
+    "rule_id": "dede.json.advanced.npm-tls-disabled",
+    "extension": "json",
+    "unsafe": "{\"strict-ssl\": false}\n",
+    "safe": "{\"strict-ssl\": true}\n"
+  },
+  {
+    "rule_id": "dede.toml.advanced.poetry-tls-disabled",
+    "extension": "toml",
+    "unsafe": "[certificates.internal]\ncert = false\n",
+    "safe": "[certificates.internal]\ncert = \"/etc/ssl/internal.pem\"\n"
+  },
+  {
+    "rule_id": "dede.html.advanced.angular-trusted-html",
+    "extension": "html",
+    "unsafe": "<div ng-bind-html-unsafe=\"message\"></div>\n",
+    "safe": "<div ng-bind=\"message\"></div>\n"
+  },
+  {
+    "rule_id": "dede.csharp.advanced.sql-injection",
+    "extension": "cs",
+    "unsafe": "class Endpoint { public void Run([FromQuery] string name) {\nvar query = \"SELECT * FROM users WHERE name = \" + name;\nvar cmd = new System.Data.SqlClient.SqlCommand(query);\n} }\n",
+    "safe": "class Endpoint { public void Run([FromQuery] string name) {\nvar cmd = new System.Data.SqlClient.SqlCommand(\"SELECT * FROM users WHERE name = @name\");\ncmd.Parameters.AddWithValue(\"@name\", name);\n} }\n"
+  },
+  {
+    "rule_id": "dede.csharp.advanced.sql-injection",
+    "extension": "cs",
+    "unsafe": "using Microsoft.Data.SqlClient;\nclass Endpoint { void Run() {\nvar input = Request.QueryString[\"q\"];\nvar cmd = new SqlCommand($\"SELECT * FROM users WHERE name = {input}\");\n} }\n",
+    "safe": "using Microsoft.Data.SqlClient;\nclass Endpoint { void Run() {\nvar input = Request.QueryString[\"q\"];\nvar cmd = new SqlCommand(\"SELECT * FROM users WHERE name = @q\");\ncmd.Parameters.AddWithValue(\"@q\", input);\n} }\n"
+  },
+  {
+    "rule_id": "dede.csharp.advanced.sql-injection",
+    "extension": "cs",
+    "unsafe": "class Endpoint { void Run() {\nvar input = Request.Query[\"q\"].ToString();\nvar rows = db.Users.FromSqlRaw($\"SELECT * FROM users WHERE name = {input}\");\n} }\n",
+    "safe": "class Endpoint { void Run() {\nvar input = Request.Query[\"q\"].ToString();\nvar rows = db.Users.FromSqlInterpolated($\"SELECT * FROM users WHERE name = {input}\");\n} }\n"
+  },
+  {
+    "rule_id": "dede.csharp.advanced.sql-injection",
+    "extension": "cs",
+    "unsafe": "class Endpoint { void Run() {\nvar input = Request.Query[\"q\"].ToString();\nvar result = db.ExecuteSqlRaw(\"DELETE FROM users WHERE name = \" + input).ToString();\n} }\n",
+    "safe": "class Endpoint { void Run() {\nvar input = Request.Query[\"q\"].ToString();\ninput = \"known\";\nvar result = db.ExecuteSqlRaw(\"DELETE FROM users WHERE name = \" + input);\n} }\n"
+  },
+  {
+    "rule_id": "dede.csharp.advanced.xss",
+    "extension": "cs",
+    "unsafe": "class Endpoint { void Run() {\nvar input = Request.Form[\"html\"].ToString();\nHtml.Raw(input);\nvar encoded = System.Net.WebUtility.HtmlEncode(input);\n} }\n",
+    "safe": "class Endpoint { void Run() {\nvar input = Request.Form[\"html\"].ToString();\nHtml.Raw(System.Net.WebUtility.HtmlEncode(input));\n} }\n"
+  },
+  {
+    "rule_id": "dede.java.advanced.spel-injection",
+    "extension": "java",
+    "unsafe": "class Sample { void run(javax.servlet.http.HttpServletRequest req) {\nvar parser = new org.springframework.expression.spel.standard.SpelExpressionParser();\nvar expr = parser.parseExpression(req.getParameter(\"q\"));\n} }\n",
+    "safe": "class Sample { void run(javax.servlet.http.HttpServletRequest req) {\nvar parser = new org.springframework.expression.spel.standard.SpelExpressionParser();\nvar expr = parser.parseExpression(\"name.length() > 3\");\n} }\n"
+  },
+  {
+    "rule_id": "dede.go.advanced.weak-crypto-rand",
+    "extension": "go",
+    "unsafe": "package main\nimport (\n\"math/rand\"\n)\nfunc main() {\nbuf := make([]byte, 16)\nrand.Read(buf)\n}\n",
+    "safe": "package main\nimport (\ncrand \"crypto/rand\"\n)\nfunc main() {\nbuf := make([]byte, 16)\ncrand.Read(buf)\n}\n"
+  },
+  {
+    "rule_id": "dede.python.advanced.db-driver-sql-injection",
+    "extension": "py",
+    "unsafe": "import psycopg2\nfrom flask import request\ndef query():\nconn = psycopg2.connect(\"dsn\")\ncur = conn.cursor()\ncur.execute(\"SELECT * FROM users WHERE name = %s\" % request.args.get(\"name\"))\n",
+    "safe": "import psycopg2\nfrom flask import request\ndef query():\nconn = psycopg2.connect(\"dsn\")\ncur = conn.cursor()\ncur.execute(\"SELECT * FROM users WHERE name = %s\", (request.args.get(\"name\"),))\n"
+  },
+  {
+    "rule_id": "dede.python.advanced.ssl-disabled-db-connect",
+    "extension": "py",
+    "unsafe": "import psycopg2\nconn = psycopg2.connect(host=\"db.internal\", sslmode=\"disable\")\n",
+    "safe": "import psycopg2\nconn = psycopg2.connect(host=\"db.internal\", sslmode=\"require\")\n"
+  },
+  {
+    "rule_id": "dede.python.advanced.pymongo-tls-disabled",
+    "extension": "py",
+    "unsafe": "import pymongo\nclient = pymongo.MongoClient(\"mongodb://db.internal:27017\", tls=False)\n",
+    "safe": "import pymongo\nclient = pymongo.MongoClient(\"mongodb://db.internal:27017\", tls=True)\n"
+  },
+  {
+    "rule_id": "dede.java.advanced.jndi-lookup-untrusted",
+    "extension": "java",
+    "unsafe": "class Sample { void run(javax.servlet.http.HttpServletRequest req) throws Exception {\nvar ctx = new javax.naming.InitialContext();\nObject value = ctx.lookup(req.getParameter(\"name\"));\n} }\n",
+    "safe": "class Sample { void run(javax.servlet.http.HttpServletRequest req) throws Exception {\nvar ctx = new javax.naming.InitialContext();\nObject value = ctx.lookup(\"java:comp/env/jdbc/appDb\");\n} }\n"
+  },
+  {
+    "rule_id": "dede.java.advanced.mysql-sslmode-weak",
+    "extension": "java",
+    "unsafe": "class Sample { Connection run() throws Exception {\nreturn java.sql.DriverManager.getConnection(\"jdbc:mysql://db.internal:3306/app?sslMode=DISABLED\");\n} }\n",
+    "safe": "class Sample { Connection run() throws Exception {\nreturn java.sql.DriverManager.getConnection(\"jdbc:mysql://db.internal:3306/app?sslMode=REQUIRED\");\n} }\n"
+  },
+  {
+    "rule_id": "dede.kotlin.advanced.webview-js-bridge",
+    "extension": "kt",
+    "unsafe": "fun configure(webView: WebView) {\nwebView.addJavascriptInterface(Bridge(), \"Android\")\n}\n",
+    "safe": "fun configure(webView: WebView) {\nwebView.settings.javaScriptEnabled = false\n}\n"
+  },
+  {
+    "rule_id": "dede.kotlin.advanced.webview-js-enabled",
+    "extension": "kt",
+    "unsafe": "fun configure(settings: WebSettings) {\nsettings.setJavaScriptEnabled(true)\n}\n",
+    "safe": "fun configure(settings: WebSettings) {\nsettings.setJavaScriptEnabled(false)\n}\n"
+  },
+  {
+    "rule_id": "dede.php.advanced.mass-assignment",
+    "extension": "php",
+    "unsafe": "<?php\nRoute::post('/users', function (Request $request) {\nUser::create($request->all());\n});\n",
+    "safe": "<?php\nRoute::post('/users', function (Request $request) {\nUser::create($request->safe()->only(['name', 'email']));\n});\n"
+  },
+  {
+    "rule_id": "dede.swift.advanced.uiwebview-deprecated",
+    "extension": "swift",
+    "unsafe": "func makeView() -> UIWebView {\nreturn UIWebView(frame: .zero)\n}\n",
+    "safe": "func makeView() -> WKWebView {\nreturn WKWebView(frame: .zero)\n}\n"
+  },
+  {
+    "rule_id": "dede.javascript.advanced.angular-bypass",
+    "extension": "ts",
+    "unsafe": "class Sample {\nconstructor(sanitizer: DomSanitizer) {\nthis.sanitizer = sanitizer;\n}\ntrusted(value: string) {\nreturn this.sanitizer.bypassSecurityTrustHtml(value);\n}\n}\n",
+    "safe": "class Sample {\nconstructor(sanitizer: DomSanitizer) {\nthis.sanitizer = sanitizer;\n}\ntrusted(value: string) {\nreturn value;\n}\n}\n"
+  },
+  {
+    "rule_id": "dede.javascript.advanced.angular-bypass",
+    "extension": "js",
+    "unsafe": "trusted(value) {\nreturn domSanitizer.bypassSecurityTrustUrl(value);\n}\n",
+    "safe": "trusted(value) {\nreturn value;\n}\n"
+  }
+]

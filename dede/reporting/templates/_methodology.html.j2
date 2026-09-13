@@ -1,0 +1,124 @@
+{% from "_macros.html.j2" import page_chrome with context %}
+{{ page_chrome('13 / Methodology & Appendix') }}
+<section class="section" id="methodology">
+  <p class="section-kicker">13 / Methodology</p>
+  <h2>Transparent analysis, reproducible decisions</h2>
+  {% if result.metadata.ai_status %}
+  <p><strong>AI review coverage:</strong> {{ result.metadata.ai_status }}</p>
+  {% if result.metadata.ai_validation_counts %}
+  <p><strong>Static verification of AI reviews:</strong> {% for status, count in result.metadata.ai_validation_counts.items() %}{{ status }}: {{ count }}{% if not loop.last %}; {% endif %}{% endfor %}</p>
+  <p><strong>Static checks of proposed examples:</strong> {% for status, count in result.metadata.ai_fix_counts.items() %}{{ status }}: {{ count }}{% if not loop.last %}; {% endif %}{% endfor %}</p>
+  {% endif %}
+  {% endif %}
+
+  <div class="two-col">
+    <div class="col">
+      <h3>Analysis Techniques</h3>
+      <p class="muted">Only techniques used by the engine for this scan.</p>
+      <ul class="compact">
+        {% for item in methodologies %}
+        <li>{{ item }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="col">
+      <h3>Confidence Model</h3>
+      <ul class="compact">
+        <li><strong>High:</strong> strong evidence or deterministic match.</li>
+        <li><strong>Medium:</strong> likely issue with incomplete contextual evidence.</li>
+        <li><strong>Low:</strong> possible weakness; human review required.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="two-col" style="margin-top:0.75rem;">
+    <div class="col callout ok">
+      <strong>No invented evidence.</strong>
+      Unknown values remain unknown. The report does not create code paths, CVEs, scores, positive security signals or business impact claims unsupported by the analysis result.
+    </div>
+    <div class="col callout neutral">
+      <strong>Human review remains part of AppSec.</strong>
+      Static analysis identifies code-level risk signals. Business logic, runtime configuration and deployment context may require additional verification.
+    </div>
+  </div>
+</section>
+
+<section class="section" id="appendix">
+  <p class="section-kicker">Appendix</p>
+  <h2>Scan metadata</h2>
+  <table class="data">
+    <tbody>
+      <tr><th>Analysis ID</th><td class="mono">{{ analysis_id }}</td></tr>
+      <tr><th>Engine Version</th><td class="mono">{{ result.metadata.scanner_version }}</td></tr>
+      <tr><th>Engine Label</th><td>{{ engine_label }}</td></tr>
+      <tr><th>Target</th><td class="mono">{{ result.metadata.target }}</td></tr>
+      <tr><th>Repository</th><td class="mono">{{ repository }}</td></tr>
+      <tr><th>Branch</th><td class="mono">{{ branch }}</td></tr>
+      <tr><th>Commit</th><td class="mono">{{ commit }}</td></tr>
+      <tr><th>Started</th><td>{{ result.metadata.scan_started }}</td></tr>
+      <tr><th>Finished</th><td>{{ result.metadata.scan_finished or 'n/a' }}</td></tr>
+      <tr><th>Offline Mode</th><td>{{ result.metadata.offline_mode }}</td></tr>
+      <tr><th>AI Enrichment</th><td>{{ ai_label }}</td></tr>
+      <tr><th>Fail-on Policy</th><td>{{ result.metadata.fail_on or 'n/a' }}</td></tr>
+      <tr><th>Suppressed Findings</th><td>{{ suppressed_count }}</td></tr>
+      <tr><th>Resolved Findings</th><td>{{ resolved_count }}</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Report Integrity & Portability</h3>
+  <table class="data">
+    <tbody>
+      <tr><th>Scan manifest digest</th><td class="mono">{{ governance_metrics.manifest_digest or 'n/a' }}</td></tr>
+      <tr><th>Machine-readable evidence</th><td>{% if pdf %}Embedded as <span class="mono">dede-report-evidence.json</span>{% else %}Available in <span class="mono">report.json</span> when JSON output is enabled{% endif %}</td></tr>
+      <tr><th>PDF archival mode</th><td>{% if pdf %}PDF/A-3u with tagged structure; SHA-256 sidecar generated{% else %}n/a (HTML is a self-contained offline document){% endif %}</td></tr>
+      <tr><th>Network dependencies</th><td>None required to view this report</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Suggested Remediation SLA</h3>
+  <p class="footer-note">These are report guidance targets, not evidence that a specific organizational SLA is configured.</p>
+  <table class="data">
+    <thead><tr><th>Severity</th><th>Suggested target</th><th>Suggested action</th></tr></thead>
+    <tbody>{% for row in remediation_sla %}<tr><td><span class="badge {{ row.severity }}">{{ row.severity }}</span></td><td>{{ row.target }}</td><td>{{ row.action }}</td></tr>{% endfor %}</tbody>
+  </table>
+
+  <h3>Ruleset Versions</h3>
+  <table class="data">
+    <thead><tr><th>Component</th><th>Version</th></tr></thead>
+    <tbody>
+      {% for key, value in result.metadata.ruleset_versions.items() %}
+      <tr><td>{{ key }}</td><td class="mono">{{ value }}</td></tr>
+      {% else %}
+      <tr><td colspan="2" class="muted">No ruleset versions recorded.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h3>Rule IDs Triggered</h3>
+  {% if rules_triggered %}
+  <p class="mono" style="overflow-wrap:anywhere;">{{ rules_triggered|join(', ') }}</p>
+  {% else %}
+  <p class="muted">None.</p>
+  {% endif %}
+
+  {% if result.suppressed_findings %}
+  <h3>Suppressed Findings</h3>
+  <table class="data">
+    <thead><tr><th>ID</th><th>Rule</th><th>File</th><th>Reason</th></tr></thead>
+    <tbody>
+      {% for f in result.suppressed_findings %}
+      <tr>
+        <td class="mono">{{ f.id }}</td>
+        <td>{{ f.rule_id }}</td>
+        <td class="mono">{{ f.file }}:{{ f.start_line }}</td>
+        <td>{{ f.suppress_reason or 'n/a' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+
+  <p class="cover-footer" style="margin-top:1.25rem;">
+    dede · STATIC SOURCE CODE ANALYSIS
+  </p>
+</section>

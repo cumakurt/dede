@@ -1,0 +1,434 @@
+{
+  "schema": 1,
+  "rules": [
+    {
+      "id": "dede.php.execution.dynamic-eval",
+      "message": "PHP eval executes a dynamic expression and can enable code injection.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "php"
+      ],
+      "when": [
+        {
+          "regex": "\\beval\\s*\\(\\s*\\$",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-95"
+      ],
+      "owasp": [
+        "A03:2025"
+      ],
+      "asvs": [
+        "v5.0.0-5.3.3"
+      ],
+      "recommendation": "Replace eval with explicit parsing and an allowlist of supported operations.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/95.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.php.deserialize.dynamic-unserialize",
+      "message": "PHP unserialize is called on dynamic data and may instantiate attacker-controlled objects.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "php"
+      ],
+      "when": [
+        {
+          "regex": "\\bunserialize\\s*\\(\\s*\\$",
+          "not_regex": "allowed_classes\\s*=>\\s*false",
+          "same_line": true
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-502"
+      ],
+      "owasp": [
+        "A08:2025"
+      ],
+      "asvs": [
+        "v5.0.0-13.3.1"
+      ],
+      "recommendation": "Use JSON for untrusted data; if legacy deserialization is unavoidable, authenticate the payload and disallow classes.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/502.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.php.command.superglobal-to-shell",
+      "message": "A request superglobal is passed directly to a PHP command-execution function.",
+      "severity": "CRITICAL",
+      "category": "security",
+      "languages": [
+        "php"
+      ],
+      "when": [
+        {
+          "regex": "\\b(system|exec|shell_exec|passthru)\\s*\\([^)]*\\$_(GET|POST|REQUEST|COOKIE)",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-78"
+      ],
+      "owasp": [
+        "A03:2025"
+      ],
+      "asvs": [
+        "v5.0.0-5.3.4"
+      ],
+      "recommendation": "Avoid a shell; pass validated allowlisted values to a fixed executable through a structured process API.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/78.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.php.sql.superglobal-query",
+      "message": "A request superglobal is interpolated directly into a database query call.",
+      "severity": "CRITICAL",
+      "category": "security",
+      "languages": [
+        "php"
+      ],
+      "when": [
+        {
+          "regex": "(query|exec)\\s*\\([^;]*(\\$_(GET|POST|REQUEST|COOKIE)|\\{\\$)",
+          "same_line": true
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-89"
+      ],
+      "owasp": [
+        "A03:2025"
+      ],
+      "asvs": [
+        "v5.0.0-15.5.1"
+      ],
+      "recommendation": "Use prepared statements and bind every untrusted value as a parameter.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/89.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.ruby.execution.eval-params",
+      "message": "Ruby eval receives request parameters and can execute attacker-controlled code.",
+      "severity": "CRITICAL",
+      "category": "security",
+      "languages": [
+        "ruby"
+      ],
+      "when": [
+        {
+          "regex": "\\beval\\s*\\(?\\s*params\\s*\\[",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-95"
+      ],
+      "owasp": [
+        "A03:2025"
+      ],
+      "asvs": [
+        "v5.0.0-5.3.3"
+      ],
+      "recommendation": "Remove eval and map accepted input values to explicit operations.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/95.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.ruby.deserialize.yaml-load",
+      "message": "Ruby YAML.load may instantiate arbitrary objects from untrusted YAML.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "ruby"
+      ],
+      "when": [
+        {
+          "regex": "\\bYAML\\.(load|unsafe_load)\\s*\\(",
+          "same_line": true
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-502"
+      ],
+      "owasp": [
+        "A08:2025"
+      ],
+      "asvs": [
+        "v5.0.0-13.3.1"
+      ],
+      "recommendation": "Use YAML.safe_load with a minimal permitted class and symbol list.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/502.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.ruby.command.params-to-shell",
+      "message": "Ruby passes request parameters to a shell execution API.",
+      "severity": "CRITICAL",
+      "category": "security",
+      "languages": [
+        "ruby"
+      ],
+      "when": [
+        {
+          "regex": "\\b(system|exec)\\s*\\(?[^#\\n]*params\\s*\\[",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-78"
+      ],
+      "owasp": [
+        "A03:2025"
+      ],
+      "asvs": [
+        "v5.0.0-5.3.4"
+      ],
+      "recommendation": "Use the array form of process APIs with a fixed command and allowlisted arguments.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/78.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.csharp.deserialize-binaryformatter",
+      "message": "BinaryFormatter is an unsafe object-graph deserializer.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "c#"
+      ],
+      "when": [
+        {
+          "regex": "\\bnew\\s+(?:[\\w]+\\.)*BinaryFormatter\\s*\\("
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-502"
+      ],
+      "owasp": [
+        "A08:2025"
+      ],
+      "asvs": [
+        "v5.0.0-13.3.1"
+      ],
+      "recommendation": "Migrate BinaryFormatter data to a schema-bound format such as System.Text.Json; a binder cannot make BinaryFormatter safe for untrusted data.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/502.html"
+      ],
+      "mode": "document",
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.rust.command.shell-c",
+      "message": "Rust launches a command through a shell -c argument, which is unsafe with dynamic input.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "rust"
+      ],
+      "when": [
+        {
+          "regex": "Command::new\\s*\\(\\s*[\"'](sh|bash)[\"']\\s*\\)",
+          "same_line": true
+        }
+      ],
+      "if": [
+        {
+          "contains": ".arg(\"-c\")"
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-78"
+      ],
+      "owasp": [
+        "A03:2025"
+      ],
+      "asvs": [
+        "v5.0.0-5.3.4"
+      ],
+      "recommendation": "Invoke the intended executable directly and pass each validated argument separately.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/78.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.c.memory.unbounded-gets",
+      "message": "gets cannot enforce a destination-buffer bound and enables memory corruption.",
+      "severity": "CRITICAL",
+      "category": "security",
+      "languages": [
+        "c",
+        "c++"
+      ],
+      "when": [
+        {
+          "regex": "(^|[^a-zA-Z0-9_])gets\\s*\\(",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-120"
+      ],
+      "owasp": [
+        "A06:2025"
+      ],
+      "asvs": [
+        "v5.0.0-11.3.3"
+      ],
+      "recommendation": "Use fgets with the actual destination-buffer size and validate truncation.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/120.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.c.memory-unbounded-strcpy",
+      "message": "strcpy copies without a destination-buffer bound.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "c",
+        "c++"
+      ],
+      "when": [
+        {
+          "regex": "(^|[^a-zA-Z0-9_])strcpy\\s*\\(",
+          "same_line": true
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-120"
+      ],
+      "owasp": [
+        "A06:2025"
+      ],
+      "asvs": [
+        "v5.0.0-11.3.3"
+      ],
+      "recommendation": "Use a bounds-aware abstraction and verify destination capacity before copying.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/120.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.c.format-unbounded-sprintf",
+      "message": "sprintf writes formatted output without a destination-buffer bound.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "c",
+        "c++"
+      ],
+      "when": [
+        {
+          "regex": "(^|[^a-zA-Z0-9_])sprintf\\s*\\(",
+          "same_line": true
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-120"
+      ],
+      "owasp": [
+        "A06:2025"
+      ],
+      "asvs": [
+        "v5.0.0-11.3.3"
+      ],
+      "recommendation": "Use snprintf with the correct destination size and check for truncation.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/120.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.shell.execution-eval-expansion",
+      "message": "Shell eval executes dynamically expanded text as code.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "shell"
+      ],
+      "when": [
+        {
+          "regex": "^\\s*eval\\s+[\"']?\\$",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-95"
+      ],
+      "owasp": [
+        "A03:2025"
+      ],
+      "asvs": [
+        "v5.0.0-5.3.3"
+      ],
+      "recommendation": "Remove eval; use arrays, case statements, or direct commands with quoted arguments.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/95.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.shell.dynamic-source",
+      "message": "Shell source/dot loads a dynamically selected file into the current process.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "shell"
+      ],
+      "when": [
+        {
+          "regex": "^\\s*(source|\\.)\\s+[\"']?\\$",
+          "same_line": true
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-829"
+      ],
+      "owasp": [
+        "A08:2025"
+      ],
+      "asvs": [
+        "v5.0.0-1.2.4"
+      ],
+      "recommendation": "Source only fixed, trusted paths owned by the application; never derive the path from external input.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/829.html"
+      ],
+      "exclude_comments": true
+    }
+  ]
+}

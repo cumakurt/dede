@@ -1,0 +1,46 @@
+{% from "_macros.html.j2" import page_chrome with context %}
+{{ page_chrome('03 / Security Score') }}
+<section class="section" id="security-score">
+  <p class="section-kicker">03 / Security Score</p>
+  <h2>Risk model with explainable factors</h2>
+
+  {% if security_score is not none and result.risk %}
+  <div class="two-col">
+    <div class="col">
+      <div class="score-hero">{{ security_score }}<span>OF 100 — {{ security_score_label }}</span></div>
+      <p class="muted" style="margin-top:0.75rem;">
+        A composite posture indicator derived from the engine risk score
+        (Security Score = 100 − engine risk). It does not replace finding review.
+      </p>
+      <p class="muted">Engine risk: {{ result.risk.score }}/100 ({{ result.risk.category }})</p>
+    </div>
+    <div class="col">
+      <h3>Score Interpretation</h3>
+      <ul class="band-list">
+        <li>0–39 Critical Risk</li>
+        <li>40–59 High Risk</li>
+        <li>60–74 Elevated Risk</li>
+        <li>75–89 Moderate / Good</li>
+        <li>90–100 Strong</li>
+      </ul>
+    </div>
+  </div>
+
+  {% if contributing_factors %}
+  <h3>Contributing Factors</h3>
+  <p class="muted">Only factors backed by this scan’s metrics are shown. Exploitability and reachability are omitted when not produced by the engine.</p>
+  <ul class="factor-list">
+    {% for f in contributing_factors %}
+    <li><span>{{ f.name }} <span class="muted">{{ f.note }}</span></span><strong>{{ f.value }}</strong></li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+
+  <div class="callout neutral">
+    <strong>Why this score is actionable.</strong>
+    The score is a portfolio-level signal. Severity, confidence and evidence remain visible so engineering teams can challenge the underlying risk.
+  </div>
+  {% else %}
+  <p class="muted">Security score not available for this analysis.</p>
+  {% endif %}
+</section>

@@ -1,0 +1,497 @@
+rules:
+- id: kotlin.lang.security.weak-rsa.use-of-weak-rsa-key
+  message: RSA keys should be at least 2048 bits based on NIST recommendation.
+  languages:
+  - kt
+  severity: WARNING
+  metadata:
+    cwe:
+    - 'CWE-326: Inadequate Encryption Strength'
+    owasp:
+    - A03:2017 - Sensitive Data Exposure
+    - A02:2021 - Cryptographic Failures
+    - A04:2025 - Cryptographic Failures
+    source-rule-url: https://find-sec-bugs.github.io/bugs.htm#RSA_KEY_SIZE
+    asvs:
+      section: V6 Stored Cryptography Verification Requirements
+      control_id: 6.2.5 Insecure Algorithm
+      control_url: https://github.com/OWASP/ASVS/blob/master/4.0/en/0x14-V6-Cryptography.md#v62-algorithms
+      version: '4'
+    references:
+    - https://cheatsheetseries.owasp.org/cheatsheets/Cryptographic_Storage_Cheat_Sheet.html#algorithms
+    category: security
+    technology:
+    - kotlin
+    subcategory:
+    - audit
+    likelihood: HIGH
+    impact: MEDIUM
+    confidence: HIGH
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Cryptographic Issues
+    source: https://semgrep.dev/r/kotlin.lang.security.weak-rsa.use-of-weak-rsa-key
+    shortlink: https://sg.run/krq7
+    semgrep.dev:
+      rule:
+        r_id: 15128
+        rv_id: 1263269
+        rule_id: nJUZNL
+        version_id: X0TzypE
+        url: https://semgrep.dev/playground/r/X0TzypE/kotlin.lang.security.weak-rsa.use-of-weak-rsa-key
+        origin: community
+  patterns:
+  - pattern-either:
+    - pattern: |
+        $KEY = $G.getInstance("RSA")
+        ...
+        $KEY.initialize($BITS)
+  - metavariable-comparison:
+      metavariable: $BITS
+      comparison: $BITS < 2048
+- id: kotlin.lang.security.use-of-md5.use-of-md5
+  message: Detected MD5 hash algorithm which is considered insecure. MD5 is not collision
+    resistant and is therefore not suitable as a cryptographic signature. Use SHA256
+    or SHA3 instead.
+  languages:
+  - kt
+  severity: WARNING
+  metadata:
+    owasp:
+    - A03:2017 - Sensitive Data Exposure
+    - A02:2021 - Cryptographic Failures
+    - A04:2025 - Cryptographic Failures
+    cwe:
+    - 'CWE-328: Use of Weak Hash'
+    source-rule-url: https://find-sec-bugs.github.io/bugs.htm#WEAK_MESSAGE_DIGEST_MD5
+    category: security
+    technology:
+    - kotlin
+    references:
+    - https://owasp.org/Top10/A02_2021-Cryptographic_Failures
+    subcategory:
+    - vuln
+    likelihood: LOW
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Insecure Hashing Algorithm
+    source: https://semgrep.dev/r/kotlin.lang.security.use-of-md5.use-of-md5
+    shortlink: https://sg.run/4eQx
+    semgrep.dev:
+      rule:
+        r_id: 14700
+        rv_id: 1263267
+        rule_id: qNUXPj
+        version_id: pZT03Jd
+        url: https://semgrep.dev/playground/r/pZT03Jd/kotlin.lang.security.use-of-md5.use-of-md5
+        origin: community
+  pattern-either:
+  - pattern: |
+      java.security.MessageDigest.getInstance("MD5")
+  - pattern: |
+      org.apache.commons.codec.digest.DigestUtils.getMd5Digest()
+- id: kotlin.lang.security.ecb-cipher.ecb-cipher
+  metadata:
+    cwe:
+    - 'CWE-327: Use of a Broken or Risky Cryptographic Algorithm'
+    owasp:
+    - A03:2017 - Sensitive Data Exposure
+    - A02:2021 - Cryptographic Failures
+    - A04:2025 - Cryptographic Failures
+    source-rule-url: https://find-sec-bugs.github.io/bugs.htm#ECB_MODE
+    category: security
+    technology:
+    - kotlin
+    references:
+    - https://owasp.org/Top10/A02_2021-Cryptographic_Failures
+    subcategory:
+    - vuln
+    likelihood: LOW
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Cryptographic Issues
+    source: https://semgrep.dev/r/kotlin.lang.security.ecb-cipher.ecb-cipher
+    shortlink: https://sg.run/DzLj
+    semgrep.dev:
+      rule:
+        r_id: 14696
+        rv_id: 1263263
+        rule_id: DbU1Zd
+        version_id: YDTZexg
+        url: https://semgrep.dev/playground/r/YDTZexg/kotlin.lang.security.ecb-cipher.ecb-cipher
+        origin: community
+  message: Cipher in ECB mode is detected. ECB mode produces the same output for the
+    same input each time which allows an attacker to intercept and replay the data.
+    Further, ECB mode does not provide any integrity checking. See https://find-sec-bugs.github.io/bugs.htm#CIPHER_INTEGRITY.
+  severity: WARNING
+  languages:
+  - kt
+  patterns:
+  - pattern-either:
+    - pattern: |
+        val $VAR : Cipher = $CIPHER.getInstance($MODE)
+    - pattern: |
+        var $VAR : Cipher = $CIPHER.getInstance($MODE)
+    - pattern: |
+        val $VAR = $CIPHER.getInstance($MODE)
+    - pattern: |
+        var $VAR = $CIPHER.getInstance($MODE)
+  - metavariable-regex:
+      metavariable: $MODE
+      regex: .*ECB.*
+- id: kotlin.lang.security.use-of-sha1.use-of-sha1
+  message: Detected SHA1 hash algorithm which is considered insecure. SHA1 is not
+    collision resistant and is therefore not suitable as a cryptographic signature.
+    Use SHA256 or SHA3 instead.
+  languages:
+  - kt
+  severity: WARNING
+  metadata:
+    owasp:
+    - A03:2017 - Sensitive Data Exposure
+    - A02:2021 - Cryptographic Failures
+    - A04:2025 - Cryptographic Failures
+    cwe:
+    - 'CWE-327: Use of a Broken or Risky Cryptographic Algorithm'
+    source-rule-url: https://find-sec-bugs.github.io/bugs.htm#WEAK_MESSAGE_DIGEST_SHA1
+    asvs:
+      section: V6 Stored Cryptography Verification Requirements
+      control_id: 6.2.5 Insecure Algorithm
+      control_url: https://github.com/OWASP/ASVS/blob/master/4.0/en/0x14-V6-Cryptography.md#v62-algorithms
+      version: '4'
+    category: security
+    technology:
+    - kotlin
+    references:
+    - https://owasp.org/Top10/A02_2021-Cryptographic_Failures
+    subcategory:
+    - vuln
+    likelihood: LOW
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Cryptographic Issues
+    source: https://semgrep.dev/r/kotlin.lang.security.use-of-sha1.use-of-sha1
+    shortlink: https://sg.run/N1pp
+    semgrep.dev:
+      rule:
+        r_id: 15127
+        rv_id: 1263268
+        rule_id: ZqUOdd
+        version_id: 2KTv2XZ
+        url: https://semgrep.dev/playground/r/2KTv2XZ/kotlin.lang.security.use-of-sha1.use-of-sha1
+        origin: community
+  pattern-either:
+  - patterns:
+    - pattern: |
+        $VAR = $MD.getInstance("$ALGO")
+    - metavariable-regex:
+        metavariable: $ALGO
+        regex: (SHA1|SHA-1)
+  - pattern: |
+      $DU.getSha1Digest().digest(...)
+- id: kotlin.lang.security.no-null-cipher.no-null-cipher
+  pattern: NullCipher(...)
+  metadata:
+    cwe:
+    - 'CWE-327: Use of a Broken or Risky Cryptographic Algorithm'
+    owasp:
+    - A03:2017 - Sensitive Data Exposure
+    - A02:2021 - Cryptographic Failures
+    - A04:2025 - Cryptographic Failures
+    source-rule-url: https://find-sec-bugs.github.io/bugs.htm#NULL_CIPHER
+    asvs:
+      section: V6 Stored Cryptography Verification Requirements
+      control_id: 6.2.5 Insecure Algorithm
+      control_url: https://github.com/OWASP/ASVS/blob/master/4.0/en/0x14-V6-Cryptography.md#v62-algorithms
+      version: '4'
+    category: security
+    technology:
+    - kotlin
+    references:
+    - https://owasp.org/Top10/A02_2021-Cryptographic_Failures
+    subcategory:
+    - vuln
+    likelihood: LOW
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Cryptographic Issues
+    source: https://semgrep.dev/r/kotlin.lang.security.no-null-cipher.no-null-cipher
+    shortlink: https://sg.run/0ywb
+    semgrep.dev:
+      rule:
+        r_id: 14698
+        rv_id: 1263265
+        rule_id: 0oU2Yy
+        version_id: o5TbDPj
+        url: https://semgrep.dev/playground/r/o5TbDPj/kotlin.lang.security.no-null-cipher.no-null-cipher
+        origin: community
+  message: 'NullCipher was detected. This will not encrypt anything; the cipher text
+    will be the same as the plain text. Use a valid, secure cipher: Cipher.getInstance("AES/CBC/PKCS7PADDING").
+    See https://owasp.org/www-community/Using_the_Java_Cryptographic_Extensions for
+    more information.'
+  severity: WARNING
+  languages:
+  - kt
+  - scala
+- id: kotlin.lang.security.anonymous-ldap-bind.anonymous-ldap-bind
+  metadata:
+    cwe:
+    - 'CWE-287: Improper Authentication'
+    owasp:
+    - A02:2017 - Broken Authentication
+    - A07:2021 - Identification and Authentication Failures
+    - A07:2025 - Authentication Failures
+    source-rule-url: https://find-sec-bugs.github.io/bugs.htm#LDAP_ANONYMOUS
+    category: security
+    technology:
+    - kotlin
+    references:
+    - https://owasp.org/Top10/A07_2021-Identification_and_Authentication_Failures
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: LOW
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Improper Authentication
+    source: https://semgrep.dev/r/kotlin.lang.security.anonymous-ldap-bind.anonymous-ldap-bind
+    shortlink: https://sg.run/rY2n
+    semgrep.dev:
+      rule:
+        r_id: 15125
+        rv_id: 1263258
+        rule_id: v8U9Q7
+        version_id: WrTqKgJ
+        url: https://semgrep.dev/playground/r/WrTqKgJ/kotlin.lang.security.anonymous-ldap-bind.anonymous-ldap-bind
+        origin: community
+  message: Detected anonymous LDAP bind. This permits anonymous users to execute LDAP
+    statements. Consider enforcing authentication for LDAP. See https://docs.oracle.com/javase/tutorial/jndi/ldap/auth_mechs.html
+    for more information.
+  severity: WARNING
+  pattern: |
+    $ENV.put($CTX.SECURITY_AUTHENTICATION, "none")
+    ...
+    $DCTX = InitialDirContext($ENV, ...)
+  languages:
+  - kt
+- id: java.lang.security.audit.crypto.rsa-no-padding.rsa-no-padding
+  metadata:
+    functional-categories:
+    - crypto::search::mode::javax.crypto
+    cwe:
+    - 'CWE-326: Inadequate Encryption Strength'
+    owasp:
+    - A03:2017 - Sensitive Data Exposure
+    - A02:2021 - Cryptographic Failures
+    - A04:2025 - Cryptographic Failures
+    source-rule-url: https://find-sec-bugs.github.io/bugs.htm#RSA_NO_PADDING
+    references:
+    - https://rdist.root.org/2009/10/06/why-rsa-encryption-padding-is-critical/
+    asvs:
+      section: V6 Stored Cryptography Verification Requirements
+      control_id: 6.2.5 Insecure Algorithm
+      control_url: https://github.com/OWASP/ASVS/blob/master/4.0/en/0x14-V6-Cryptography.md#v62-algorithms
+      version: '4'
+    category: security
+    technology:
+    - java
+    - kotlin
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: HIGH
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Cryptographic Issues
+    source: https://semgrep.dev/r/java.lang.security.audit.crypto.rsa-no-padding.rsa-no-padding
+    shortlink: https://sg.run/DoOj
+    semgrep.dev:
+      rule:
+        r_id: 9196
+        rv_id: 1263003
+        rule_id: AbUzoj
+        version_id: l4TJRpK
+        url: https://semgrep.dev/playground/r/l4TJRpK/java.lang.security.audit.crypto.rsa-no-padding.rsa-no-padding
+        origin: community
+  message: Using RSA without OAEP mode weakens the encryption.
+  severity: WARNING
+  languages:
+  - java
+  - kt
+  pattern: $CIPHER.getInstance("=~/RSA/[Nn][Oo][Nn][Ee]/NoPadding/")
+- id: java.lang.security.audit.crypto.des-is-deprecated.des-is-deprecated
+  message: DES is considered deprecated. AES is the recommended cipher. Upgrade to
+    use AES. See https://www.nist.gov/news-events/news/2005/06/nist-withdraws-outdated-data-encryption-standard
+    for more information.
+  metadata:
+    functional-categories:
+    - crypto::search::symmetric-algorithm::javax.crypto
+    cwe:
+    - 'CWE-326: Inadequate Encryption Strength'
+    owasp:
+    - A03:2017 - Sensitive Data Exposure
+    - A02:2021 - Cryptographic Failures
+    - A04:2025 - Cryptographic Failures
+    source-rule-url: https://find-sec-bugs.github.io/bugs.htm#DES_USAGE
+    asvs:
+      section: V6 Stored Cryptography Verification Requirements
+      control_id: 6.2.5 Insecure Algorithm
+      control_url: https://github.com/OWASP/ASVS/blob/master/4.0/en/0x14-V6-Cryptography.md#v62-algorithms
+      version: '4'
+    references:
+    - https://www.nist.gov/news-events/news/2005/06/nist-withdraws-outdated-data-encryption-standard
+    - https://cheatsheetseries.owasp.org/cheatsheets/Cryptographic_Storage_Cheat_Sheet.html#algorithms
+    category: security
+    technology:
+    - java
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: HIGH
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Cryptographic Issues
+    source: https://semgrep.dev/r/java.lang.security.audit.crypto.des-is-deprecated.des-is-deprecated
+    shortlink: https://sg.run/5Q73
+    semgrep.dev:
+      rule:
+        r_id: 9191
+        rv_id: 1262996
+        rule_id: PeUZNg
+        version_id: A8TgdEn
+        url: https://semgrep.dev/playground/r/A8TgdEn/java.lang.security.audit.crypto.des-is-deprecated.des-is-deprecated
+        origin: community
+  severity: WARNING
+  patterns:
+  - pattern-either:
+    - pattern-inside: $CIPHER.getInstance("=~/DES/.*/")
+    - pattern-inside: $CIPHER.getInstance("DES")
+  - pattern-either:
+    - pattern: |
+        "=~/DES/.*/"
+    - pattern: |
+        "DES"
+  fix: |
+    "AES/GCM/NoPadding"
+  languages:
+  - java
+  - kt
+- id: java.lang.security.audit.crypto.desede-is-deprecated.desede-is-deprecated
+  message: Triple DES (3DES or DESede) is considered deprecated. AES is the recommended
+    cipher. Upgrade to use AES.
+  metadata:
+    functional-categories:
+    - crypto::search::symmetric-algorithm::javax.crypto
+    cwe:
+    - 'CWE-326: Inadequate Encryption Strength'
+    owasp:
+    - A03:2017 - Sensitive Data Exposure
+    - A02:2021 - Cryptographic Failures
+    - A04:2025 - Cryptographic Failures
+    source-rule-url: https://find-sec-bugs.github.io/bugs.htm#TDES_USAGE
+    references:
+    - https://csrc.nist.gov/News/2017/Update-to-Current-Use-and-Deprecation-of-TDEA
+    category: security
+    technology:
+    - java
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: HIGH
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Cryptographic Issues
+    source: https://semgrep.dev/r/java.lang.security.audit.crypto.desede-is-deprecated.desede-is-deprecated
+    shortlink: https://sg.run/Geqn
+    semgrep.dev:
+      rule:
+        r_id: 9192
+        rv_id: 1262997
+        rule_id: JDUy8J
+        version_id: BjTkZyQ
+        url: https://semgrep.dev/playground/r/BjTkZyQ/java.lang.security.audit.crypto.desede-is-deprecated.desede-is-deprecated
+        origin: community
+  severity: WARNING
+  patterns:
+  - pattern-either:
+    - pattern: |
+        $CIPHER.getInstance("=~/DESede.*/")
+    - pattern: |
+        $CRYPTO.KeyGenerator.getInstance("DES")
+  languages:
+  - java
+  - kt
+- id: kotlin.gradle.security.build-gradle-password-hardcoded.build-gradle-password-hardcoded
+  message: A secret is hard-coded in the application. Secrets stored in source code,
+    such as credentials, identifiers, and other types of sensitive data, can be leaked
+    and used by internal or external malicious actors. It is recommended to rotate
+    the secret and retrieve them from a secure secret vault or Hardware Security Module
+    (HSM), alternatively environment variables can be used if allowed by your company
+    policy.
+  severity: WARNING
+  metadata:
+    likelihood: LOW
+    impact: HIGH
+    confidence: MEDIUM
+    category: security
+    subcategory:
+    - vuln
+    cwe:
+    - 'CWE-798: Use of Hard-coded Credentials'
+    cwe2020-top25: true
+    cwe2021-top25: true
+    cwe2022-top25: true
+    owasp:
+    - A07:2021 - Identification and Authentication Failures
+    - A07:2025 - Authentication Failures
+    references:
+    - https://owasp.org/Top10/A07_2021-Identification_and_Authentication_Failures
+    technology:
+    - secrets
+    vulnerability_class:
+    - Hard-coded Secrets
+    source_rule_url: https://semgrep.dev/playground/r/d8Ur5BA/achufistov6_personal_org.build-gradle-password-hardcoded
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    source: https://semgrep.dev/r/kotlin.gradle.security.build-gradle-password-hardcoded.build-gradle-password-hardcoded
+    shortlink: https://sg.run/qN29x
+    semgrep.dev:
+      rule:
+        r_id: 137856
+        rv_id: 1263257
+        rule_id: ReUD6Kg
+        version_id: DkTRbLX
+        url: https://semgrep.dev/playground/r/DkTRbLX/kotlin.gradle.security.build-gradle-password-hardcoded.build-gradle-password-hardcoded
+        origin: community
+  languages:
+  - kotlin
+  options:
+    symbolic_propagation: true
+  patterns:
+  - pattern-either:
+    - pattern: '$PASS = env[...] ?: $VALUE'
+  - metavariable-regex:
+      metavariable: $PASS
+      regex: (password|pass|passwd|loginPassword)
+  - metavariable-pattern:
+      language: generic
+      metavariable: $VALUE
+      patterns:
+      - pattern-either:
+        - pattern-regex: ^[A-Za-z0-9/+=]+$
+  paths:
+    include:
+    - '*build.gradle.kts'

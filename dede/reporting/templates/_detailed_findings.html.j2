@@ -1,0 +1,96 @@
+{% from "_macros.html.j2" import page_chrome, source_tag with context %}
+{{ page_chrome('05 / Detailed Findings') }}
+<section class="section" id="detailed-findings">
+  <p class="section-kicker">05 / Finding Detail</p>
+  <h2>Evidence-backed findings</h2>
+  {% if omitted_findings_count and pdf %}
+  <p class="muted">
+    Showing the top {{ finding_views|length }} findings by severity and confidence.
+    {{ omitted_findings_count }} additional finding(s) are available in the HTML report and JSON export.
+  </p>
+  {% endif %}
+
+  {% if not pdf %}
+  <div class="filter-panel" aria-label="Finding filters">
+    <div class="filter-search-row">
+      <input id="filter-text" type="search" placeholder="Search finding, file, rule, CWE, endpoint…" aria-label="Search findings" />
+      <button type="button" id="clear-filters">Clear filters</button>
+    </div>
+    <div class="filters">
+      <select id="filter-severity" aria-label="Filter by severity">
+        <option value="">All severities</option>
+        <option>CRITICAL</option><option>HIGH</option><option>MEDIUM</option><option>LOW</option><option>INFO</option>
+      </select>
+      <select id="filter-category" aria-label="Filter by category">
+        <option value="">All categories</option>
+        <option>security</option><option>secret</option><option>quality</option><option>bug</option><option>complexity</option><option>maintainability</option><option>duplicate</option><option>code_smell</option><option>other</option>
+      </select>
+      <select id="filter-tool" aria-label="Filter by analyzer">
+        <option value="">All analyzers</option>
+        {% for t in result.tool_statuses %}<option value="{{ t.tool }}">{{ t.tool }}</option>{% endfor %}
+      </select>
+      <select id="filter-lifecycle" aria-label="Filter by lifecycle">
+        <option value="">All lifecycle states</option>
+        <option>NEW</option><option>EXISTING</option><option>REOPENED</option>
+      </select>
+      <select id="filter-reachability" aria-label="Filter by reachability">
+        <option value="">All reachability</option>
+        <option value="reachable">Reachable</option>
+        <option value="unreachable">Unreachable</option>
+        <option value="exposed">Internet exposed</option>
+      </select>
+    </div>
+    <p class="filter-help">Tip: press <kbd>/</kbd> to focus search. Filters operate entirely inside this offline report.</p>
+  </div>
+  <div id="filter-empty" class="callout neutral" hidden>No findings match the selected filters.</div>
+  {% endif %}
+
+  {% if finding_views %}
+    {% for view in finding_views %}
+      {% set f = view.finding %}
+      {% if pdf %}
+      <div class="finding" id="{{ view.dom_id }}">
+        <div class="finding-head">
+          <span class="section-kicker" style="display:inline;">FINDING {{ f.id }}</span>
+          · <span class="badge {{ f.severity.value }}">{{ f.severity.value }}</span>
+          {% if f.lifecycle_status %}<span class="badge lifecycle-badge lifecycle-{{ f.lifecycle_status|lower }}">{{ f.lifecycle_status }}</span>{% endif %}
+          {% if view.needs_review %}<span class="badge needs-review">{{ view.status }}</span>{% endif %}
+          <div style="margin-top:0.35rem;font-weight:700;">{{ source_tag(view.title_origin) }} {{ view.title }}</div>
+        </div>
+        <div class="finding-body">
+          {% include "_finding_body.html.j2" %}
+        </div>
+      </div>
+      {% else %}
+      <details class="finding"
+        id="{{ view.dom_id }}"
+        data-severity="{{ f.severity.value }}"
+        data-category="{{ f.category.value }}"
+        data-tools="{{ f.detected_by|join(' ') }}"
+        data-lifecycle="{{ f.lifecycle_status }}"
+        data-reachable="{{ 'true' if f.reachable is sameas true else 'false' if f.reachable is sameas false else '' }}"
+        data-exposed="{{ 'true' if f.internet_exposed is sameas true else 'false' if f.internet_exposed is sameas false else '' }}"
+        data-file="{{ f.file }}">
+        <summary>
+          <span class="badge {{ f.severity.value }}">{{ f.severity.value }}</span>
+          <strong>{{ f.id }}</strong>
+          {% if f.lifecycle_status %}<span class="badge lifecycle-badge lifecycle-{{ f.lifecycle_status|lower }}">{{ f.lifecycle_status }}</span>{% endif %}
+          <span class="finding-summary-title">{{ source_tag(view.title_origin) }} {{ view.title }}</span>
+          <span class="muted mono finding-summary-location">{{ f.file }}:{{ f.start_line }}</span>
+          {% if f.exploitability_score is not none %}<span class="score-chip">EXP {{ '%.0f'|format(f.exploitability_score) }}</span>{% endif %}
+          {% if view.needs_review %}<span class="badge needs-review">{{ view.status }}</span>{% endif %}
+        </summary>
+        <div class="finding-body">
+          <div class="finding-actions">
+            <a href="#{{ view.dom_id }}" class="permalink" aria-label="Permalink to {{ f.id }}"># Permalink</a>
+            <button type="button" class="copy-link" data-target="{{ view.dom_id }}">Copy link</button>
+          </div>
+          {% include "_finding_body.html.j2" %}
+        </div>
+      </details>
+      {% endif %}
+    {% endfor %}
+  {% else %}
+  <p>No findings.</p>
+  {% endif %}
+</section>

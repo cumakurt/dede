@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "name": "dede/python-web",
+  "version": "1.0.0",
+  "models": {
+    "python": {
+      "sources": [
+        {
+          "call": "fastapi.Request.query_params.get",
+          "kind": "http.query"
+        },
+        {
+          "call": "django.http.HttpRequest.GET.get",
+          "kind": "http.query"
+        }
+      ],
+      "sinks": [],
+      "sanitizers": [
+        "werkzeug.utils.secure_filename"
+      ]
+    }
+  },
+  "integrity": {
+    "sha256": "e77c1b26489cfc61dcd93d3f9256b26367c328d9b2704eb757679e3f65e3e028"
+  }
+}

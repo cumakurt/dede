@@ -1,0 +1,2895 @@
+rules:
+- id: ruby.lang.security.ssl-mode-no-verify.ssl-mode-no-verify
+  pattern: OpenSSL::SSL::VERIFY_NONE
+  message: Detected SSL that will accept an unverified connection. This makes the
+    connections susceptible to man-in-the-middle attacks. Use 'OpenSSL::SSL::VERIFY_PEER'
+    instead.
+  fix-regex:
+    regex: VERIFY_NONE
+    replacement: VERIFY_PEER
+  severity: WARNING
+  languages:
+  - ruby
+  metadata:
+    cwe:
+    - 'CWE-295: Improper Certificate Validation'
+    category: security
+    technology:
+    - ruby
+    owasp:
+    - A03:2017 - Sensitive Data Exposure
+    - A07:2021 - Identification and Authentication Failures
+    - A07:2025 - Authentication Failures
+    references:
+    - https://owasp.org/Top10/A07_2021-Identification_and_Authentication_Failures
+    subcategory:
+    - vuln
+    likelihood: HIGH
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Improper Authentication
+    source: https://semgrep.dev/r/ruby.lang.security.ssl-mode-no-verify.ssl-mode-no-verify
+    shortlink: https://sg.run/kLxX
+    semgrep.dev:
+      rule:
+        r_id: 9728
+        rv_id: 1263617
+        rule_id: v8U5Yn
+        version_id: DkTRbl4
+        url: https://semgrep.dev/playground/r/DkTRbl4/ruby.lang.security.ssl-mode-no-verify.ssl-mode-no-verify
+        origin: community
+- id: ruby.lang.security.force-ssl-false.force-ssl-false
+  message: Checks for configuration setting of force_ssl to false. Force_ssl forces
+    usage of HTTPS, which could lead to network interception of unencrypted application
+    traffic. To fix, set config.force_ssl = true.
+  metadata:
+    cwe:
+    - 'CWE-311: Missing Encryption of Sensitive Data'
+    references:
+    - https://github.com/presidentbeef/brakeman/blob/main/lib/brakeman/checks/check_force_ssl.rb
+    category: security
+    technology:
+    - ruby
+    owasp:
+    - A03:2017 - Sensitive Data Exposure
+    - A04:2021 - Insecure Design
+    - A06:2025 - Insecure Design
+    subcategory:
+    - vuln
+    likelihood: LOW
+    impact: MEDIUM
+    confidence: HIGH
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Cryptographic Issues
+    source: https://semgrep.dev/r/ruby.lang.security.force-ssl-false.force-ssl-false
+    shortlink: https://sg.run/YgkW
+    semgrep.dev:
+      rule:
+        r_id: 9714
+        rv_id: 1263605
+        rule_id: 2ZU4lx
+        version_id: WrTqKB3
+        url: https://semgrep.dev/playground/r/WrTqKB3/ruby.lang.security.force-ssl-false.force-ssl-false
+        origin: community
+  languages:
+  - ruby
+  severity: WARNING
+  pattern: config.force_ssl = false
+  fix-regex:
+    regex: =\s*false
+    replacement: = true
+- id: ruby.lang.security.bad-deserialization.bad-deserialization
+  mode: taint
+  pattern-sources:
+  - pattern-either:
+    - pattern: params
+    - pattern: cookies
+  pattern-sinks:
+  - pattern-either:
+    - pattern: |
+        CSV.load(...)
+    - pattern: |
+        Marshal.load(...)
+    - pattern: |
+        Marshal.restore(...)
+    - pattern: |
+        Oj.object_load(...)
+    - pattern: |
+        Oj.load($X)
+  message: Checks for unsafe deserialization. Objects in Ruby can be serialized into
+    strings, then later loaded from strings. However, uses of load and object_load
+    can cause remote code execution. Loading user input with MARSHAL or CSV can potentially
+    be dangerous. Use JSON in a secure fashion instead.
+  metadata:
+    references:
+    - https://groups.google.com/g/rubyonrails-security/c/61bkgvnSGTQ/m/nehwjA8tQ8EJ
+    - https://github.com/presidentbeef/brakeman/blob/main/lib/brakeman/checks/check_deserialize.rb
+    category: security
+    cwe:
+    - 'CWE-502: Deserialization of Untrusted Data'
+    owasp:
+    - A08:2017 - Insecure Deserialization
+    - A08:2021 - Software and Data Integrity Failures
+    - A08:2025 - Software or Data Integrity Failures
+    technology:
+    - ruby
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: HIGH
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - 'Insecure Deserialization '
+    source: https://semgrep.dev/r/ruby.lang.security.bad-deserialization.bad-deserialization
+    shortlink: https://sg.run/DJj2
+    semgrep.dev:
+      rule:
+        r_id: 9708
+        rv_id: 1263595
+        rule_id: lBUdQg
+        version_id: 3ZT4Xqp
+        url: https://semgrep.dev/playground/r/3ZT4Xqp/ruby.lang.security.bad-deserialization.bad-deserialization
+        origin: community
+  languages:
+  - ruby
+  severity: ERROR
+- id: ruby.lang.security.hardcoded-http-auth-in-controller.hardcoded-http-auth-in-controller
+  patterns:
+  - pattern-inside: |
+      class $CONTROLLER < ApplicationController
+        ...
+        http_basic_authenticate_with ..., :password => "$SECRET", ...
+      end
+  - focus-metavariable: $SECRET
+  message: Detected hardcoded password used in basic authentication in a controller
+    class. Including this password in version control could expose this credential.
+    Consider refactoring to use environment variables or configuration files.
+  severity: WARNING
+  metadata:
+    cwe:
+    - 'CWE-798: Use of Hard-coded Credentials'
+    owasp:
+    - A07:2021 - Identification and Authentication Failures
+    - A07:2025 - Authentication Failures
+    references:
+    - https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html
+    source-rule-url: https://github.com/presidentbeef/brakeman/blob/main/docs/warning_types/basic_auth/index.markdown
+    category: security
+    technology:
+    - ruby
+    - secrets
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - audit
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: HIGH
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Hard-coded Secrets
+    source: https://semgrep.dev/r/ruby.lang.security.hardcoded-http-auth-in-controller.hardcoded-http-auth-in-controller
+    shortlink: https://sg.run/6r0w
+    semgrep.dev:
+      rule:
+        r_id: 9715
+        rv_id: 1263606
+        rule_id: X5UZWK
+        version_id: 0bTKzNK
+        url: https://semgrep.dev/playground/r/0bTKzNK/ruby.lang.security.hardcoded-http-auth-in-controller.hardcoded-http-auth-in-controller
+        origin: community
+  languages:
+  - ruby
+- id: ruby.lang.security.weak-hashes-md5.weak-hashes-md5
+  message: Should not use md5 to generate hashes. md5 is proven to be vulnerable through
+    the use of brute-force attacks. Could also result in collisions, leading to potential
+    collision attacks. Use SHA256 or other hashing functions instead.
+  metadata:
+    cwe:
+    - 'CWE-328: Use of Weak Hash'
+    references:
+    - https://www.ibm.com/support/pages/security-bulletin-vulnerability-md5-signature-and-hash-algorithm-affects-sterling-integrator-and-sterling-file-gateway-cve-2015-7575
+    category: security
+    technology:
+    - ruby
+    owasp:
+    - A03:2017 - Sensitive Data Exposure
+    - A02:2021 - Cryptographic Failures
+    - A04:2025 - Cryptographic Failures
+    subcategory:
+    - vuln
+    likelihood: LOW
+    impact: HIGH
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Insecure Hashing Algorithm
+    source: https://semgrep.dev/r/ruby.lang.security.weak-hashes-md5.weak-hashes-md5
+    shortlink: https://sg.run/O1re
+    semgrep.dev:
+      rule:
+        r_id: 9731
+        rv_id: 1263619
+        rule_id: nJUYxZ
+        version_id: 0bTKzN8
+        url: https://semgrep.dev/playground/r/0bTKzN8/ruby.lang.security.weak-hashes-md5.weak-hashes-md5
+        origin: community
+  languages:
+  - ruby
+  severity: WARNING
+  pattern-either:
+  - pattern: Digest::MD5.base64digest $X
+  - pattern: Digest::MD5.hexdigest $X
+  - pattern: Digest::MD5.digest $X
+  - pattern: Digest::MD5.new
+  - pattern: OpenSSL::Digest::MD5.base64digest $X
+  - pattern: OpenSSL::Digest::MD5.hexdigest $X
+  - pattern: OpenSSL::Digest::MD5.digest $X
+  - pattern: OpenSSL::Digest::MD5.new
+- id: ruby.lang.security.divide-by-zero.divide-by-zero
+  message: Detected a possible ZeroDivisionError.
+  metadata:
+    cwe:
+    - 'CWE-369: Divide By Zero'
+    references:
+    - https://github.com/presidentbeef/brakeman/blob/main/lib/brakeman/checks/check_divide_by_zero.rb
+    category: security
+    technology:
+    - ruby
+    confidence: MEDIUM
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Other
+    source: https://semgrep.dev/r/ruby.lang.security.divide-by-zero.divide-by-zero
+    shortlink: https://sg.run/KWpP
+    semgrep.dev:
+      rule:
+        r_id: 9711
+        rv_id: 946476
+        rule_id: oqUzXA
+        version_id: BjT1NPZ
+        url: https://semgrep.dev/playground/r/BjT1NPZ/ruby.lang.security.divide-by-zero.divide-by-zero
+        origin: community
+  languages:
+  - ruby
+  severity: WARNING
+  mode: taint
+  pattern-sources:
+  - patterns:
+    - pattern: $VAR
+    - metavariable-regex:
+        metavariable: $VAR
+        regex: ^\d*(?!\.)$
+  pattern-sinks:
+  - patterns:
+    - pattern-inside: $NUMER / 0
+    - pattern: $NUMER
+- id: ruby.lang.security.weak-hashes-sha1.weak-hashes-sha1
+  message: Should not use SHA1 to generate hashes. There is a proven SHA1 hash collision
+    by Google, which could lead to vulnerabilities. Use SHA256, SHA3 or other hashing
+    functions instead.
+  metadata:
+    cwe:
+    - 'CWE-328: Use of Weak Hash'
+    references:
+    - https://security.googleblog.com/2017/02/announcing-first-sha1-collision.html
+    - https://shattered.io/
+    category: security
+    technology:
+    - ruby
+    owasp:
+    - A03:2017 - Sensitive Data Exposure
+    - A02:2021 - Cryptographic Failures
+    - A04:2025 - Cryptographic Failures
+    subcategory:
+    - vuln
+    likelihood: LOW
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Insecure Hashing Algorithm
+    source: https://semgrep.dev/r/ruby.lang.security.weak-hashes-sha1.weak-hashes-sha1
+    shortlink: https://sg.run/e4qX
+    semgrep.dev:
+      rule:
+        r_id: 9732
+        rv_id: 1263620
+        rule_id: EwU4jq
+        version_id: K3TKkEZ
+        url: https://semgrep.dev/playground/r/K3TKkEZ/ruby.lang.security.weak-hashes-sha1.weak-hashes-sha1
+        origin: community
+  languages:
+  - ruby
+  severity: WARNING
+  pattern-either:
+  - pattern: Digest::SHA1.$FUNC
+  - pattern: OpenSSL::Digest::SHA1.$FUNC
+  - pattern: OpenSSL::HMAC.$FUNC("sha1",...)
+- id: ruby.lang.security.dangerous-exec.dangerous-exec
+  mode: taint
+  pattern-sources:
+  - patterns:
+    - pattern: |
+        def $F(...,$ARG,...)
+            ...
+        end
+    - focus-metavariable: $ARG
+  - pattern: params
+  - pattern: cookies
+  pattern-sinks:
+  - patterns:
+    - pattern: |
+        $EXEC(...)
+    - pattern-not: |
+        $EXEC("...","...","...",...)
+    - pattern-not: |
+        $EXEC(["...","...","...",...],...)
+    - pattern-not: |
+        $EXEC({...},"...","...","...",...)
+    - pattern-not: |
+        $EXEC({...},["...","...","...",...],...)
+    - metavariable-regex:
+        metavariable: $EXEC
+        regex: ^(system|exec|spawn|Process.exec|Process.spawn|Open3.capture2|Open3.capture2e|Open3.capture3|Open3.popen2|Open3.popen2e|Open3.popen3|IO.popen|Gem::Util.popen|PTY.spawn)$
+  message: Detected non-static command inside $EXEC. Audit the input to '$EXEC'. If
+    unverified user data can reach this call site, this is a code injection vulnerability.
+    A malicious actor can inject a malicious script to execute arbitrary code.
+  metadata:
+    source-rule-url: https://github.com/presidentbeef/brakeman/blob/main/lib/brakeman/checks/check_execute.rb
+    cwe:
+    - 'CWE-94: Improper Control of Generation of Code (''Code Injection'')'
+    owasp:
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    category: security
+    technology:
+    - ruby
+    - rails
+    references:
+    - https://guides.rubyonrails.org/security.html#command-line-injection
+    cwe2022-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: HIGH
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Code Injection
+    source: https://semgrep.dev/r/ruby.lang.security.dangerous-exec.dangerous-exec
+    shortlink: https://sg.run/R8GY
+    semgrep.dev:
+      rule:
+        r_id: 9805
+        rv_id: 1409405
+        rule_id: WAUZOw
+        version_id: WrT7erb
+        url: https://semgrep.dev/playground/r/WrT7erb/ruby.lang.security.dangerous-exec.dangerous-exec
+        origin: community
+  severity: WARNING
+  languages:
+  - ruby
+- id: ruby.rails.security.audit.sqli.ruby-pg-sqli.ruby-pg-sqli
+  mode: taint
+  pattern-propagators:
+  - pattern: $X << $Y
+    from: $Y
+    to: $X
+  pattern-sources:
+  - pattern-either:
+    - pattern: |
+        params
+    - pattern: |
+        cookies
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - pattern-inside: |
+          $CON = PG.connect(...)
+          ...
+      - pattern-inside: |
+          $CON = PG::Connection.open(...)
+          ...
+      - pattern-inside: |
+          $CON = PG::Connection.new(...)
+          ...
+    - pattern-either:
+      - pattern: |
+          $CON.$METHOD($X,...)
+      - pattern: |
+          $CON.$METHOD $X, ...
+    - focus-metavariable: $X
+    - metavariable-regex:
+        metavariable: $METHOD
+        regex: ^(exec|exec_params)$
+  languages:
+  - ruby
+  message: 'Detected string concatenation with a non-literal variable in a pg Ruby
+    SQL statement. This could lead to SQL injection if the variable is user-controlled
+    and not properly sanitized. In order to prevent SQL injection, use parameterized
+    queries or prepared statements instead. You can use parameterized queries like
+    so: `conn.exec_params(''SELECT $1 AS a, $2 AS b, $3 AS c'', [1, 2, nil])` And
+    you can use prepared statements with `exec_prepared`.'
+  metadata:
+    cwe:
+    - 'CWE-89: Improper Neutralization of Special Elements used in an SQL Command
+      (''SQL Injection'')'
+    owasp:
+    - A01:2017 - Injection
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    references:
+    - https://www.rubydoc.info/gems/pg/PG/Connection
+    category: security
+    technology:
+    - rails
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: HIGH
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - SQL Injection
+    source: https://semgrep.dev/r/ruby.rails.security.audit.sqli.ruby-pg-sqli.ruby-pg-sqli
+    shortlink: https://sg.run/kL0o
+    semgrep.dev:
+      rule:
+        r_id: 10328
+        rv_id: 1263628
+        rule_id: NbUAz7
+        version_id: 2KTv2y2
+        url: https://semgrep.dev/playground/r/2KTv2y2/ruby.rails.security.audit.sqli.ruby-pg-sqli.ruby-pg-sqli
+        origin: community
+  severity: WARNING
+- id: ruby.rails.security.brakeman.check-secrets.check-secrets
+  patterns:
+  - pattern: $VAR = "$VALUE"
+  - metavariable-regex:
+      metavariable: $VAR
+      regex: (?i)password|secret|(rest_auth_site|api)_key$
+  - metavariable-regex:
+      metavariable: $VALUE
+      regex: .+
+  message: Found a Brakeman-style secret - a variable with the name password/secret/api_key/rest_auth_site_key
+    and a non-empty string literal value.
+  languages:
+  - ruby
+  severity: WARNING
+  metadata:
+    technology:
+    - ruby
+    - rails
+    category: security
+    cwe:
+    - 'CWE-200: Exposure of Sensitive Information to an Unauthorized Actor'
+    owasp:
+    - A01:2021 - Broken Access Control
+    - A01:2025 - Broken Access Control
+    source-rule-url: https://github.com/presidentbeef/brakeman/blob/main/lib/brakeman/checks/check_secrets.rb
+    references:
+    - https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html
+    - https://github.com/presidentbeef/brakeman/blob/3f5d5d5f00864cdf7769c50f5bd26f1769a4ba75/test/apps/rails3.1/app/controllers/users_controller.rb
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/ruby.rails.security.brakeman.check-secrets.check-secrets
+    shortlink: https://sg.run/5ZKl
+    semgrep.dev:
+      rule:
+        r_id: 20047
+        rv_id: 1263659
+        rule_id: AbUNqO
+        version_id: A8TgdBv
+        url: https://semgrep.dev/playground/r/A8TgdBv/ruby.rails.security.brakeman.check-secrets.check-secrets
+        origin: community
+- id: ruby.lang.security.md5-used-as-password.md5-used-as-password
+  languages:
+  - ruby
+  severity: WARNING
+  message: It looks like MD5 is used as a password hash. MD5 is not considered a secure
+    password hash because it can be cracked by an attacker in a short amount of time.
+    Instead, use a suitable password hashing function such as bcrypt. You can use
+    the `bcrypt` gem.
+  metadata:
+    category: security
+    technology:
+    - md5
+    references:
+    - https://tools.ietf.org/id/draft-lvelvindron-tls-md5-sha1-deprecate-01.html
+    - https://security.stackexchange.com/questions/211/how-to-securely-hash-passwords
+    - https://github.com/returntocorp/semgrep-rules/issues/1609
+    owasp:
+    - A03:2017 - Sensitive Data Exposure
+    - A02:2021 - Cryptographic Failures
+    - A04:2025 - Cryptographic Failures
+    cwe:
+    - 'CWE-327: Use of a Broken or Risky Cryptographic Algorithm'
+    subcategory:
+    - vuln
+    likelihood: HIGH
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Cryptographic Issues
+    source: https://semgrep.dev/r/ruby.lang.security.md5-used-as-password.md5-used-as-password
+    shortlink: https://sg.run/GOZy
+    semgrep.dev:
+      rule:
+        r_id: 14704
+        rv_id: 1263611
+        rule_id: oqU4p2
+        version_id: JdTzx0e
+        url: https://semgrep.dev/playground/r/JdTzx0e/ruby.lang.security.md5-used-as-password.md5-used-as-password
+        origin: community
+  mode: taint
+  pattern-sources:
+  - pattern: Digest::MD5
+  pattern-sinks:
+  - patterns:
+    - pattern: $FUNCTION(...);
+    - metavariable-regex:
+        metavariable: $FUNCTION
+        regex: (?i)(.*password.*)
+- id: ruby.rails.security.brakeman.check-regex-dos.check-regex-dos
+  mode: taint
+  pattern-sources:
+  - patterns:
+    - pattern-either:
+      - pattern: |
+          cookies[...]
+      - patterns:
+        - pattern: |
+            cookies. ... .$PROPERTY[...]
+        - metavariable-regex:
+            metavariable: $PROPERTY
+            regex: (?!signed|encrypted)
+      - pattern: |
+          params[...]
+      - pattern: |
+          request.env[...]
+      - patterns:
+        - pattern: $Y
+        - pattern-either:
+          - pattern-inside: |
+              $RECORD.read_attribute($Y)
+          - pattern-inside: |
+              $RECORD[$Y]
+        - metavariable-regex:
+            metavariable: $RECORD
+            regex: '[A-Z][a-z]+'
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - patterns:
+        - pattern: $Y
+        - pattern-inside: |
+            /...#{...}.../
+      - patterns:
+        - pattern: $Y
+        - pattern-inside: |
+            Regexp.new(...)
+  message: Found a potentially user-controllable argument in the construction of a
+    regular expressions. This may result in excessive resource consumption when applied
+    to certain inputs, or when the user is allowed to control the match target. Avoid
+    allowing users to specify regular expressions processed by the server. If you
+    must support user-controllable input in a regular expression, use an allow-list
+    to restrict the expressions users may supply to limit catastrophic backtracking.
+  languages:
+  - ruby
+  severity: ERROR
+  metadata:
+    source-rule-url: https://github.com/presidentbeef/brakeman/blob/main/lib/brakeman/checks/check_regex_dos.rb
+    category: security
+    cwe:
+    - 'CWE-1333: Inefficient Regular Expression Complexity'
+    owasp:
+    - A03:2017 - Sensitive Data Exposure
+    technology:
+    - ruby
+    - rails
+    references:
+    - https://owasp.org/www-community/attacks/Regular_expression_Denial_of_Service_-_ReDoS
+    subcategory:
+    - vuln
+    likelihood: HIGH
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Denial-of-Service (DoS)
+    source: https://semgrep.dev/r/ruby.rails.security.brakeman.check-regex-dos.check-regex-dos
+    shortlink: https://sg.run/qZwx
+    semgrep.dev:
+      rule:
+        r_id: 20156
+        rv_id: 1409406
+        rule_id: YGUY4R
+        version_id: 0bTG0WO
+        url: https://semgrep.dev/playground/r/0bTG0WO/ruby.rails.security.brakeman.check-regex-dos.check-regex-dos
+        origin: community
+- id: ruby.aws-lambda.security.activerecord-sqli.activerecord-sqli
+  languages:
+  - ruby
+  message: 'Detected SQL statement that is tainted by `event` object. This could lead
+    to SQL injection if the variable is user-controlled and not properly sanitized.
+    In order to prevent SQL injection, use parameterized queries or prepared statements
+    instead. You can use parameterized statements like so: `Example.find_by_sql ["SELECT
+    title FROM posts WHERE author = ? AND created > ?", author_id, start_date]`'
+  mode: taint
+  metadata:
+    references:
+    - https://guides.rubyonrails.org/active_record_querying.html#finding-by-sql
+    category: security
+    owasp:
+    - A01:2017 - Injection
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    cwe:
+    - 'CWE-89: Improper Neutralization of Special Elements used in an SQL Command
+      (''SQL Injection'')'
+    technology:
+    - aws-lambda
+    - active-record
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: HIGH
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - SQL Injection
+    source: https://semgrep.dev/r/ruby.aws-lambda.security.activerecord-sqli.activerecord-sqli
+    shortlink: https://sg.run/vXvY
+    semgrep.dev:
+      rule:
+        r_id: 18277
+        rv_id: 1263581
+        rule_id: 0oUw9g
+        version_id: w8TRor7
+        url: https://semgrep.dev/playground/r/w8TRor7/ruby.aws-lambda.security.activerecord-sqli.activerecord-sqli
+        origin: community
+  pattern-sinks:
+  - patterns:
+    - pattern: $QUERY
+    - pattern-either:
+      - pattern: ActiveRecord::Base.connection.execute($QUERY,...)
+      - pattern: $MODEL.find_by_sql($QUERY,...)
+      - pattern: $MODEL.select_all($QUERY,...)
+    - pattern-inside: |
+        require 'active_record'
+        ...
+  pattern-sources:
+  - patterns:
+    - pattern: event
+    - pattern-inside: |
+        def $HANDLER(event, context)
+          ...
+        end
+  severity: WARNING
+- id: ruby.rails.security.audit.avoid-tainted-ftp-call.avoid-tainted-ftp-call
+  metadata:
+    owasp:
+    - A05:2017 - Broken Access Control
+    - A01:2021 - Broken Access Control
+    - A01:2025 - Broken Access Control
+    cwe:
+    - 'CWE-22: Improper Limitation of a Pathname to a Restricted Directory (''Path
+      Traversal'')'
+    references:
+    - https://github.com/presidentbeef/brakeman/blob/main/docs/warning_types/file_access/index.markdown
+    category: security
+    technology:
+    - rails
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: HIGH
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Path Traversal
+    source: https://semgrep.dev/r/ruby.rails.security.audit.avoid-tainted-ftp-call.avoid-tainted-ftp-call
+    shortlink: https://sg.run/Q9gP
+    semgrep.dev:
+      rule:
+        r_id: 13586
+        rv_id: 1263623
+        rule_id: WAUyzp
+        version_id: YDTZeWL
+        url: https://semgrep.dev/playground/r/YDTZeWL/ruby.rails.security.audit.avoid-tainted-ftp-call.avoid-tainted-ftp-call
+        origin: community
+  message: Using user input when accessing files is potentially dangerous. A malicious
+    actor could use this to modify or access files they have no right to.
+  languages:
+  - ruby
+  severity: WARNING
+  mode: taint
+  pattern-sources:
+  - pattern: params
+  - pattern: cookies
+  - pattern: request.env
+  pattern-sinks:
+  - pattern-either:
+    - pattern: Net::FTP.$X(...)
+    - patterns:
+      - pattern-inside: |
+          $FTP = Net::FTP.$OPEN(...)
+          ...
+          $FTP.$METHOD(...)
+      - pattern: $FTP.$METHOD(...)
+- id: ruby.rails.security.brakeman.check-unsafe-reflection-methods.check-unsafe-reflection-methods
+  mode: taint
+  pattern-sources:
+  - pattern-either:
+    - pattern: |
+        cookies[...]
+    - patterns:
+      - pattern: |
+          cookies. ... .$PROPERTY[...]
+      - metavariable-regex:
+          metavariable: $PROPERTY
+          regex: (?!signed|encrypted)
+    - pattern: |
+        params[...]
+    - pattern: |
+        request.env[...]
+  pattern-sinks:
+  - patterns:
+    - pattern: $X
+    - pattern-either:
+      - pattern-inside: |
+          $X. ... .to_proc
+      - patterns:
+        - pattern-inside: |
+            $Y.method($Z)
+        - focus-metavariable: $Z
+      - patterns:
+        - pattern-inside: |
+            $Y.tap($Z)
+        - focus-metavariable: $Z
+      - patterns:
+        - pattern-inside: |
+            $Y.tap{ |$ANY| $Z }
+        - focus-metavariable: $Z
+  message: Found user-controllable input to a reflection method. This may allow a
+    user to alter program behavior and potentially execute arbitrary instructions
+    in the context of the process. Do not provide arbitrary user input to `tap`, `method`,
+    or `to_proc`
+  languages:
+  - ruby
+  severity: ERROR
+  metadata:
+    source-rule-url: https://github.com/presidentbeef/brakeman/blob/main/lib/brakeman/checks/check_unsafe_reflection_methods.rb
+    category: security
+    cwe:
+    - 'CWE-94: Improper Control of Generation of Code (''Code Injection'')'
+    owasp:
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    technology:
+    - ruby
+    - rails
+    references:
+    - https://github.com/presidentbeef/brakeman/blob/main/test/apps/rails6/app/controllers/groups_controller.rb
+    cwe2022-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Code Injection
+    source: https://semgrep.dev/r/ruby.rails.security.brakeman.check-unsafe-reflection-methods.check-unsafe-reflection-methods
+    shortlink: https://sg.run/dPYd
+    semgrep.dev:
+      rule:
+        r_id: 20534
+        rv_id: 1263662
+        rule_id: eqUZ2Q
+        version_id: WrTqKLA
+        url: https://semgrep.dev/playground/r/WrTqKLA/ruby.rails.security.brakeman.check-unsafe-reflection-methods.check-unsafe-reflection-methods
+        origin: community
+- id: ruby.rails.security.brakeman.check-sql.check-sql
+  mode: taint
+  pattern-sources:
+  - pattern-either:
+    - pattern: |
+        cookies[...]
+    - patterns:
+      - pattern: |
+          cookies. ... .$PROPERTY[...]
+      - metavariable-regex:
+          metavariable: $PROPERTY
+          regex: (?!signed|encrypted)
+    - pattern: |
+        params[...]
+    - pattern: |
+        request.env[...]
+  pattern-sanitizers:
+  - patterns:
+    - pattern-either:
+      - patterns:
+        - pattern: $X
+        - pattern-either:
+          - pattern-inside: |
+              :$KEY => $X
+          - pattern-inside: |
+              ["...",$X,...]
+      - pattern: |
+          params[...].to_i
+      - pattern: |
+          params[...].to_f
+      - patterns:
+        - pattern: |
+            params[...] ? $A : $B
+        - metavariable-pattern:
+            metavariable: $A
+            patterns:
+            - pattern-not: |
+                params[...]
+        - metavariable-pattern:
+            metavariable: $B
+            patterns:
+            - pattern-not: |
+                params[...]
+  pattern-sinks:
+  - patterns:
+    - pattern: $X
+    - pattern-not-inside: |
+        $P.where("...",...)
+    - pattern-not-inside: |
+        $P.where(:$KEY => $VAL,...)
+    - pattern-either:
+      - pattern-inside: |
+          $P.$M(...)
+      - pattern-inside: |
+          $P.$M("...",...)
+    - pattern-inside: |
+        class $P < ActiveRecord::Base
+          ...
+        end
+    - metavariable-regex:
+        metavariable: $M
+        regex: (where|find|first|last|select|minimum|maximum|calculate|sum|average)
+  message: Found potential SQL injection due to unsafe SQL query construction via
+    $X. Where possible, prefer parameterized queries.
+  languages:
+  - ruby
+  severity: ERROR
+  metadata:
+    source-rule-url: https://github.com/presidentbeef/brakeman/blob/main/lib/brakeman/checks/check_sql.rb
+    category: security
+    cwe:
+    - 'CWE-89: Improper Neutralization of Special Elements used in an SQL Command
+      (''SQL Injection'')'
+    owasp:
+    - A01:2017 - Injection
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    technology:
+    - ruby
+    - rails
+    references:
+    - https://owasp.org/www-community/attacks/SQL_Injection
+    - https://github.com/presidentbeef/brakeman/blob/main/test/apps/rails3.1/app/models/product.rb
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - SQL Injection
+    source: https://semgrep.dev/r/ruby.rails.security.brakeman.check-sql.check-sql
+    shortlink: https://sg.run/vpgb
+    semgrep.dev:
+      rule:
+        r_id: 20533
+        rv_id: 1263661
+        rule_id: OrUv2z
+        version_id: DkTRbE4
+        url: https://semgrep.dev/playground/r/DkTRbE4/ruby.rails.security.brakeman.check-sql.check-sql
+        origin: community
+- id: ruby.rails.security.brakeman.check-http-verb-confusion.check-http-verb-confusion
+  mode: search
+  patterns:
+  - pattern: |
+      if request.get?
+        ...
+      else
+        ...
+      end
+  - pattern-not-inside: |
+      if ...
+      elsif ...
+        ...
+      end
+  message: Found an improperly constructed control flow block with `request.get?`.
+    Rails will route HEAD requests as GET requests but they will fail the `request.get?`
+    check, potentially causing unexpected behavior unless an `elif` condition is used.
+  languages:
+  - ruby
+  severity: ERROR
+  metadata:
+    source-rule-url: https://github.com/presidentbeef/brakeman/blob/main/lib/brakeman/checks/check_verb_confusion.rb
+    category: security
+    cwe:
+    - 'CWE-650: Trusting HTTP Permission Methods on the Server Side'
+    owasp:
+    - A04:2021 - Insecure Design
+    - A06:2025 - Insecure Design
+    technology:
+    - ruby
+    - rails
+    references:
+    - https://github.com/presidentbeef/brakeman/blob/main/test/apps/rails6/app/controllers/accounts_controller.rb
+    subcategory:
+    - vuln
+    likelihood: HIGH
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Other
+    source: https://semgrep.dev/r/ruby.rails.security.brakeman.check-http-verb-confusion.check-http-verb-confusion
+    shortlink: https://sg.run/eJ6y
+    semgrep.dev:
+      rule:
+        r_id: 20532
+        rv_id: 1263652
+        rule_id: x8UdDE
+        version_id: 3ZT4X82
+        url: https://semgrep.dev/playground/r/3ZT4X82/ruby.rails.security.brakeman.check-http-verb-confusion.check-http-verb-confusion
+        origin: community
+- id: ruby.rails.security.audit.avoid-session-manipulation.avoid-session-manipulation
+  metadata:
+    shortDescription: Allowing an attacker to manipulate the session may lead to unintended
+      behavior.
+    tags:
+    - security
+    owasp:
+    - A01:2021 - Broken Access Control
+    - A01:2025 - Broken Access Control
+    cwe:
+    - 'CWE-276: Incorrect Default Permissions'
+    references:
+    - https://brakemanscanner.org/docs/warning_types/session_manipulation/
+    category: security
+    technology:
+    - rails
+    help: |
+      ## Remediation
+      Session manipulation can occur when an application allows user-input in session keys. Since sessions are typically considered a source of truth (e.g. to check the logged-in user or to match CSRF tokens), allowing an attacker to manipulate the session may lead to unintended behavior.
+
+      ## References
+      [Session Manipulation](https://brakemanscanner.org/docs/warning_types/session_manipulation/)
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Improper Authorization
+    source: https://semgrep.dev/r/ruby.rails.security.audit.avoid-session-manipulation.avoid-session-manipulation
+    shortlink: https://sg.run/86q7
+    semgrep.dev:
+      rule:
+        r_id: 13584
+        rv_id: 1263621
+        rule_id: BYUdW6
+        version_id: qkTR76G
+        url: https://semgrep.dev/playground/r/qkTR76G/ruby.rails.security.audit.avoid-session-manipulation.avoid-session-manipulation
+        origin: community
+  message: This gets data from session using user inputs. A malicious user may be
+    able to retrieve information from your session that you didn't intend them to.
+    Do not use user input as a session key.
+  languages:
+  - ruby
+  severity: WARNING
+  mode: taint
+  pattern-sources:
+  - pattern: params
+  - pattern: cookies
+  - pattern: request.env
+  pattern-sinks:
+  - pattern: session[...]
+- id: ruby.rails.security.audit.xss.avoid-link-to.avoid-link-to
+  metadata:
+    source-rule-url: https://github.com/presidentbeef/brakeman/blob/main/lib/brakeman/checks/check_link_to.rb
+    owasp:
+    - A07:2017 - Cross-Site Scripting (XSS)
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    cwe:
+    - 'CWE-79: Improper Neutralization of Input During Web Page Generation (''Cross-site
+      Scripting'')'
+    references:
+    - https://brakemanscanner.org/docs/warning_types/link_to/
+    - https://brakemanscanner.org/docs/warning_types/link_to_href/
+    category: security
+    technology:
+    - rails
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: HIGH
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Cross-Site-Scripting (XSS)
+    source: https://semgrep.dev/r/ruby.rails.security.audit.xss.avoid-link-to.avoid-link-to
+    shortlink: https://sg.run/JxXQ
+    semgrep.dev:
+      rule:
+        r_id: 13590
+        rv_id: 1263632
+        rule_id: lBU8Qj
+        version_id: 9lT4brj
+        url: https://semgrep.dev/playground/r/9lT4brj/ruby.rails.security.audit.xss.avoid-link-to.avoid-link-to
+        origin: community
+  message: This code includes user input in `link_to`. In Rails 2.x, the body of `link_to`
+    is not escaped. This means that user input which reaches the body will be executed
+    when the HTML is rendered. Even in other versions, values starting with `javascript:`
+    or `data:` are not escaped. It is better to create and use a safer function which
+    checks the body argument.
+  languages:
+  - ruby
+  severity: WARNING
+  mode: taint
+  pattern-sources:
+  - pattern: params
+  - pattern: cookies
+  - pattern: request.env
+  - pattern-either:
+    - pattern: $MODEL.url(...)
+    - pattern: $MODEL.uri(...)
+    - pattern: $MODEL.link(...)
+    - pattern: $MODEL.page(...)
+    - pattern: $MODEL.site(...)
+  pattern-sinks:
+  - pattern: link_to(...)
+  pattern-sanitizers:
+  - patterns:
+    - pattern: |
+        "...#{...}..."
+    - pattern-not: |
+        "#{...}..."
+- id: ruby.rails.security.brakeman.check-unsafe-reflection.check-unsafe-reflection
+  mode: taint
+  pattern-sources:
+  - pattern-either:
+    - pattern: |
+        cookies[...]
+    - patterns:
+      - pattern: |
+          cookies. ... .$PROPERTY[...]
+      - metavariable-regex:
+          metavariable: $PROPERTY
+          regex: (?!signed|encrypted)
+    - pattern: |
+        params[...]
+    - pattern: |
+        request.env[...]
+  pattern-sinks:
+  - patterns:
+    - pattern: $X
+    - pattern-either:
+      - pattern-inside: |
+          $X.constantize
+      - pattern-inside: |
+          $X. ... .safe_constantize
+      - pattern-inside: |
+          const_get(...)
+      - pattern-inside: |
+          qualified_const_get(...)
+  message: Found user-controllable input to Ruby reflection functionality. This allows
+    a remote user to influence runtime behavior, up to and including arbitrary remote
+    code execution. Do not provide user-controllable input to reflection functionality.
+    Do not call symbol conversion on user-controllable input.
+  languages:
+  - ruby
+  severity: ERROR
+  metadata:
+    source-rule-url: https://github.com/presidentbeef/brakeman/blob/main/lib/brakeman/checks/check_unsafe_reflection.rb
+    category: security
+    cwe:
+    - 'CWE-94: Improper Control of Generation of Code (''Code Injection'')'
+    owasp:
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    technology:
+    - ruby
+    - rails
+    references:
+    - https://github.com/presidentbeef/brakeman/blob/main/test/apps/rails2/app/controllers/application_controller.rb
+    cwe2022-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Code Injection
+    source: https://semgrep.dev/r/ruby.rails.security.brakeman.check-unsafe-reflection.check-unsafe-reflection
+    shortlink: https://sg.run/vpEX
+    semgrep.dev:
+      rule:
+        r_id: 20733
+        rv_id: 1263663
+        rule_id: wdUkYA
+        version_id: 0bTKzn8
+        url: https://semgrep.dev/playground/r/0bTKzn8/ruby.rails.security.brakeman.check-unsafe-reflection.check-unsafe-reflection
+        origin: community
+- id: ruby.rails.security.injection.raw-html-format.raw-html-format
+  languages:
+  - ruby
+  severity: WARNING
+  message: Detected user input flowing into a manually constructed HTML string. You
+    may be accidentally bypassing secure methods of rendering HTML by manually constructing
+    HTML and this could create a cross-site scripting vulnerability, which could let
+    attackers steal sensitive user data. Use the `render template` and make template
+    files which will safely render HTML instead, or inspect that the HTML is absolutely
+    rendered safely with a function like `sanitize`.
+  metadata:
+    cwe:
+    - 'CWE-79: Improper Neutralization of Input During Web Page Generation (''Cross-site
+      Scripting'')'
+    owasp:
+    - A07:2017 - Cross-Site Scripting (XSS)
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    category: security
+    technology:
+    - rails
+    references:
+    - https://www.netsparker.com/blog/web-security/preventing-xss-ruby-on-rails-web-applications/
+    - https://api.rubyonrails.org/classes/ActionView/Helpers/SanitizeHelper.html
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: HIGH
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Cross-Site-Scripting (XSS)
+    source: https://semgrep.dev/r/ruby.rails.security.injection.raw-html-format.raw-html-format
+    shortlink: https://sg.run/b2JQ
+    semgrep.dev:
+      rule:
+        r_id: 14470
+        rv_id: 1409408
+        rule_id: kxUwZX
+        version_id: qkTvgYY
+        url: https://semgrep.dev/playground/r/qkTvgYY/ruby.rails.security.injection.raw-html-format.raw-html-format
+        origin: community
+  mode: taint
+  pattern-sanitizers:
+  - pattern-either:
+    - pattern: sanitize(...)
+    - pattern: strip_tags(...)
+  pattern-sources:
+  - patterns:
+    - pattern-either:
+      - pattern: params
+      - pattern: request
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - patterns:
+        - pattern: |
+            $HTMLSTR
+        - pattern-regex: <\w+.*
+      - patterns:
+        - pattern-either:
+          - pattern: Kernel::sprintf("$HTMLSTR", ...)
+          - pattern: |
+              "$HTMLSTR" + $EXPR
+          - pattern: |
+              "$HTMLSTR" % $EXPR
+        - metavariable-pattern:
+            metavariable: $HTMLSTR
+            language: generic
+            pattern: <$TAG ...
+- id: ruby.rails.security.brakeman.check-render-local-file-include.check-render-local-file-include
+  mode: taint
+  pattern-sources:
+  - patterns:
+    - pattern: params[...]
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - pattern: |
+          render ..., file: $X
+      - pattern: |
+          render ..., inline: $X
+      - pattern: |
+          render ..., template: $X
+      - pattern: |
+          render ..., action: $X
+      - pattern: |
+          render $X, ...
+    - focus-metavariable: $X
+  pattern-sanitizers:
+  - patterns:
+    - pattern: $MAP[...]
+    - metavariable-pattern:
+        metavariable: $MAP
+        patterns:
+        - pattern-not-regex: params
+  - pattern: File.basename(...)
+  message: Found request parameters in a call to `render`. This can allow end users
+    to request arbitrary local files which may result in leaking sensitive information
+    persisted on disk. Where possible, avoid letting users specify template paths
+    for `render`. If you must allow user input, use an allow-list of known templates
+    or normalize the user-supplied value with `File.basename(...)`.
+  languages:
+  - ruby
+  severity: WARNING
+  metadata:
+    technology:
+    - ruby
+    - rails
+    category: security
+    cwe:
+    - 'CWE-22: Improper Limitation of a Pathname to a Restricted Directory (''Path
+      Traversal'')'
+    owasp:
+    - A05:2017 - Broken Access Control
+    - A01:2021 - Broken Access Control
+    - A01:2025 - Broken Access Control
+    source-rule-url: https://github.com/presidentbeef/brakeman/blob/main/lib/brakeman/checks/check_render.rb
+    references:
+    - https://owasp.org/www-project-web-security-testing-guide/v42/4-Web_Application_Security_Testing/07-Input_Validation_Testing/11.1-Testing_for_Local_File_Inclusion
+    - https://github.com/presidentbeef/brakeman/blob/f74cb53/test/apps/rails2/app/controllers/home_controller.rb#L48-L60
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: HIGH
+    confidence: MEDIUM
+    vulnerability_class:
+    - Path Traversal
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    source: https://semgrep.dev/r/ruby.rails.security.brakeman.check-render-local-file-include.check-render-local-file-include
+    shortlink: https://sg.run/Jw8Z
+    semgrep.dev:
+      rule:
+        r_id: 20046
+        rv_id: 1409407
+        rule_id: ReU2pZ
+        version_id: K3TgANN
+        url: https://semgrep.dev/playground/r/K3TgANN/ruby.rails.security.brakeman.check-render-local-file-include.check-render-local-file-include
+        origin: community
+- id: ruby.rails.security.brakeman.check-send-file.check-send-file
+  mode: taint
+  pattern-sources:
+  - pattern-either:
+    - pattern: |
+        cookies[...]
+    - patterns:
+      - pattern: |
+          cookies. ... .$PROPERTY[...]
+      - metavariable-regex:
+          metavariable: $PROPERTY
+          regex: (?!signed|encrypted)
+    - pattern: |
+        params[...]
+    - pattern: |
+        request.env[...]
+  pattern-sinks:
+  - patterns:
+    - pattern: |
+        send_file ...
+  message: Allowing user input to `send_file` allows a malicious user to potentially
+    read arbitrary files from the server. Avoid accepting user input in `send_file`
+    or normalize with `File.basename(...)`
+  languages:
+  - ruby
+  severity: ERROR
+  metadata:
+    source-rule-url: https://github.com/presidentbeef/brakeman/blob/main/lib/brakeman/checks/check_send_file.rb
+    category: security
+    cwe:
+    - 'CWE-73: External Control of File Name or Path'
+    owasp:
+    - A04:2021 - Insecure Design
+    - A06:2025 - Insecure Design
+    technology:
+    - ruby
+    - rails
+    references:
+    - https://owasp.org/www-community/attacks/Path_Traversal
+    - https://owasp.org/Top10/A01_2021-Broken_Access_Control/
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Path Traversal
+    source: https://semgrep.dev/r/ruby.rails.security.brakeman.check-send-file.check-send-file
+    shortlink: https://sg.run/GbY1
+    semgrep.dev:
+      rule:
+        r_id: 20048
+        rv_id: 1263660
+        rule_id: BYUKbl
+        version_id: BjTkZRj
+        url: https://semgrep.dev/playground/r/BjTkZRj/ruby.rails.security.brakeman.check-send-file.check-send-file
+        origin: community
+- id: ruby.aws-lambda.security.sequel-sqli.sequel-sqli
+  languages:
+  - ruby
+  message: 'Detected SQL statement that is tainted by `event` object. This could lead
+    to SQL injection if the variable is user-controlled and not properly sanitized.
+    In order to prevent SQL injection, use parameterized queries or prepared statements
+    instead. You can use parameterized statements like so: `DB[''select * from items
+    where name = ?'', name]`'
+  mode: taint
+  metadata:
+    references:
+    - https://github.com/jeremyevans/sequel#label-Arbitrary+SQL+queries
+    category: security
+    owasp:
+    - A01:2017 - Injection
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    cwe:
+    - 'CWE-89: Improper Neutralization of Special Elements used in an SQL Command
+      (''SQL Injection'')'
+    technology:
+    - aws-lambda
+    - sequel
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: HIGH
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - SQL Injection
+    source: https://semgrep.dev/r/ruby.aws-lambda.security.sequel-sqli.sequel-sqli
+    shortlink: https://sg.run/n9vY
+    semgrep.dev:
+      rule:
+        r_id: 18280
+        rv_id: 1263584
+        rule_id: lBUy2N
+        version_id: e1Tyj5j
+        url: https://semgrep.dev/playground/r/e1Tyj5j/ruby.aws-lambda.security.sequel-sqli.sequel-sqli
+        origin: community
+  pattern-sinks:
+  - patterns:
+    - pattern: $QUERY
+    - pattern-either:
+      - pattern: DB[$QUERY,...]
+      - pattern: DB.run($QUERY,...)
+    - pattern-inside: |
+        require 'sequel'
+        ...
+  pattern-sources:
+  - patterns:
+    - pattern: event
+    - pattern-inside: |
+        def $HANDLER(event, context)
+          ...
+        end
+  severity: WARNING
+- id: ruby.rails.security.brakeman.check-validation-regex.check-validation-regex
+  mode: search
+  patterns:
+  - pattern-either:
+    - pattern: |
+        validates ..., :format => <... $V ...>,...
+    - pattern: |
+        validates_format_of ..., :with => <... $V ...>,...
+  - metavariable-regex:
+      metavariable: $V
+      regex: /(.{2}(?<!\\A)[^\/]+|[^\/]+(?<!\\[Zz]))\/
+  message: $V Found an incorrectly-bounded regex passed to `validates_format_of` or
+    `validate ... format => ...`. Ruby regex behavior is multiline by default and
+    lines should be terminated by `\A` for beginning of line and `\Z` for end of line,
+    respectively.
+  languages:
+  - ruby
+  severity: ERROR
+  metadata:
+    source-rule-url: https://github.com/presidentbeef/brakeman/blob/main/lib/brakeman/checks/check_validation_regex.rb
+    category: security
+    cwe:
+    - 'CWE-185: Incorrect Regular Expression'
+    owasp:
+    - A05:2017 - Broken Access Control
+    - A01:2021 - Broken Access Control
+    - A01:2025 - Broken Access Control
+    technology:
+    - ruby
+    - rails
+    references:
+    - https://brakemanscanner.org/docs/warning_types/format_validation/
+    - https://github.com/presidentbeef/brakeman/blob/aef6253a8b7bcb97116f2af1ed2a561a6ae35bd5/test/apps/rails3/app/models/account.rb
+    - https://github.com/presidentbeef/brakeman/blob/main/test/apps/rails3.1/app/models/account.rb
+    subcategory:
+    - vuln
+    impact: MEDIUM
+    likelihood: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Improper Validation
+    source: https://semgrep.dev/r/ruby.rails.security.brakeman.check-validation-regex.check-validation-regex
+    shortlink: https://sg.run/ZPo7
+    semgrep.dev:
+      rule:
+        r_id: 20735
+        rv_id: 1263665
+        rule_id: OrUv1X
+        version_id: qkTR7DG
+        url: https://semgrep.dev/playground/r/qkTR7DG/ruby.rails.security.brakeman.check-validation-regex.check-validation-regex
+        origin: community
+- id: ruby.rails.security.injection.tainted-url-host.tainted-url-host
+  languages:
+  - ruby
+  severity: WARNING
+  message: User data flows into the host portion of this manually-constructed URL.
+    This could allow an attacker to send data to their own server, potentially exposing
+    sensitive data such as cookies or authorization information sent with this request.
+    They could also probe internal servers or other resources that the server running
+    this code can access. (This is called server-side request forgery, or SSRF.) Do
+    not allow arbitrary hosts. Use the `ssrf_filter` gem and guard the url construction
+    with `SsrfFilter(...)`, or create an allowlist for approved hosts.
+  metadata:
+    cwe:
+    - 'CWE-79: Improper Neutralization of Input During Web Page Generation (''Cross-site
+      Scripting'')'
+    owasp:
+    - A07:2017 - Cross-Site Scripting (XSS)
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    category: security
+    technology:
+    - rails
+    references:
+    - https://cheatsheetseries.owasp.org/cheatsheets/Server_Side_Request_Forgery_Prevention_Cheat_Sheet.html
+    - https://github.com/arkadiyt/ssrf_filter
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: HIGH
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Cross-Site-Scripting (XSS)
+    source: https://semgrep.dev/r/ruby.rails.security.injection.tainted-url-host.tainted-url-host
+    shortlink: https://sg.run/RX3g
+    semgrep.dev:
+      rule:
+        r_id: 14705
+        rv_id: 1263668
+        rule_id: zdUY0W
+        version_id: 6xT29BN
+        url: https://semgrep.dev/playground/r/6xT29BN/ruby.rails.security.injection.tainted-url-host.tainted-url-host
+        origin: community
+  mode: taint
+  pattern-sanitizers:
+  - pattern: SsrfFilter
+  pattern-sources:
+  - patterns:
+    - pattern-either:
+      - pattern: params
+      - pattern: request
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - patterns:
+        - pattern: |
+            $URLSTR
+        - pattern-regex: \w+:\/\/#{.*}
+      - patterns:
+        - pattern-either:
+          - pattern: Kernel::sprintf("$URLSTR", ...)
+          - pattern: |
+              "$URLSTR" + $EXPR
+          - pattern: |
+              "$URLSTR" % $EXPR
+        - metavariable-pattern:
+            metavariable: $URLSTR
+            language: generic
+            pattern: $SCHEME:// ...
+- id: ruby.rails.security.audit.xss.avoid-redirect.avoid-redirect
+  metadata:
+    owasp:
+    - A01:2021 - Broken Access Control
+    - A01:2025 - Broken Access Control
+    cwe:
+    - 'CWE-601: URL Redirection to Untrusted Site (''Open Redirect'')'
+    references:
+    - https://brakemanscanner.org/docs/warning_types/redirect/
+    category: security
+    technology:
+    - rails
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Open Redirect
+    source: https://semgrep.dev/r/ruby.rails.security.audit.xss.avoid-redirect.avoid-redirect
+    shortlink: https://sg.run/5DY3
+    semgrep.dev:
+      rule:
+        r_id: 13591
+        rv_id: 1263634
+        rule_id: YGUDqJ
+        version_id: rxTAKdY
+        url: https://semgrep.dev/playground/r/rxTAKdY/ruby.rails.security.audit.xss.avoid-redirect.avoid-redirect
+        origin: community
+  message: When a redirect uses user input, a malicious user can spoof a website under
+    a trusted URL or access restricted parts of a site. When using user-supplied values,
+    sanitize the value before using it for the redirect.
+  languages:
+  - ruby
+  severity: WARNING
+  mode: taint
+  pattern-sources:
+  - pattern: params
+  - pattern: cookies
+  - pattern: request.env
+  - patterns:
+    - pattern: $MODEL.$X(...)
+    - pattern-not: $MODEL.$X("...")
+    - metavariable-pattern:
+        metavariable: $X
+        pattern-either:
+        - pattern: all
+        - pattern: create
+        - pattern: create!
+        - pattern: find
+        - pattern: find_by_sql
+        - pattern: first
+        - pattern: last
+        - pattern: new
+        - pattern: from
+        - pattern: group
+        - pattern: having
+        - pattern: joins
+        - pattern: lock
+        - pattern: order
+        - pattern: reorder
+        - pattern: select
+        - pattern: where
+        - pattern: find_by
+        - pattern: find_by!
+        - pattern: take
+  pattern-sinks:
+  - pattern: redirect_to(...)
+  pattern-sanitizers:
+  - pattern: params.merge(:only_path => true)
+  - pattern: params.merge(:host => ...)
+- id: ruby.rails.security.audit.avoid-tainted-file-access.avoid-tainted-file-access
+  metadata:
+    owasp:
+    - A05:2017 - Broken Access Control
+    - A01:2021 - Broken Access Control
+    - A01:2025 - Broken Access Control
+    cwe:
+    - 'CWE-22: Improper Limitation of a Pathname to a Restricted Directory (''Path
+      Traversal'')'
+    references:
+    - https://github.com/presidentbeef/brakeman/blob/main/docs/warning_types/file_access/index.markdown
+    category: security
+    technology:
+    - rails
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: HIGH
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Path Traversal
+    source: https://semgrep.dev/r/ruby.rails.security.audit.avoid-tainted-file-access.avoid-tainted-file-access
+    shortlink: https://sg.run/gYln
+    semgrep.dev:
+      rule:
+        r_id: 13585
+        rv_id: 1263622
+        rule_id: DbU1dr
+        version_id: l4TJRkk
+        url: https://semgrep.dev/playground/r/l4TJRkk/ruby.rails.security.audit.avoid-tainted-file-access.avoid-tainted-file-access
+        origin: community
+  message: Using user input when accessing files is potentially dangerous. A malicious
+    actor could use this to modify or access files they have no right to.
+  languages:
+  - ruby
+  severity: WARNING
+  mode: taint
+  pattern-sources:
+  - pattern: params
+  - pattern: cookies
+  - pattern: request.env
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - pattern: Dir.$X(...)
+      - pattern: File.$X(...)
+      - pattern: IO.$X(...)
+      - pattern: Kernel.$X(...)
+      - pattern: PStore.$X(...)
+      - pattern: Pathname.$X(...)
+    - metavariable-pattern:
+        metavariable: $X
+        patterns:
+        - pattern-either:
+          - pattern: chdir
+          - pattern: chroot
+          - pattern: delete
+          - pattern: entries
+          - pattern: foreach
+          - pattern: glob
+          - pattern: install
+          - pattern: lchmod
+          - pattern: lchown
+          - pattern: link
+          - pattern: load
+          - pattern: load_file
+          - pattern: makedirs
+          - pattern: move
+          - pattern: new
+          - pattern: open
+          - pattern: read
+          - pattern: readlines
+          - pattern: rename
+          - pattern: rmdir
+          - pattern: safe_unlink
+          - pattern: symlink
+          - pattern: syscopy
+          - pattern: sysopen
+          - pattern: truncate
+          - pattern: unlink
+- id: ruby.rails.security.brakeman.check-redirect-to.check-redirect-to
+  mode: taint
+  pattern-sources:
+  - patterns:
+    - pattern-either:
+      - pattern: params
+      - pattern: cookies
+      - pattern: request.env
+      - pattern: url_for(params[...],...,:only_path => false,...)
+  pattern-sanitizers:
+  - patterns:
+    - pattern-either:
+      - patterns:
+        - pattern: |
+            $F(...)
+        - metavariable-pattern:
+            metavariable: $F
+            patterns:
+            - pattern-not-regex: (params|url_for|cookies|request.env|permit|redirect_to)
+      - pattern: |
+          params.merge! :only_path => true
+          ...
+      - pattern: |
+          params.slice(...)
+          ...
+      - pattern: |
+          redirect_to [...]
+      - patterns:
+        - pattern: |
+            $MODEL. ... .$M(...)
+            ...
+        - metavariable-regex:
+            metavariable: $MODEL
+            regex: '[A-Z]\w+'
+        - metavariable-regex:
+            metavariable: $M
+            regex: (all|create|find|find_by|find_by_sql|first|last|new|from|group|having|joins|lock|order|reorder|select|where|take)
+      - patterns:
+        - pattern: |
+            params.$UNSAFE_HASH.merge(...,:only_path => true,...)
+            ...
+        - metavariable-regex:
+            metavariable: $UNSAFE_HASH
+            regex: to_unsafe_h(ash)?
+      - patterns:
+        - pattern: params.permit(...,$X,...)
+        - metavariable-pattern:
+            metavariable: $X
+            patterns:
+            - pattern-not-regex: (host|port|(sub)?domain)
+  pattern-sinks:
+  - patterns:
+    - pattern: $X
+    - pattern-inside: |
+        redirect_to $X, ...
+    - pattern-not-regex: params\.\w+(?<!permit)\(.*?\)
+  message: Found potentially unsafe handling of redirect behavior $X. Do not pass
+    `params` to `redirect_to` without the `:only_path => true` hash value.
+  languages:
+  - ruby
+  severity: WARNING
+  metadata:
+    source-rule-url: https://github.com/presidentbeef/brakeman/blob/main/lib/brakeman/checks/check_redirect.rb
+    category: security
+    cwe:
+    - 'CWE-601: URL Redirection to Untrusted Site (''Open Redirect'')'
+    technology:
+    - ruby
+    - rails
+    references:
+    - https://cheatsheetseries.owasp.org/cheatsheets/Unvalidated_Redirects_and_Forwards_Cheat_Sheet.html
+    owasp:
+    - A01:2021 - Broken Access Control
+    - A01:2025 - Broken Access Control
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Open Redirect
+    source: https://semgrep.dev/r/ruby.rails.security.brakeman.check-redirect-to.check-redirect-to
+    shortlink: https://sg.run/eJNX
+    semgrep.dev:
+      rule:
+        r_id: 20732
+        rv_id: 1263657
+        rule_id: kxUOJ6
+        version_id: GxTke14
+        url: https://semgrep.dev/playground/r/GxTke14/ruby.rails.security.brakeman.check-redirect-to.check-redirect-to
+        origin: community
+- id: ruby.aws-lambda.security.mysql2-sqli.mysql2-sqli
+  languages:
+  - ruby
+  message: 'Detected SQL statement that is tainted by `event` object. This could lead
+    to SQL injection if the variable is user-controlled and not properly sanitized.
+    In order to prevent SQL injection, use parameterized queries or prepared statements
+    instead. You can use sanitize statements like so: `escaped = client.escape(user_input)`'
+  mode: taint
+  metadata:
+    references:
+    - https://github.com/brianmario/mysql2
+    category: security
+    owasp:
+    - A01:2017 - Injection
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    cwe:
+    - 'CWE-89: Improper Neutralization of Special Elements used in an SQL Command
+      (''SQL Injection'')'
+    technology:
+    - aws-lambda
+    - mysql2
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: HIGH
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - SQL Injection
+    source: https://semgrep.dev/r/ruby.aws-lambda.security.mysql2-sqli.mysql2-sqli
+    shortlink: https://sg.run/dJLE
+    semgrep.dev:
+      rule:
+        r_id: 18278
+        rv_id: 1263582
+        rule_id: KxUrQ3
+        version_id: xyTjzOe
+        url: https://semgrep.dev/playground/r/xyTjzOe/ruby.aws-lambda.security.mysql2-sqli.mysql2-sqli
+        origin: community
+  pattern-sinks:
+  - patterns:
+    - pattern: $QUERY
+    - pattern-either:
+      - pattern: $CLIENT.query($QUERY,...)
+      - pattern: $CLIENT.prepare($QUERY,...)
+    - pattern-inside: |
+        require 'mysql2'
+        ...
+  pattern-sanitizers:
+  - pattern: $CLIENT.escape(...)
+  pattern-sources:
+  - patterns:
+    - pattern: event
+    - pattern-inside: |
+        def $HANDLER(event, context)
+          ...
+        end
+  severity: WARNING
+- id: ruby.aws-lambda.security.pg-sqli.pg-sqli
+  languages:
+  - ruby
+  message: 'Detected SQL statement that is tainted by `event` object. This could lead
+    to SQL injection if the variable is user-controlled and not properly sanitized.
+    In order to prevent SQL injection, use parameterized queries or prepared statements
+    instead. You can use parameterized statements like so: `conn.exec_params(''SELECT
+    $1 AS a, $2 AS b, $3 AS c'', [1, 2, nil])`'
+  mode: taint
+  metadata:
+    references:
+    - https://www.rubydoc.info/gems/pg/PG/Connection
+    category: security
+    owasp:
+    - A01:2017 - Injection
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    cwe:
+    - 'CWE-89: Improper Neutralization of Special Elements used in an SQL Command
+      (''SQL Injection'')'
+    technology:
+    - aws-lambda
+    - postgres
+    - pg
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: HIGH
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - SQL Injection
+    source: https://semgrep.dev/r/ruby.aws-lambda.security.pg-sqli.pg-sqli
+    shortlink: https://sg.run/ZKww
+    semgrep.dev:
+      rule:
+        r_id: 18279
+        rv_id: 1263583
+        rule_id: qNUQee
+        version_id: O9Tpxz7
+        url: https://semgrep.dev/playground/r/O9Tpxz7/ruby.aws-lambda.security.pg-sqli.pg-sqli
+        origin: community
+  pattern-sinks:
+  - patterns:
+    - pattern: $QUERY
+    - pattern-either:
+      - pattern: $CONN.exec($QUERY,...)
+      - pattern: $CONN.exec_params($QUERY,...)
+      - pattern: $CONN.exec_prepared($QUERY,...)
+      - pattern: $CONN.async_exec($QUERY,...)
+      - pattern: $CONN.async_exec_params($QUERY,...)
+      - pattern: $CONN.async_exec_prepared($QUERY,...)
+    - pattern-inside: |
+        require 'pg'
+        ...
+  pattern-sources:
+  - patterns:
+    - pattern: event
+    - pattern-inside: |
+        def $HANDLER(event, context)
+          ...
+        end
+  severity: WARNING
+- id: ruby.rails.security.audit.xss.avoid-render-dynamic-path.avoid-render-dynamic-path
+  metadata:
+    owasp:
+    - A05:2017 - Broken Access Control
+    - A01:2021 - Broken Access Control
+    - A01:2025 - Broken Access Control
+    cwe:
+    - 'CWE-22: Improper Limitation of a Pathname to a Restricted Directory (''Path
+      Traversal'')'
+    references:
+    - https://brakemanscanner.org/docs/warning_types/dynamic_render_paths/
+    category: security
+    technology:
+    - rails
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: HIGH
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Path Traversal
+    source: https://semgrep.dev/r/ruby.rails.security.audit.xss.avoid-render-dynamic-path.avoid-render-dynamic-path
+    shortlink: https://sg.run/GO2n
+    semgrep.dev:
+      rule:
+        r_id: 13592
+        rv_id: 1263635
+        rule_id: 6JU1bL
+        version_id: bZT53p0
+        url: https://semgrep.dev/playground/r/bZT53p0/ruby.rails.security.audit.xss.avoid-render-dynamic-path.avoid-render-dynamic-path
+        origin: community
+  message: Avoid rendering user input. It may be possible for a malicious user to
+    input a path that lets them access a template they shouldn't. To prevent this,
+    check dynamic template paths against a predefined allowlist to make sure it's
+    an allowed template.
+  languages:
+  - ruby
+  severity: WARNING
+  mode: taint
+  pattern-sources:
+  - pattern: params
+  - pattern: cookies
+  - pattern: request.env
+  pattern-sinks:
+  - patterns:
+    - pattern-inside: render($X => $INPUT, ...)
+    - pattern: $INPUT
+    - metavariable-pattern:
+        metavariable: $X
+        pattern-either:
+        - pattern: action
+        - pattern: template
+        - pattern: partial
+        - pattern: file
+- id: ruby.rails.security.audit.avoid-tainted-http-request.avoid-tainted-http-request
+  metadata:
+    owasp:
+    - A10:2021 - Server-Side Request Forgery (SSRF)
+    - A01:2025 - Broken Access Control
+    cwe:
+    - 'CWE-918: Server-Side Request Forgery (SSRF)'
+    references:
+    - https://github.com/presidentbeef/brakeman/blob/main/docs/warning_types/file_access/index.markdown
+    category: security
+    technology:
+    - rails
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    impact: MEDIUM
+    likelihood: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Server-Side Request Forgery (SSRF)
+    source: https://semgrep.dev/r/ruby.rails.security.audit.avoid-tainted-http-request.avoid-tainted-http-request
+    shortlink: https://sg.run/3rLb
+    semgrep.dev:
+      rule:
+        r_id: 13587
+        rv_id: 1263624
+        rule_id: 0oU2x3
+        version_id: 6xT29nN
+        url: https://semgrep.dev/playground/r/6xT29nN/ruby.rails.security.audit.avoid-tainted-http-request.avoid-tainted-http-request
+        origin: community
+  message: Using user input when accessing files is potentially dangerous. A malicious
+    actor could use this to modify or access files they have no right to.
+  languages:
+  - ruby
+  severity: WARNING
+  mode: taint
+  pattern-sources:
+  - pattern: params
+  - pattern: cookies
+  - pattern: request.env
+  pattern-sinks:
+  - pattern-either:
+    - patterns:
+      - pattern: Net::HTTP::$METHOD.new(...)
+      - metavariable-pattern:
+          metavariable: $METHOD
+          patterns:
+          - pattern-either:
+            - pattern: Copy
+            - pattern: Delete
+            - pattern: Get
+            - pattern: Head
+            - pattern: Lock
+            - pattern: Mkcol
+            - pattern: Move
+            - pattern: Options
+            - pattern: Patch
+            - pattern: Post
+            - pattern: Propfind
+            - pattern: Proppatch
+            - pattern: Put
+            - pattern: Trace
+            - pattern: Unlock
+    - patterns:
+      - pattern: Net::HTTP.$X(...)
+      - metavariable-pattern:
+          metavariable: $X
+          patterns:
+          - pattern-either:
+            - pattern: get
+            - pattern: get2
+            - pattern: head
+            - pattern: head2
+            - pattern: options
+            - pattern: patch
+            - pattern: post
+            - pattern: post2
+            - pattern: post_form
+            - pattern: put
+            - pattern: request
+            - pattern: request_get
+            - pattern: request_head
+            - pattern: request_post
+            - pattern: send_request
+            - pattern: trace
+            - pattern: get_print
+            - pattern: get_response
+            - pattern: start
+- id: ruby.rails.security.injection.tainted-sql-string.tainted-sql-string
+  languages:
+  - ruby
+  severity: ERROR
+  message: Detected user input used to manually construct a SQL string. This is usually
+    bad practice because manual construction could accidentally result in a SQL injection.
+    An attacker could use a SQL injection to steal or modify contents of the database.
+    Instead, use a parameterized query which is available by default in most database
+    engines. Alternatively, consider using an object-relational mapper (ORM) such
+    as ActiveRecord which will protect your queries.
+  metadata:
+    cwe:
+    - 'CWE-89: Improper Neutralization of Special Elements used in an SQL Command
+      (''SQL Injection'')'
+    owasp:
+    - A01:2017 - Injection
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    category: security
+    technology:
+    - rails
+    references:
+    - https://rorsecurity.info/portfolio/ruby-on-rails-sql-injection-cheat-sheet
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: HIGH
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - SQL Injection
+    source: https://semgrep.dev/r/ruby.rails.security.injection.tainted-sql-string.tainted-sql-string
+    shortlink: https://sg.run/Y85o
+    semgrep.dev:
+      rule:
+        r_id: 14714
+        rv_id: 1263667
+        rule_id: bwU8gl
+        version_id: YDTZeLL
+        url: https://semgrep.dev/playground/r/YDTZeLL/ruby.rails.security.injection.tainted-sql-string.tainted-sql-string
+        origin: community
+  mode: taint
+  pattern-sources:
+  - patterns:
+    - pattern-either:
+      - pattern: params
+      - pattern: request
+  pattern-sanitizers:
+  - pattern: |
+      $PARAMS.slice(...)
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - patterns:
+        - pattern-either:
+          - patterns:
+            - pattern: |
+                $RECORD.where($X,...)
+          - pattern: |
+              $RECORD.find(..., :conditions => $X,...)
+        - focus-metavariable: $X
+      - patterns:
+        - pattern: |
+            "$SQLVERB#{$EXPR}..."
+        - pattern-not-inside: |
+            $FUNC("...",  "...#{$EXPR}...",...)
+        - focus-metavariable: $SQLVERB
+        - pattern-regex: (?i)(select|delete|insert|create|update|alter|drop)\b
+      - patterns:
+        - pattern-either:
+          - pattern: Kernel::sprintf("$SQLSTR", $EXPR)
+          - pattern: |
+              "$SQLSTR" + $EXPR
+          - pattern: |
+              "$SQLSTR" % $EXPR
+        - pattern-not-inside: |
+            $FUNC("...",  "...#{$EXPR}...",...)
+        - focus-metavariable: $EXPR
+        - metavariable-regex:
+            metavariable: $SQLSTR
+            regex: (?i)(select|delete|insert|create|update|alter|drop)\b
+- id: ruby.rails.security.brakeman.check-unscoped-find.check-unscoped-find
+  mode: taint
+  pattern-sources:
+  - pattern-either:
+    - pattern: |
+        cookies[...]
+    - patterns:
+      - pattern: |
+          cookies. ... .$PROPERTY[...]
+      - metavariable-regex:
+          metavariable: $PROPERTY
+          regex: (?!signed|encrypted)
+    - pattern: |
+        params[...]
+    - pattern: |
+        request.env[...]
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - pattern: $MODEL.find(...)
+      - pattern: $MODEL.find_by_id(...)
+      - pattern: $MODEL.find_by_id!(...)
+    - metavariable-regex:
+        metavariable: $MODEL
+        regex: '[A-Z]\S+'
+  message: Found an unscoped `find(...)` with user-controllable input. If the ActiveRecord
+    model being searched against is sensitive, this may lead to Insecure Direct Object
+    Reference (IDOR) behavior and allow users to read arbitrary records. Scope the
+    find to the current user, e.g. `current_user.accounts.find(params[:id])`.
+  languages:
+  - ruby
+  severity: WARNING
+  metadata:
+    source-rule-url: https://github.com/presidentbeef/brakeman/blob/main/lib/brakeman/checks/check_unscoped_find.rb
+    category: security
+    cwe:
+    - 'CWE-639: Authorization Bypass Through User-Controlled Key'
+    owasp:
+    - A05:2017 - Broken Access Control
+    - A01:2021 - Broken Access Control
+    - A01:2025 - Broken Access Control
+    technology:
+    - ruby
+    - rails
+    references:
+    - https://brakemanscanner.org/docs/warning_types/unscoped_find/
+    - https://github.com/presidentbeef/brakeman/blob/main/test/apps/rails3.1/app/controllers/users_controller.rb
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: HIGH
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Improper Authorization
+    source: https://semgrep.dev/r/ruby.rails.security.brakeman.check-unscoped-find.check-unscoped-find
+    shortlink: https://sg.run/dPbP
+    semgrep.dev:
+      rule:
+        r_id: 20734
+        rv_id: 1263664
+        rule_id: x8Ud6d
+        version_id: K3TKkxZ
+        url: https://semgrep.dev/playground/r/K3TKkxZ/ruby.rails.security.brakeman.check-unscoped-find.check-unscoped-find
+        origin: community
+- id: ruby.rails.security.brakeman.check-rails-session-secret-handling.check-rails-session-secret-handling
+  patterns:
+  - pattern-either:
+    - patterns:
+      - pattern: |
+          :$KEY => "$LITERAL"
+      - pattern-inside: |
+          ActionController::Base.session = {...}
+    - pattern: |
+        $RAILS::Application.config.$KEY = "$LITERAL"
+    - pattern: |
+        Rails.application.config.$KEY = "$LITERAL"
+  - metavariable-regex:
+      metavariable: $KEY
+      regex: ^secret(_(token|key_base))?$
+  message: Found a string literal assignment to a Rails session secret `$KEY`. Do
+    not commit secret values to source control! Any user in possession of this value
+    may falsify arbitrary session data in your application. Read this value from an
+    environment variable, KMS, or file on disk outside of source control.
+  languages:
+  - ruby
+  severity: WARNING
+  metadata:
+    source-rule-url: https://github.com/presidentbeef/brakeman/blob/main/lib/brakeman/checks/check_session_settings.rb
+    category: security
+    cwe:
+    - 'CWE-540: Inclusion of Sensitive Information in Source Code'
+    owasp:
+    - A01:2021 - Broken Access Control
+    - A01:2025 - Broken Access Control
+    technology:
+    - ruby
+    - rails
+    references:
+    - https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/06-Session_Management_Testing/02-Testing_for_Cookies_Attributes
+    - https://github.com/presidentbeef/brakeman/blob/main/test/apps/rails4_with_engines/config/initializers/secret_token.rb
+    - https://github.com/presidentbeef/brakeman/blob/main/test/apps/rails3/config/initializers/secret_token.rb
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/ruby.rails.security.brakeman.check-rails-session-secret-handling.check-rails-session-secret-handling
+    shortlink: https://sg.run/KyJd
+    semgrep.dev:
+      rule:
+        r_id: 20155
+        rv_id: 1263656
+        rule_id: lBUX1r
+        version_id: 5PTo1ZY
+        url: https://semgrep.dev/playground/r/5PTo1ZY/ruby.rails.security.brakeman.check-rails-session-secret-handling.check-rails-session-secret-handling
+        origin: community
+- id: ruby.lang.security.hardcoded-secret-rsa-passphrase.hardcoded-secret-rsa-passphrase
+  message: Found the use of an hardcoded passphrase for RSA. The passphrase can be
+    easily discovered, and therefore should not be stored in source-code. It is recommended
+    to remove the passphrase from source-code, and use system environment variables
+    or a restricted configuration file.
+  languages:
+  - ruby
+  severity: WARNING
+  metadata:
+    technology:
+    - ruby
+    - secrets
+    category: security
+    references:
+    - https://cwe.mitre.org/data/definitions/522.html
+    cwe:
+    - 'CWE-798: Use of Hard-coded Credentials'
+    owasp:
+    - A07:2021 - Identification and Authentication Failures
+    - A07:2025 - Authentication Failures
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: HIGH
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Hard-coded Secrets
+    source: https://semgrep.dev/r/ruby.lang.security.hardcoded-secret-rsa-passphrase.hardcoded-secret-rsa-passphrase
+    shortlink: https://sg.run/xPEe
+    semgrep.dev:
+      rule:
+        r_id: 20730
+        rv_id: 1263607
+        rule_id: bwULyN
+        version_id: K3TKkEo
+        url: https://semgrep.dev/playground/r/K3TKkEo/ruby.lang.security.hardcoded-secret-rsa-passphrase.hardcoded-secret-rsa-passphrase
+        origin: community
+  patterns:
+  - pattern-either:
+    - pattern: OpenSSL::PKey::RSA.new(..., '...')
+    - pattern: OpenSSL::PKey::RSA.new(...).to_pem(..., '...')
+    - pattern: OpenSSL::PKey::RSA.new(...).export(..., '...')
+    - patterns:
+      - pattern-inside: |
+          $OPENSSL = OpenSSL::PKey::RSA.new(...)
+          ...
+      - pattern-either:
+        - pattern: |
+            $OPENSSL.export(...,'...')
+        - pattern: |
+            $OPENSSL.to_pem(...,'...')
+    - patterns:
+      - pattern-either:
+        - patterns:
+          - pattern-inside: |
+              $ASSIGN = '...'
+              ...
+          - pattern: OpenSSL::PKey::RSA.new(..., $ASSIGN)
+        - patterns:
+          - pattern-inside: |
+              def $METHOD1(...)
+              ...
+              $ASSIGN = '...'
+              ...
+              end
+              ...
+              def $METHOD2(...)
+              ...
+              end
+          - pattern: OpenSSL::PKey::RSA.new(..., $ASSIGN)
+        - patterns:
+          - pattern-inside: |
+              $ASSIGN = '...'
+              ...
+              def $METHOD(...)
+                $OPENSSL = OpenSSL::PKey::RSA.new(...)
+              ...
+              end
+              ...
+          - pattern-either:
+            - pattern: $OPENSSL.export(...,$ASSIGN)
+            - pattern: $OPENSSL.to_pem(...,$ASSIGN)
+        - patterns:
+          - pattern-inside: |
+              def $METHOD1(...)
+              ...
+              $OPENSSL = OpenSSL::PKey::RSA.new(...)
+              ...
+              $ASSIGN = '...'
+              ...
+              end
+              ...
+          - pattern-either:
+            - pattern: $OPENSSL.export(...,$ASSIGN)
+            - pattern: $OPENSSL.to_pem(...,$ASSIGN)
+        - patterns:
+          - pattern-inside: |
+              def $METHOD1(...)
+              ...
+              $ASSIGN = '...'
+              ...
+              end
+              ...
+              def $METHOD2(...)
+              ...
+              $OPENSSL = OpenSSL::PKey::RSA.new(...)
+              ...
+              end
+              ...
+          - pattern-either:
+            - pattern: $OPENSSL.export(...,$ASSIGN)
+            - pattern: $OPENSSL.to_pem(...,$ASSIGN)
+- id: ruby.aws-lambda.security.tainted-sql-string.tainted-sql-string
+  languages:
+  - ruby
+  severity: ERROR
+  message: Detected user input used to manually construct a SQL string. This is usually
+    bad practice because manual construction could accidentally result in a SQL injection.
+    An attacker could use a SQL injection to steal or modify contents of the database.
+    Instead, use a parameterized query which is available by default in most database
+    engines. Alternatively, consider using an object-relational mapper (ORM) such
+    as Sequelize which will protect your queries.
+  metadata:
+    references:
+    - https://rorsecurity.info/portfolio/ruby-on-rails-sql-injection-cheat-sheet
+    category: security
+    owasp:
+    - A01:2017 - Injection
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    cwe:
+    - 'CWE-89: Improper Neutralization of Special Elements used in an SQL Command
+      (''SQL Injection'')'
+    technology:
+    - aws-lambda
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: HIGH
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - SQL Injection
+    source: https://semgrep.dev/r/ruby.aws-lambda.security.tainted-sql-string.tainted-sql-string
+    shortlink: https://sg.run/EB7N
+    semgrep.dev:
+      rule:
+        r_id: 18281
+        rv_id: 1263586
+        rule_id: PeUxOE
+        version_id: d6Tyx1Z
+        url: https://semgrep.dev/playground/r/d6Tyx1Z/ruby.aws-lambda.security.tainted-sql-string.tainted-sql-string
+        origin: community
+  mode: taint
+  pattern-sources:
+  - patterns:
+    - pattern: event
+    - pattern-inside: |
+        def $HANDLER(event, context)
+          ...
+        end
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - patterns:
+        - pattern: |
+            "...#{...}..."
+        - pattern-regex: (?i)(select|delete|insert|create|update|alter|drop)\b|\w+\s*!?[<>=].*
+      - patterns:
+        - pattern-either:
+          - pattern: Kernel::sprintf("$SQLSTR", ...)
+          - pattern: |
+              "$SQLSTR" + $EXPR
+          - pattern: |
+              "$SQLSTR" % $EXPR
+        - metavariable-regex:
+            metavariable: $SQLSTR
+            regex: (?i)(select|delete|insert|create|update|alter|drop)\b|\w+\s*!?[<>=].*
+    - pattern-not-inside: |
+        puts(...)
+- id: ruby.rails.security.audit.avoid-tainted-shell-call.avoid-tainted-shell-call
+  metadata:
+    owasp:
+    - A01:2017 - Injection
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    cwe:
+    - 'CWE-78: Improper Neutralization of Special Elements used in an OS Command (''OS
+      Command Injection'')'
+    references:
+    - https://github.com/presidentbeef/brakeman/blob/main/docs/warning_types/file_access/index.markdown
+    category: security
+    technology:
+    - rails
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: HIGH
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Command Injection
+    source: https://semgrep.dev/r/ruby.rails.security.audit.avoid-tainted-shell-call.avoid-tainted-shell-call
+    shortlink: https://sg.run/4e8E
+    semgrep.dev:
+      rule:
+        r_id: 13588
+        rv_id: 1263625
+        rule_id: KxU72k
+        version_id: o5TbDq8
+        url: https://semgrep.dev/playground/r/o5TbDq8/ruby.rails.security.audit.avoid-tainted-shell-call.avoid-tainted-shell-call
+        origin: community
+  message: Using user input when accessing files is potentially dangerous. A malicious
+    actor could use this to modify or access files they have no right to.
+  languages:
+  - ruby
+  severity: ERROR
+  mode: taint
+  pattern-sources:
+  - pattern-either:
+    - pattern: params[...]
+    - pattern: cookies
+    - pattern: request.env
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - patterns:
+        - pattern: Kernel.$X(...)
+      - patterns:
+        - pattern-either:
+          - pattern: Shell.$X(...)
+          - patterns:
+            - pattern-inside: |
+                $SHELL = Shell.$ANY(...)
+                ...
+                $SHELL.$X(...)
+            - pattern: $SHELL.$X(...)
+    - metavariable-pattern:
+        metavariable: $X
+        patterns:
+        - pattern-either:
+          - pattern: cat
+          - pattern: chdir
+          - pattern: chroot
+          - pattern: delete
+          - pattern: entries
+          - pattern: exec
+          - pattern: foreach
+          - pattern: glob
+          - pattern: install
+          - pattern: lchmod
+          - pattern: lchown
+          - pattern: link
+          - pattern: load
+          - pattern: load_file
+          - pattern: makedirs
+          - pattern: move
+          - pattern: new
+          - pattern: open
+          - pattern: read
+          - pattern: readlines
+          - pattern: rename
+          - pattern: rmdir
+          - pattern: safe_unlink
+          - pattern: symlink
+          - pattern: syscopy
+          - pattern: sysopen
+          - pattern: system
+          - pattern: truncate
+          - pattern: unlink
+- id: ruby.rails.security.brakeman.check-before-filter.check-before-filter
+  mode: search
+  patterns:
+  - pattern-either:
+    - pattern: |
+        skip_filter ..., :except => $ARGS
+    - pattern: |
+        skip_before_filter ..., :except => $ARGS
+    - pattern: |
+        skip_before_action ..., :except => $ARGS
+  message: 'Disabled-by-default Rails controller checks make it much easier to introduce
+    access control mistakes. Prefer an allowlist approach with `:only => [...]` rather
+    than `except: => [...]`'
+  languages:
+  - ruby
+  severity: ERROR
+  metadata:
+    source-rule-url: https://github.com/presidentbeef/brakeman/blob/main/lib/brakeman/checks/check_skip_before_filter.rb
+    category: security
+    cwe:
+    - 'CWE-284: Improper Access Control'
+    owasp:
+    - A05:2017 - Broken Access Control
+    - A01:2021 - Broken Access Control
+    - A01:2025 - Broken Access Control
+    technology:
+    - ruby
+    - rails
+    references:
+    - https://owasp.org/Top10/A01_2021-Broken_Access_Control
+    subcategory:
+    - vuln
+    impact: MEDIUM
+    likelihood: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Improper Authorization
+    source: https://semgrep.dev/r/ruby.rails.security.brakeman.check-before-filter.check-before-filter
+    shortlink: https://sg.run/O4Zn
+    semgrep.dev:
+      rule:
+        r_id: 20531
+        rv_id: 1263649
+        rule_id: wdUkBP
+        version_id: 8KT5rDy
+        url: https://semgrep.dev/playground/r/8KT5rDy/ruby.rails.security.brakeman.check-before-filter.check-before-filter
+        origin: community
+- id: ruby.aws-lambda.security.tainted-deserialization.tainted-deserialization
+  mode: taint
+  languages:
+  - ruby
+  message: Deserialization of a string tainted by `event` object found. Objects in
+    Ruby can be serialized into strings, then later loaded from strings. However,
+    uses of `load` can cause remote code execution. Loading user input with MARSHAL,
+    YAML or CSV can potentially be dangerous. If you need to deserialize untrusted
+    data, you should use JSON as it is only capable of returning 'primitive' types
+    such as strings, arrays, hashes, numbers and nil.
+  metadata:
+    references:
+    - https://ruby-doc.org/core-3.1.2/doc/security_rdoc.html
+    - https://groups.google.com/g/rubyonrails-security/c/61bkgvnSGTQ/m/nehwjA8tQ8EJ
+    - https://github.com/presidentbeef/brakeman/blob/main/lib/brakeman/checks/check_deserialize.rb
+    category: security
+    owasp:
+    - A08:2017 - Insecure Deserialization
+    - A08:2021 - Software and Data Integrity Failures
+    - A08:2025 - Software or Data Integrity Failures
+    cwe:
+    - 'CWE-502: Deserialization of Untrusted Data'
+    technology:
+    - ruby
+    - aws-lambda
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: HIGH
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - 'Insecure Deserialization '
+    source: https://semgrep.dev/r/ruby.aws-lambda.security.tainted-deserialization.tainted-deserialization
+    shortlink: https://sg.run/dplX
+    semgrep.dev:
+      rule:
+        r_id: 22078
+        rv_id: 1263585
+        rule_id: zdUlNJ
+        version_id: vdT06gR
+        url: https://semgrep.dev/playground/r/vdT06gR/ruby.aws-lambda.security.tainted-deserialization.tainted-deserialization
+        origin: community
+  pattern-sinks:
+  - patterns:
+    - pattern: $SINK
+    - pattern-either:
+      - pattern-inside: |
+          YAML.load($SINK,...)
+      - pattern-inside: |
+          CSV.load($SINK,...)
+      - pattern-inside: |
+          Marshal.load($SINK,...)
+      - pattern-inside: |
+          Marshal.restore($SINK,...)
+  pattern-sources:
+  - patterns:
+    - pattern: event
+    - pattern-inside: |
+        def $HANDLER(event, context)
+          ...
+        end
+  severity: WARNING
+- id: ruby.lang.security.insufficient-rsa-key-size.insufficient-rsa-key-size
+  message: The RSA key size $SIZE is insufficent by NIST standards. It is recommended
+    to use a key length of 2048 or higher.
+  languages:
+  - ruby
+  severity: WARNING
+  metadata:
+    technology:
+    - ruby
+    category: security
+    references:
+    - https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-57Pt3r1.pdf
+    cwe:
+    - 'CWE-326: Inadequate Encryption Strength'
+    owasp:
+    - A03:2017 - Sensitive Data Exposure
+    - A02:2021 - Cryptographic Failures
+    - A04:2025 - Cryptographic Failures
+    subcategory:
+    - vuln
+    likelihood: HIGH
+    impact: MEDIUM
+    confidence: HIGH
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Cryptographic Issues
+    source: https://semgrep.dev/r/ruby.lang.security.insufficient-rsa-key-size.insufficient-rsa-key-size
+    shortlink: https://sg.run/O4Re
+    semgrep.dev:
+      rule:
+        r_id: 20731
+        rv_id: 1263608
+        rule_id: NbUe4N
+        version_id: qkTR76v
+        url: https://semgrep.dev/playground/r/qkTR76v/ruby.lang.security.insufficient-rsa-key-size.insufficient-rsa-key-size
+        origin: community
+  patterns:
+  - pattern-either:
+    - pattern: OpenSSL::PKey::RSA.generate($SIZE,...)
+    - pattern: OpenSSL::PKey::RSA.new($SIZE, ...)
+    - patterns:
+      - pattern-either:
+        - patterns:
+          - pattern-inside: |
+              $ASSIGN = $SIZE
+              ...
+          - pattern-either:
+            - pattern: OpenSSL::PKey::RSA.new($ASSIGN, ...)
+            - pattern: OpenSSL::PKey::RSA.generate($ASSIGN, ...)
+        - patterns:
+          - pattern-inside: |
+              def $METHOD1(...)
+              ...
+              $ASSIGN = $SIZE
+              ...
+              end
+              ...
+          - pattern-either:
+            - pattern: OpenSSL::PKey::RSA.new($ASSIGN, ...)
+            - pattern: OpenSSL::PKey::RSA.generate($ASSIGN, ...)
+  - metavariable-comparison:
+      metavariable: $SIZE
+      comparison: $SIZE < 2048
+- id: ruby.lang.security.audit.sha224-hash.sha224-hash
+  message: This code uses a 224-bit hash function, which is deprecated or disallowed
+    in some security policies. Consider updating to a stronger hash function such
+    as SHA-384 or higher to ensure compliance and security.
+  metadata:
+    cwe:
+    - 'CWE-328: Use of Weak Hash'
+    references:
+    - https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-131Ar3.ipd.pdf
+    - https://www.cyber.gov.au/resources-business-and-government/essential-cyber-security/ism/cyber-security-guidelines/guidelines-cryptography
+    category: security
+    technology:
+    - ruby
+    owasp:
+    - A03:2017 - Sensitive Data Exposure
+    - A02:2021 - Cryptographic Failures
+    - A04:2025 - Cryptographic Failures
+    subcategory:
+    - vuln
+    likelihood: LOW
+    impact: LOW
+    confidence: HIGH
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Insecure Hashing Algorithm
+    source: https://semgrep.dev/r/ruby.lang.security.audit.sha224-hash.sha224-hash
+    shortlink: https://sg.run/WABbo
+    semgrep.dev:
+      rule:
+        r_id: 151753
+        rv_id: 1263592
+        rule_id: DbU60wQ
+        version_id: 8KT5rRY
+        url: https://semgrep.dev/playground/r/8KT5rRY/ruby.lang.security.audit.sha224-hash.sha224-hash
+        origin: community
+  languages:
+  - ruby
+  severity: WARNING
+  pattern-either:
+  - pattern: Digest::SHA224.$FUNC
+  - pattern: OpenSSL::Digest::SHA224.$FUNC
+  - pattern: SHA3::Digest::SHA224(...)
+  - patterns:
+    - pattern-either:
+      - pattern: OpenSSL::HMAC.hexdigest("$ALGO", ...)
+      - pattern: OpenSSL::HMAC.digest("$ALGO", ...)
+      - pattern: OpenSSL::HMAC.new($KEY, "$ALGO")
+      - pattern: OpenSSL::Digest.digest("$ALGO", ...)
+      - pattern: OpenSSL::Digest.new("$ALGO", ...)
+    - metavariable-regex:
+        metavariable: $ALGO
+        regex: .*224
+- id: ruby.lang.security.no-eval.ruby-eval
+  message: Use of eval with user-controllable input detected. This can lead  to attackers
+    running arbitrary code. Ensure external data does not  reach here, otherwise this
+    is a security vulnerability. Consider  other ways to do this without eval.
+  severity: WARNING
+  metadata:
+    likelihood: HIGH
+    impact: MEDIUM
+    confidence: MEDIUM
+    category: security
+    cwe2022-top25: true
+    cwe2021-top25: true
+    cwe:
+    - 'CWE-94: Improper Control of Generation of Code (''Code Injection'')'
+    owasp:
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    references:
+    - https://owasp.org/Top10/A03_2021-Injection
+    source-rule-url: https://github.com/presidentbeef/brakeman/blob/main/lib/brakeman/checks/check_evaluation.rb
+    subcategory:
+    - vuln
+    technology:
+    - ruby
+    - rails
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Code Injection
+    source: https://semgrep.dev/r/ruby.lang.security.no-eval.ruby-eval
+    shortlink: https://sg.run/bDwZ
+    semgrep.dev:
+      rule:
+        r_id: 9726
+        rv_id: 1263615
+        rule_id: OrUGNk
+        version_id: A8TgdDv
+        url: https://semgrep.dev/playground/r/A8TgdDv/ruby.lang.security.no-eval.ruby-eval
+        origin: community
+  languages:
+  - ruby
+  mode: taint
+  pattern-sources:
+  - pattern-either:
+    - pattern: params
+    - pattern: cookies
+    - patterns:
+      - pattern: |
+          RubyVM::InstructionSequence.compile(...)
+      - pattern-not: |
+          RubyVM::InstructionSequence.compile("...")
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - pattern: $X.eval
+      - pattern: $X.class_eval
+      - pattern: $X.instance_eval
+      - pattern: $X.module_eval
+      - pattern: $X.eval(...)
+      - pattern: $X.class_eval(...)
+      - pattern: $X.instance_eval(...)
+      - pattern: $X.module_eval(...)
+      - pattern: eval(...)
+      - pattern: class_eval(...)
+      - pattern: module_eval(...)
+      - pattern: instance_eval(...)
+    - pattern-not: $M("...",...)
+- id: package_managers.ruby.bundler-gemfile-missing-cooldown.bundler-gemfile-missing-cooldown
+  message: 'A Gemfile `source` declaration without a `cooldown` (or with a cooldown
+    below 7 days) allows Bundler to resolve newly published gem versions immediately,
+    before the community has had time to detect malicious releases. The May 2026 RubyGems
+    supply-chain attack demonstrated that threat actors can push compromised gem versions
+    and have them automatically pulled into builds within minutes. Add `cooldown:
+    7` to each public source declaration so Bundler ignores gem versions published
+    within the last 7 days during dependency resolution (e.g. `source "https://rubygems.org",
+    cooldown: 7`). If you operate an internal or private registry where the supply-chain
+    risk is lower, use `cooldown: 0` as an explicit bypass. Note: this feature requires
+    Bundler >= 4.0.13. Cooldown only applies during `bundle update` and `bundle add`;
+    `bundle install` with an existing lockfile is unaffected.'
+  languages:
+  - ruby
+  severity: MEDIUM
+  paths:
+    include:
+    - '**/Gemfile'
+    - '**/gems.rb'
+    exclude:
+    - '**/vendor/**'
+    - '**/.bundle/**'
+  pattern-either:
+  - patterns:
+    - pattern: source "...", ...
+    - pattern-not: 'source "...", ..., cooldown: $N, ...'
+  - patterns:
+    - pattern: 'source "...", ..., cooldown: $N, ...'
+    - metavariable-comparison:
+        metavariable: $N
+        comparison: $N > 0 and $N < 7
+    - focus-metavariable: $N
+  metadata:
+    category: security
+    technology:
+    - bundler
+    - ruby
+    cwe:
+    - 'CWE-829: Inclusion of Functionality from Untrusted Control Sphere'
+    owasp:
+    - A08:2021 - Software and Data Integrity Failures
+    confidence: MEDIUM
+    likelihood: LOW
+    impact: MEDIUM
+    subcategory:
+    - audit
+    vulnerability_class:
+    - Insecure Configuration
+    references:
+    - https://blog.rubygems.org/2026/06/03/cooldown-let-new-gems-be-vetted.html
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    source: https://semgrep.dev/r/package_managers.ruby.bundler-gemfile-missing-cooldown.bundler-gemfile-missing-cooldown
+    shortlink: https://sg.run/5Wlkl
+    semgrep.dev:
+      rule:
+        r_id: 309391
+        rv_id: 1443455
+        rule_id: wdUzPbP
+        version_id: 1QTEjAN
+        url: https://semgrep.dev/playground/r/1QTEjAN/package_managers.ruby.bundler-gemfile-missing-cooldown.bundler-gemfile-missing-cooldown
+        origin: community

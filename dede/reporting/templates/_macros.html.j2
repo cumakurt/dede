@@ -1,0 +1,14 @@
+{% macro source_tag(origin) -%}
+<span class="source-tag {% if origin == 'AI' %}source-ai{% else %}source-static{% endif %}" data-origin="{{ origin }}">{{ origin }}</span>
+{%- endmacro %}
+
+{% macro page_chrome(label) -%}
+{# Imported macros need `with context` at call site, or explicit pdf arg.
+   Keep chrome HTML-only to avoid duplicating PDF @page headers. #}
+{% if not pdf %}
+<div class="page-chrome">
+  <span>dede · STATIC SOURCE CODE ANALYSIS</span>
+  <span>{{ label }}</span>
+</div>
+{% endif %}
+{%- endmacro %}

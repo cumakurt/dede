@@ -1,0 +1,107 @@
+rules:
+  - id: dede.php.web.sql-injection
+    languages: [php]
+    mode: taint
+    severity: ERROR
+    message: Request data reaches SQL statement text.
+    metadata:
+      category: security
+      cwe: [CWE-89]
+      confidence: HIGH
+      analysis: taint
+      recommendation: Use a constant prepared statement and bind user input as parameters.
+      references: [https://cwe.mitre.org/data/definitions/89.html]
+    pattern-sources:
+      - pattern-either:
+          - pattern: $_GET[...]
+          - pattern: $_POST[...]
+          - pattern: $_REQUEST[...]
+          - pattern: $_COOKIE[...]
+        exact: true
+    pattern-sinks:
+      - patterns:
+          - pattern-either:
+              - pattern: mysqli_query($CONNECTION, $QUERY, ...)
+              - pattern: $PDO->query($QUERY, ...)
+              - pattern: $PDO->prepare($QUERY, ...)
+          - focus-metavariable: $QUERY
+
+  - id: dede.php.web.command-injection
+    languages: [php]
+    mode: taint
+    severity: ERROR
+    message: Request data reaches a shell command.
+    metadata:
+      category: security
+      cwe: [CWE-78]
+      confidence: HIGH
+      analysis: taint
+      recommendation: Avoid shell commands and use dedicated APIs or a fixed executable with validated arguments.
+      references: [https://cwe.mitre.org/data/definitions/78.html]
+    pattern-sources:
+      - pattern-either:
+          - pattern: $_GET[...]
+          - pattern: $_POST[...]
+          - pattern: $_REQUEST[...]
+          - pattern: $_COOKIE[...]
+        exact: true
+    pattern-sinks:
+      - patterns:
+          - pattern-either:
+              - pattern: system($COMMAND, ...)
+              - pattern: exec($COMMAND, ...)
+              - pattern: shell_exec($COMMAND)
+              - pattern: passthru($COMMAND, ...)
+          - focus-metavariable: $COMMAND
+
+  - id: dede.php.web.code-injection
+    languages: [php]
+    mode: taint
+    severity: ERROR
+    message: Request data reaches PHP code evaluation.
+    metadata:
+      category: security
+      cwe: [CWE-95]
+      confidence: HIGH
+      analysis: taint
+      recommendation: Replace evaluation with explicit operations on validated data.
+      references: [https://cwe.mitre.org/data/definitions/95.html]
+    pattern-sources:
+      - pattern-either:
+          - pattern: $_GET[...]
+          - pattern: $_POST[...]
+          - pattern: $_REQUEST[...]
+          - pattern: $_COOKIE[...]
+        exact: true
+    pattern-sinks:
+      - patterns:
+          - pattern: eval($CODE)
+          - focus-metavariable: $CODE
+
+  - id: dede.php.web.file-inclusion
+    languages: [php]
+    mode: taint
+    severity: ERROR
+    message: Request data controls the path of included PHP code.
+    metadata:
+      category: security
+      cwe: [CWE-98]
+      confidence: HIGH
+      analysis: taint
+      recommendation: Resolve allowed identifiers to fixed include paths; never include a user-supplied path or URL.
+      references: [https://cwe.mitre.org/data/definitions/98.html]
+    pattern-sources:
+      - pattern-either:
+          - pattern: $_GET[...]
+          - pattern: $_POST[...]
+          - pattern: $_REQUEST[...]
+          - pattern: $_COOKIE[...]
+        exact: true
+    pattern-sinks:
+      - patterns:
+          - pattern-either:
+              - pattern: include($PATH)
+              - pattern: include_once($PATH)
+              - pattern: require($PATH)
+              - pattern: require_once($PATH)
+          - focus-metavariable: $PATH

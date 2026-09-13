@@ -1,0 +1,130 @@
+{% from "_macros.html.j2" import page_chrome with context %}
+{{ page_chrome('02b / Security Operations') }}
+<section class="section" id="security-operations">
+  <p class="section-kicker">02b / Security Operations</p>
+  <h2>Lifecycle, attack surface and governance</h2>
+
+  {% if pdf %}
+  <table class="kpi-row" role="presentation"><tr>
+    <td><span class="kpi-label">New</span><span class="kpi-value">{{ lifecycle_metrics.counts.NEW }}</span><span class="kpi-hint">Current scan</span></td>
+    <td><span class="kpi-label">Reopened</span><span class="kpi-value HIGH">{{ lifecycle_metrics.counts.REOPENED }}</span><span class="kpi-hint">Returned risk</span></td>
+    <td><span class="kpi-label">Resolved</span><span class="kpi-value LOW">{{ lifecycle_metrics.counts.RESOLVED }}</span><span class="kpi-hint">Since snapshot</span></td>
+    <td><span class="kpi-label">Internet Exposed</span><span class="kpi-value HIGH">{{ attack_metrics.internet_exposed }}</span><span class="kpi-hint">Evidence-backed</span></td>
+    <td><span class="kpi-label">Policy Gate</span><span class="kpi-value {% if governance_metrics.policy_gate == 'BLOCKED' %}HIGH{% else %}LOW{% endif %}" style="font-size:12pt;">{{ governance_metrics.policy_gate }}</span><span class="kpi-hint">{{ governance_metrics.policy_violation_count }} violation(s)</span></td>
+  </tr></table>
+  {% else %}
+  <div class="kpi-row">
+    <div class="kpi-card"><span class="kpi-label">New</span><span class="kpi-value">{{ lifecycle_metrics.counts.NEW }}</span><span class="kpi-hint">Current scan</span></div>
+    <div class="kpi-card"><span class="kpi-label">Reopened</span><span class="kpi-value HIGH">{{ lifecycle_metrics.counts.REOPENED }}</span><span class="kpi-hint">Returned risk</span></div>
+    <div class="kpi-card"><span class="kpi-label">Resolved</span><span class="kpi-value LOW">{{ lifecycle_metrics.counts.RESOLVED }}</span><span class="kpi-hint">Since snapshot</span></div>
+    <div class="kpi-card"><span class="kpi-label">Internet Exposed</span><span class="kpi-value HIGH">{{ attack_metrics.internet_exposed }}</span><span class="kpi-hint">Evidence-backed</span></div>
+    <div class="kpi-card"><span class="kpi-label">Policy Gate</span><span class="kpi-value {% if governance_metrics.policy_gate == 'BLOCKED' %}HIGH{% else %}LOW{% endif %}" style="font-size:1.1rem;">{{ governance_metrics.policy_gate }}</span><span class="kpi-hint">{{ governance_metrics.policy_violation_count }} violation(s)</span></div>
+  </div>
+  {% endif %}
+
+  <div class="two-col">
+    <div class="col panel-card">
+      <p class="panel-title">Attack Surface Evidence</p>
+      <ul class="factor-list">
+        <li><span>Reachable findings</span><strong>{{ attack_metrics.reachable }}</strong></li>
+        <li><span>High exploitability (≥80)</span><strong>{{ attack_metrics.high_exploitability }}</strong></li>
+        <li><span>Unauthenticated exposed endpoints</span><strong>{{ attack_metrics.unauthenticated_exposed }}</strong></li>
+        <li><span>Source-to-sink trace coverage</span><strong>{{ attack_metrics.flow_coverage_pct }}%</strong></li>
+        <li><span>Evidence coverage</span><strong>{{ attack_metrics.evidence_coverage_pct }}%</strong></li>
+      </ul>
+      <p class="footer-note">Counts are shown only when the underlying analyzers emitted the supporting metadata.</p>
+    </div>
+    <div class="col panel-card">
+      <p class="panel-title">Analyzer Health</p>
+      <ul class="factor-list">
+        <li><span>Successful / applicable</span><strong>{{ analyzer_metrics.success }} / {{ analyzer_metrics.applicable }}</strong></li>
+        <li><span>Completion</span><strong>{{ analyzer_metrics.completion_pct }}%</strong></li>
+        <li><span>Failed</span><strong>{{ analyzer_metrics.failed }}</strong></li>
+        <li><span>Skipped</span><strong>{{ analyzer_metrics.skipped }}</strong></li>
+        <li><span>Multi-engine corroboration</span><strong>{{ finding_quality_metrics.multi_engine_pct }}%</strong></li>
+      </ul>
+      {% if analyzer_metrics.coverage_degraded %}<div class="callout warn"><strong>Coverage degraded.</strong> Treat absence of findings as inconclusive for failed or skipped analyzers.</div>{% endif %}
+    </div>
+  </div>
+
+  {% if governance_metrics.policy_violation_count %}
+  <h3>Policy Violations</h3>
+  <table class="data">
+    <thead><tr><th>Policy</th><th>Finding</th><th>Severity</th><th>File</th></tr></thead>
+    <tbody>
+    {% for violation in governance_metrics.policy_violations %}
+      <tr>
+        <td>{{ violation.get('policy') or violation.get('name') or 'Policy' }}</td>
+        <td class="mono">{{ violation.get('finding_id') or violation.get('id') or 'n/a' }}</td>
+        <td>{{ violation.get('severity') or 'n/a' }}</td>
+        <td class="mono">{{ violation.get('file') or 'n/a' }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="callout ok"><strong>No policy violations were recorded by this scan.</strong> This is a policy-engine result, not a guarantee that the application is secure.</div>
+  {% endif %}
+
+  {% if lifecycle_metrics.has_history %}
+  <h3>Finding Lifecycle</h3>
+  <div class="lifecycle-strip">
+    {% for name in ['NEW','EXISTING','REOPENED','RESOLVED'] %}
+    <div class="lifecycle-cell lifecycle-{{ name|lower }}"><strong>{{ lifecycle_metrics.counts[name] }}</strong><span>{{ name }}</span></div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="muted">Lifecycle history is not available yet. A subsequent scan with the persistent index can classify NEW, EXISTING, REOPENED and RESOLVED findings.</p>
+  {% endif %}
+
+  {% if attack_metrics.endpoints %}
+  <h3>Highest-Risk Endpoints</h3>
+  <table class="data endpoint-table">
+    <thead><tr><th>Method</th><th>Endpoint</th><th>Findings</th><th>Critical / High</th><th>Auth</th><th>Exposure</th><th>Max Exploitability</th></tr></thead>
+    <tbody>
+    {% for row in attack_metrics.endpoints[:10] %}
+      <tr>
+        <td><span class="method-pill">{{ row.method }}</span></td>
+        <td class="mono">{{ row.endpoint }}</td>
+        <td>{{ row.findings }}</td>
+        <td>{{ row.critical_high }}</td>
+        <td>{% if row.authentication_required is sameas true %}Required{% elif row.authentication_required is sameas false %}<strong>Not detected</strong>{% else %}Unknown{% endif %}</td>
+        <td>{% if row.internet_exposed %}<strong>Internet</strong>{% else %}Not asserted{% endif %}</td>
+        <td>{% if row.max_exploitability is not none %}{{ '%.0f'|format(row.max_exploitability) }}/100{% else %}n/a{% endif %}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+
+  {% if attack_metrics.query_matches %}
+  <h3>DedeQL Classifications</h3>
+  <div class="tag-cloud">
+    {% for row in attack_metrics.query_matches %}<span class="query-tag">{{ row.id }} <strong>{{ row.count }}</strong></span>{% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="two-col">
+    <div class="col panel-card">
+      <p class="panel-title">Scan Performance</p>
+      {% if performance_metrics.phases %}
+        {% for phase in performance_metrics.phases %}
+        <div class="hbar compact-bar">
+          <div class="hbar-label"><span>{{ phase.name }}</span><span>{{ '%.3f'|format(phase.seconds) }}s</span></div>
+          <div class="hbar-track"><div class="hbar-fill" style="width:{{ phase.bar }}%"></div></div>
+        </div>
+        {% endfor %}
+      {% else %}<p class="muted">Phase profiling was not enabled for this scan.</p>{% endif %}
+    </div>
+    <div class="col panel-card">
+      <p class="panel-title">Traceability</p>
+      <ul class="factor-list">
+        <li><span>Offline runtime</span><strong>{{ 'YES' if governance_metrics.offline_mode else 'NO' }}</strong></li>
+        <li><span>Scan manifest digest</span><strong class="mono">{{ governance_metrics.manifest_digest_short }}</strong></li>
+        <li><span>Rulesets</span><strong>{{ governance_metrics.rulesets|length }}</strong></li>
+        <li><span>Changed files</span><strong>{{ performance_metrics.incremental.changed_files }}</strong></li>
+        <li><span>Affected files</span><strong>{{ performance_metrics.incremental.affected_files }}</strong></li>
+      </ul>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,117 @@
+{% from "_macros.html.j2" import page_chrome with context %}
+{{ page_chrome('11 / Analysis Coverage') }}
+<section class="section" id="coverage">
+  <p class="section-kicker">11 / Analysis Coverage</p>
+  <h2>What was analyzed — and what was not</h2>
+
+  {% if pdf %}
+  <table class="kpi-row" role="presentation">
+    <tr>
+      <td><span class="kpi-label">Files Scanned</span><span class="kpi-value">{{ files_scanned }}</span></td>
+      <td><span class="kpi-label">Lines Analyzed</span><span class="kpi-value">{{ lines_scanned }}</span></td>
+      <td><span class="kpi-label">Rules Triggered</span><span class="kpi-value">{{ rules_triggered_count }}</span></td>
+      <td><span class="kpi-label">Duration</span><span class="kpi-value" style="font-size:14pt;">{{ '%.1f'|format(result.metadata.duration_seconds) }}s</span></td>
+      <td><span class="kpi-label">Analyzer Completion</span><span class="kpi-value">{% if coverage_pct is not none %}{{ coverage_pct }}%{% else %}n/a{% endif %}</span></td>
+    </tr>
+  </table>
+  {% else %}
+  <div class="kpi-row">
+    <div class="kpi-card"><span class="kpi-label">Files Scanned</span><span class="kpi-value">{{ files_scanned }}</span></div>
+    <div class="kpi-card"><span class="kpi-label">Lines Analyzed</span><span class="kpi-value">{{ lines_scanned }}</span></div>
+    <div class="kpi-card"><span class="kpi-label">Rules Triggered</span><span class="kpi-value">{{ rules_triggered_count }}</span></div>
+    <div class="kpi-card"><span class="kpi-label">Duration</span><span class="kpi-value" style="font-size:1.35rem;">{{ '%.1f'|format(result.metadata.duration_seconds) }}s</span></div>
+    <div class="kpi-card"><span class="kpi-label">Analyzer Completion</span><span class="kpi-value">{% if coverage_pct is not none %}{{ coverage_pct }}%{% else %}n/a{% endif %}</span></div>
+  </div>
+  {% endif %}
+
+  <h3>Source Distribution by Language</h3>
+  <p class="footer-note">Percentages describe source lines, not security-rule completeness.</p>
+  {% if languages_list %}
+    {% for lang in languages_list %}
+    <div class="hbar">
+      <div class="hbar-label"><span>{{ lang.name }}</span><span>{{ lang.pct }}%</span></div>
+      <div class="hbar-track"><div class="hbar-fill" style="width:{{ lang.pct }}%"></div></div>
+    </div>
+    {% endfor %}
+  {% else %}
+  <p class="muted">No language distribution available.</p>
+  {% endif %}
+
+  <p><strong>Frameworks:</strong> {{ frameworks_display }}</p>
+  <p><strong>Coverage status:</strong> {{ scan_coverage }}</p>
+  {% if native_coverage %}
+  <h3>Native Engine Coverage</h3>
+  <p>{{ native_coverage.files_scanned }} of {{ native_coverage.files_requested }} discovered files processed;
+    {{ native_coverage.files_failed }} failed, {{ native_coverage.files_truncated }} reached finding limits,
+    {{ native_coverage.files_unprocessed }} unprocessed.</p>
+  {% if native_coverage.languages %}
+  <table class="data">
+    <thead><tr><th>Language</th><th>Files</th><th>Language rules</th><th>Generic rules</th><th>Analysis modes</th></tr></thead>
+    <tbody>
+    {% for name, coverage in native_coverage.languages|dictsort %}
+      <tr><td>{{ name }}</td><td>{{ coverage.files_scanned }}</td><td>{{ coverage.language_rules }}</td>
+        <td>{{ coverage.rules - coverage.language_rules }}</td><td>{{ coverage.rule_kinds.keys()|join(', ') or 'Generic secret checks only' }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+  <p class="footer-note">Rule counts show available checks, not exhaustive vulnerability detection.
+    Native taint follows local C# expressions and assignments using API-name heuristics;
+    it does not resolve arbitrary types, cross-method calls or runtime authorization.</p>
+  {% endif %}
+  <p class="footer-note">
+    Detailed skipped-file inventory is not emitted by this engine version. Exclusions follow scanner configuration.
+  </p>
+
+  <h3>Analyzer Execution</h3>
+  <table class="data">
+    <thead>
+      <tr><th>Tool</th><th>Status</th><th>Version</th><th>Duration</th><th>Message</th></tr>
+    </thead>
+    <tbody>
+      {% for t in result.tool_statuses %}
+      <tr>
+        <td>{{ t.tool }}</td>
+        <td>{{ t.status.value }}</td>
+        <td class="mono">{{ t.version or 'n/a' }}</td>
+        <td>{% if t.duration_seconds %}{{ '%.2f'|format(t.duration_seconds) }}s{% else %}n/a{% endif %}</td>
+        <td>{{ t.message or '—' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h3>Security Standard Evidence</h3>
+  <p class="footer-note">{{ standards_assessment.scope }}</p>
+  {% if standards_assessment.controls %}
+  <table class="data">
+    <thead><tr><th>Standard</th><th>Control</th><th>Findings</th><th>Rules</th><th>Assessment</th></tr></thead>
+    <tbody>
+      {% for control in standards_assessment.controls %}
+      <tr>
+        <td>{{ control.standard }}</td>
+        <td>{{ control.control }}</td>
+        <td>{{ control.finding_count }}</td>
+        <td class="mono">{{ control.rule_ids|join(', ') }}</td>
+        <td>{{ control.status }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="muted">No mapped static findings. Controls remain unverified.</p>
+  {% endif %}
+</section>
+
+{% if security_strengths %}
+<section class="section" id="strengths">
+  <p class="section-kicker">12 / Positive Security Signals</p>
+  <h2>Verified strengths</h2>
+  <p class="muted">Only signals verified by this analysis are listed.</p>
+  <ul class="strength-list">
+    {% for item in security_strengths %}
+    <li><span class="mark">✓</span>{{ item }}</li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}

@@ -1,0 +1,45 @@
+rules:
+- id: dede.csharp.security.insecure-deserial-binaryformatter
+  message: BinaryFormatter deserialization is insecure (CWE-502).
+  languages:
+  - csharp
+  severity: ERROR
+  metadata:
+    cwe:
+    - CWE-502
+    owasp:
+    - A08:2025
+    category: security
+    confidence: HIGH
+    standards:
+      microsoft-dotnet:
+      - CA2300
+      owasp-asvs-5.0.0:
+      - v5.0.0-1.5.2
+    recommendation: Replace BinaryFormatter with data-only serialization and explicit schemas. A binder
+      does not make BinaryFormatter safe.
+    references:
+    - https://learn.microsoft.com/en-us/dotnet/standard/serialization/binaryformatter-security-guide
+  pattern-either:
+  - pattern: (new BinaryFormatter()).Deserialize(...)
+  - patterns:
+    - pattern-inside: var $F = new BinaryFormatter(...); ...
+    - pattern: $F.Deserialize(...)
+  - patterns:
+    - pattern-inside: $TYPE $F = new BinaryFormatter(...); ...
+    - pattern: $F.Deserialize(...)
+  - patterns:
+    - pattern-inside: $F = new BinaryFormatter(...); ...
+    - pattern: $F.Deserialize(...)
+  - patterns:
+    - pattern-inside: var $F = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter(...);
+        ...
+    - pattern: $F.Deserialize(...)
+  - patterns:
+    - pattern-inside: $TYPE $F = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter(...);
+        ...
+    - pattern: $F.Deserialize(...)
+  - patterns:
+    - pattern-inside: $F = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter(...); ...
+    - pattern: $F.Deserialize(...)
+  - pattern: (new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter()).Deserialize(...)

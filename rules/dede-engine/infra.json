@@ -1,0 +1,387 @@
+{
+  "schema": 1,
+  "rules": [
+    {
+      "id": "dede.docker.unpinned-base-image",
+      "message": "Base image referenced without a sha256 digest; builds are not reproducible and a moved tag can silently pull compromised or breaking images.",
+      "severity": "MEDIUM",
+      "category": "security",
+      "languages": [
+        "dockerfile"
+      ],
+      "when": [
+        {
+          "regex": "^\\s*FROM\\s+(?!\\S+@sha256:[0-9a-fA-F]{64})\\S+",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-1357"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "asvs": [
+        "v5.0.0-14.2.1"
+      ],
+      "recommendation": "Pin base images by digest (FROM image@sha256:...) or at least a specific immutable version tag.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/1357.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.docker.root-user-no-user-directive",
+      "message": "Container likely runs as root: CMD/ENTRYPOINT present but no non-root USER directive anywhere in the Dockerfile.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "dockerfile"
+      ],
+      "when": [
+        {
+          "regex": "^\\s*(CMD|ENTRYPOINT)\\s",
+          "same_line": true
+        }
+      ],
+      "if": [
+        {
+          "not_regex": "^\\s*USER\\s+(?!root\\b)(?!0\\s*$)\\S+"
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-250"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "asvs": [
+        "v5.0.0-14.2.2"
+      ],
+      "recommendation": "Add a USER directive with a dedicated non-root UID; drop Linux capabilities at runtime as well.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/250.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.docker.curl-sh-installer",
+      "message": "curl/wget output piped straight into sh/bash executes remote code at build time; a compromised server or network injects arbitrary commands.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "dockerfile"
+      ],
+      "when": [
+        {
+          "regex": "(curl|wget)[^|]*\\|\\s*(ba)?sh\\b",
+          "same_line": true
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-494"
+      ],
+      "owasp": [
+        "A08:2025"
+      ],
+      "asvs": [
+        "v5.0.0-14.2.3"
+      ],
+      "recommendation": "Download, verify a checksum or signature, then execute the fetched artifact as separate steps.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/494.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.docker.secrets-in-env",
+      "message": "ENV looks like a credential; build-time environment variables persist in image layers and are readable by anyone with the image.",
+      "severity": "HIGH",
+      "category": "secret",
+      "languages": [
+        "dockerfile"
+      ],
+      "when": [
+        {
+          "regex": "^\\s*ENV\\s+\\S*(PASSWORD|PASSWD|SECRET|API_KEY|APIKEY|AUTH_TOKEN|ACCESS_TOKEN|PRIVATE_KEY)\\S*\\s*=?\\s*\\S+",
+          "not_pattern": "${|example|changeme|your_",
+          "same_line": true
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-798"
+      ],
+      "owasp": [
+        "A07:2025"
+      ],
+      "asvs": [
+        "v5.0.0-6.4.1"
+      ],
+      "recommendation": "Inject secrets at runtime (orchestrator secrets, mounted files); never bake them into image layers.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/798.html"
+      ]
+    },
+    {
+      "id": "dede.k8s.privileged-container",
+      "message": "privileged: true grants the container nearly all host capabilities; container escape or host compromise becomes trivial.",
+      "severity": "CRITICAL",
+      "category": "security",
+      "languages": [
+        "yaml"
+      ],
+      "when": [
+        {
+          "pattern": "privileged: true",
+          "same_line": true
+        }
+      ],
+      "if": [
+        {
+          "contains_any": [
+            "containers:",
+            "securitycontext"
+          ]
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-250"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "asvs": [
+        "v5.0.0-14.2.2"
+      ],
+      "recommendation": "Set privileged: false and add only the specific capabilities the workload requires.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/250.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.k8s.host-namespace-shared",
+      "message": "hostNetwork/hostPID/hostIPC exposes host namespaces to the pod; node processes and network become reachable.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "yaml"
+      ],
+      "when": [
+        {
+          "regex": "(?i)host(network|pid|ipc)\\s*:\\s*true",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-250"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "asvs": [
+        "v5.0.0-14.2.2"
+      ],
+      "recommendation": "Avoid host namespaces; when unavoidable, isolate the pod and minimize its RBAC permissions.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/250.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.k8s.readonly-root-fs-missing",
+      "message": "Writable root filesystem on a long-running container; a compromised process can modify the application and persist.",
+      "severity": "LOW",
+      "category": "security",
+      "languages": [
+        "yaml"
+      ],
+      "when": [
+        {
+          "pattern": "image:",
+          "same_line": true
+        }
+      ],
+      "if": [
+        {
+          "contains_any": [
+            "containers:"
+          ],
+          "not_regex": "(?i)readonlyrootfilesystem\\s*:\\s*true"
+        }
+      ],
+      "confidence": "LOW",
+      "cwe": [
+        "CWE-1284"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "asvs": [
+        "v5.0.0-14.2.2"
+      ],
+      "recommendation": "Set securityContext.readOnlyRootFilesystem: true and mount writable emptyDir volumes explicitly.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/1284.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.tf.sensitive-variable-unmarked",
+      "message": "Terraform variable looks like a credential without sensitive = true; the value lands in state and plan output in plaintext.",
+      "severity": "HIGH",
+      "category": "secret",
+      "languages": [
+        "hcl",
+        "terraform"
+      ],
+      "when": [
+        {
+          "regex": "(?i)^\\s*variable\\s+\"[^\"]*(password|secret|token|api_key|private_key)",
+          "same_line": true
+        }
+      ],
+      "if": [
+        {
+          "not_regex": "(?i)sensitive\\s*=\\s*true"
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-798"
+      ],
+      "owasp": [
+        "A07:2025"
+      ],
+      "asvs": [
+        "v5.0.0-6.4.1"
+      ],
+      "recommendation": "Mark the variable sensitive = true and keep real values in a secret manager, not tfvars.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/798.html"
+      ]
+    },
+    {
+      "id": "dede.tf.public-ingress-open",
+      "message": "Security group / firewall rule allows 0.0.0.0/0 on a common management port; the service is exposed to the entire internet.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "hcl",
+        "terraform"
+      ],
+      "when": [
+        {
+          "regex": "(?i)(cidr_blocks|source_ranges)\\s*=\\s*\\[?\\s*\"0\\.0\\.0\\.0/0\"",
+          "same_line": true
+        }
+      ],
+      "if": [
+        {
+          "contains_any": [
+            "aws_security_group",
+            "ingress",
+            "google_compute_firewall",
+            "azurerm_network_security_group"
+          ]
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-284"
+      ],
+      "owasp": [
+        "A01:2025"
+      ],
+      "asvs": [
+        "v5.0.0-12.4.1"
+      ],
+      "recommendation": "Restrict ingress to known CIDR ranges; put management ports behind a VPN or bastion.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/284.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.ci.pull-request-target-with-secrets",
+      "message": "Workflow triggered on pull_request_target while referencing secrets; PR authors can run code with repository secrets.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "yaml"
+      ],
+      "when": [
+        {
+          "pattern": "pull_request_target",
+          "same_line": true
+        }
+      ],
+      "if": [
+        {
+          "contains_any": [
+            "secrets."
+          ]
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-829"
+      ],
+      "owasp": [
+        "A08:2025"
+      ],
+      "asvs": [
+        "v5.0.0-14.3.1"
+      ],
+      "recommendation": "Use pull_request, pin actions to digests, and keep secrets out of PR-triggered jobs.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/829.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.ci.action-unpinned-third-party",
+      "message": "Third-party GitHub Action referenced without a commit SHA; a moved tag executes attacker-controlled code in CI.",
+      "severity": "MEDIUM",
+      "category": "security",
+      "languages": [
+        "yaml"
+      ],
+      "when": [
+        {
+          "regex": "uses:\\s*(?!docker/)(?!actions/)(?!\\.?/)(?!\\S+@[0-9a-fA-F]{40}\\b)[^\\s#]+",
+          "same_line": true
+        }
+      ],
+      "if": [
+        {
+          "contains_any": [
+            "jobs:",
+            "steps:"
+          ]
+        }
+      ],
+      "confidence": "LOW",
+      "cwe": [
+        "CWE-1357"
+      ],
+      "owasp": [
+        "A08:2025"
+      ],
+      "asvs": [
+        "v5.0.0-14.3.1"
+      ],
+      "recommendation": "Pin actions to a full 40-character commit SHA instead of a branch or mutable tag.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/1357.html"
+      ],
+      "exclude_comments": true
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "name": "dede/laravel",
+  "version": "1.0.0",
+  "models": {
+    "php": {
+      "sources": [
+        {
+          "call": "request",
+          "kind": "http.request"
+        },
+        {
+          "call": "Request.input",
+          "kind": "http.request"
+        }
+      ],
+      "sinks": [
+        {
+          "call": "DB.raw",
+          "kind": "sql-execution",
+          "cwe": "CWE-89",
+          "severity": "HIGH"
+        },
+        {
+          "call": "DB.select",
+          "kind": "sql-execution",
+          "cwe": "CWE-89",
+          "severity": "HIGH"
+        },
+        {
+          "call": "whereRaw",
+          "kind": "sql-execution",
+          "cwe": "CWE-89",
+          "severity": "HIGH"
+        }
+      ],
+      "sanitizers": [
+        "intval"
+      ]
+    }
+  },
+  "integrity": {
+    "sha256": "29703c62251c1423a358992912fc478de060d2adb619b2ce3b68efad235657e0"
+  }
+}

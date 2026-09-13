@@ -1,0 +1,1090 @@
+{
+  "schema": 1,
+  "rules": [
+    {
+      "id": "dede.py.tls.verify-disabled",
+      "message": "TLS certificate verification is explicitly disabled.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "python"
+      ],
+      "when": [
+        {
+          "regex": "(?i)\\b(?:requests|httpx)\\.(?:get|post|put|patch|delete|request)\\s*\\([^\\n]*\\bverify\\s*=\\s*false\\b",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-295"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "recommendation": "Keep TLS certificate verification enabled and trust a specific CA bundle.",
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.py.tls.unverified-context",
+      "message": "Python SSL peer verification is disabled.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "python"
+      ],
+      "when": [
+        {
+          "regex": "\\b(?:ssl\\.)?(?:CERT_NONE|_create_unverified_context)\\b",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-295"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "recommendation": "Use ssl.create_default_context() with certificate and hostname verification.",
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.js.tls.reject-unauthorized-false",
+      "message": "Node.js TLS peer verification is disabled.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "when": [
+        {
+          "regex": "(?i)\\brejectUnauthorized\\s*:\\s*false\\b|NODE_TLS_REJECT_UNAUTHORIZED\\s*=\\s*[\\'\\\"]?0",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-295"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "recommendation": "Keep rejectUnauthorized enabled and configure trusted certificates.",
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.java.tls.trust-all-hostname",
+      "message": "Hostname verification accepts every server.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "java",
+        "kotlin",
+        "scala"
+      ],
+      "when": [
+        {
+          "regex": "(?i)(?:setHostnameVerifier|setDefaultHostnameVerifier)[^\\n]*(?:->\\s*true|return\\s+true)",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-295"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "recommendation": "Use the platform hostname verifier and expected peer identity.",
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.csharp.tls.accept-any-certificate",
+      "message": "TLS certificate validation accepts every certificate.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "c#"
+      ],
+      "when": [
+        {
+          "regex": "(?i)DangerousAcceptAnyServerCertificateValidator|ServerCertificateCustomValidationCallback\\s*=\\s*[^;]*(?:=>\\s*true|return\\s+true)",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-295"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "recommendation": "Remove permissive certificate callbacks.",
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.php.tls.curl-no-peer-verify",
+      "message": "cURL certificate verification is disabled.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "php"
+      ],
+      "when": [
+        {
+          "regex": "(?i)CURLOPT_SSL_VERIFYPEER\\s*,\\s*(?:false|0)\\b",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-295"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "recommendation": "Enable CURLOPT_SSL_VERIFYPEER.",
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.php.tls.curl-no-host-verify",
+      "message": "cURL hostname verification is disabled.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "php"
+      ],
+      "when": [
+        {
+          "regex": "(?i)CURLOPT_SSL_VERIFYHOST\\s*,\\s*0\\b",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-295"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "recommendation": "Use CURLOPT_SSL_VERIFYHOST=2.",
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.ruby.tls.verify-none",
+      "message": "Ruby TLS certificate verification is disabled.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "ruby"
+      ],
+      "when": [
+        {
+          "regex": "OpenSSL::SSL::VERIFY_NONE|verify_mode\\s*=\\s*[^\\n]*VERIFY_NONE",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-295"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "recommendation": "Use VERIFY_PEER with a trusted certificate store.",
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.rust.tls.accept-invalid-certs",
+      "message": "Rust HTTP client accepts invalid TLS certificates.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "rust"
+      ],
+      "when": [
+        {
+          "regex": "(?i)danger_accept_invalid_certs\\s*\\(\\s*true\\s*\\)",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-295"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "recommendation": "Keep certificate validation enabled and configure a trusted root store.",
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.py.crypto.ecb",
+      "message": "ECB cipher mode is explicitly selected.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "python"
+      ],
+      "when": [
+        {
+          "regex": "\\b(?:AES\\.)?MODE_ECB\\b",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-327"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "recommendation": "Use authenticated encryption such as AES-GCM.",
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.java.crypto.ecb",
+      "message": "ECB cipher mode is explicitly selected.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "java",
+        "kotlin",
+        "scala"
+      ],
+      "when": [
+        {
+          "regex": "(?i)Cipher\\.getInstance\\s*\\(\\s*[\\'\\\"][^\\'\\\"]*/ECB(?:/|[\\'\\\"])",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-327"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "recommendation": "Use an authenticated mode such as AES/GCM/NoPadding.",
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.csharp.crypto.ecb",
+      "message": "ECB cipher mode is explicitly selected.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "c#"
+      ],
+      "when": [
+        {
+          "regex": "\\bCipherMode\\.ECB\\b",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-327"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "recommendation": "Use AesGcm or another authenticated mode.",
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.js.crypto.ecb",
+      "message": "ECB cipher mode is explicitly selected.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "when": [
+        {
+          "regex": "(?i)createCipheriv\\s*\\(\\s*[\\'\\\"][^\\'\\\"]*ecb[^\\'\\\"]*[\\'\\\"]",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-327"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "recommendation": "Use an authenticated encryption construction such as AES-GCM.",
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.php.crypto.ecb",
+      "message": "ECB cipher mode is explicitly selected.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "php"
+      ],
+      "when": [
+        {
+          "regex": "(?i)openssl_encrypt\\s*\\([^\\n]*[\\'\\\"][^\\'\\\"]*ecb[^\\'\\\"]*[\\'\\\"]",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-327"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "recommendation": "Use AES-GCM or another authenticated mode.",
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.py.crypto.weak-password-hash",
+      "message": "Password-like data is hashed with MD5/SHA-1.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "python"
+      ],
+      "when": [
+        {
+          "regex": "(?i)hashlib\\.(?:md5|sha1)\\s*\\([^\\n]*(?:password|passwd|pwd)",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-327"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "recommendation": "Use Argon2id, scrypt, bcrypt, or PBKDF2 with a unique salt.",
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.php.crypto.weak-password-hash",
+      "message": "Password-like data is hashed with MD5/SHA-1.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "php"
+      ],
+      "when": [
+        {
+          "regex": "(?i)\\b(?:md5|sha1)\\s*\\(\\s*\\$(?:password|passwd|pwd)\\b",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-327"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "recommendation": "Use password_hash() with PASSWORD_DEFAULT/Argon2id.",
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.java.crypto.md5",
+      "message": "A legacy digest algorithm is selected.",
+      "severity": "MEDIUM",
+      "category": "security",
+      "languages": [
+        "java",
+        "kotlin",
+        "scala"
+      ],
+      "when": [
+        {
+          "regex": "(?i)MessageDigest\\.getInstance\\s*\\(\\s*[\\'\\\"](?:MD5|SHA-?1)[\\'\\\"]",
+          "same_line": true
+        }
+      ],
+      "confidence": "LOW",
+      "cwe": [
+        "CWE-327"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "recommendation": "Use SHA-256+ for integrity or a password KDF for passwords.",
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.csharp.crypto.md5",
+      "message": "A legacy digest algorithm is selected.",
+      "severity": "MEDIUM",
+      "category": "security",
+      "languages": [
+        "c#"
+      ],
+      "when": [
+        {
+          "regex": "\\b(?:MD5|SHA1)\\.Create\\s*\\(",
+          "same_line": true
+        }
+      ],
+      "confidence": "LOW",
+      "cwe": [
+        "CWE-327"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "recommendation": "Use SHA-256+ for integrity or a password KDF for passwords.",
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.go.crypto.md5",
+      "message": "A legacy digest algorithm is selected.",
+      "severity": "MEDIUM",
+      "category": "security",
+      "languages": [
+        "go"
+      ],
+      "when": [
+        {
+          "regex": "\\b(?:md5|sha1)\\.New\\s*\\(",
+          "same_line": true
+        }
+      ],
+      "confidence": "LOW",
+      "cwe": [
+        "CWE-327"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "recommendation": "Use SHA-256+ for integrity or a password KDF for passwords.",
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.py.auth.jwt-verification-disabled",
+      "message": "JWT signature verification is disabled.",
+      "severity": "CRITICAL",
+      "category": "security",
+      "languages": [
+        "python"
+      ],
+      "when": [
+        {
+          "regex": "(?i)jwt\\.decode\\s*\\([^\\n]*(?:verify\\s*=\\s*false|[\\'\\\"]verify_signature[\\'\\\"]\\s*:\\s*false)",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-347"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "recommendation": "Verify signatures with an explicit allowlisted algorithm and trusted key.",
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.js.auth.jwt-ignore-expiration",
+      "message": "JWT expiration validation is disabled.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "when": [
+        {
+          "regex": "(?i)jwt\\.verify\\s*\\([^\\n]*ignoreExpiration\\s*:\\s*true",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-613"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Validate exp, issuer and audience.",
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.csharp.auth.jwt-no-lifetime",
+      "message": "JWT lifetime/expiration validation is disabled.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "c#"
+      ],
+      "when": [
+        {
+          "regex": "\\b(?:ValidateLifetime|RequireExpirationTime)\\s*=\\s*false\\b",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-613"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Require expiration and validate token lifetime.",
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.java.auth.cookie-not-secure",
+      "message": "A cookie is explicitly configured without Secure.",
+      "severity": "MEDIUM",
+      "category": "security",
+      "languages": [
+        "java",
+        "kotlin"
+      ],
+      "when": [
+        {
+          "regex": "\\.setSecure\\s*\\(\\s*false\\s*\\)",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-614"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Enable Secure for session/authentication cookies.",
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.java.auth.cookie-not-httponly",
+      "message": "A cookie is explicitly configured without HttpOnly.",
+      "severity": "MEDIUM",
+      "category": "security",
+      "languages": [
+        "java",
+        "kotlin"
+      ],
+      "when": [
+        {
+          "regex": "\\.setHttpOnly\\s*\\(\\s*false\\s*\\)",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-1004"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Keep HttpOnly enabled for session/authentication cookies.",
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.py.file.insecure-mktemp",
+      "message": "tempfile.mktemp() is race-prone.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "python"
+      ],
+      "when": [
+        {
+          "regex": "\\btempfile\\.mktemp\\s*\\(",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-377"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Use NamedTemporaryFile or mkstemp.",
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.posix.file.world-writable",
+      "message": "A file or directory is made world-writable.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "python",
+        "go",
+        "ruby",
+        "php",
+        "c",
+        "c++"
+      ],
+      "when": [
+        {
+          "regex": "(?i)\\b(?:chmod|os\\.chmod|os\\.Chmod)\\s*\\([^\\n]*(?:0o?777|0777|0x1ff)\\b",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-732"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Use the minimum required filesystem permissions.",
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.web.cors.credentials-wildcard",
+      "message": "Credentialed CORS is configured with a wildcard origin.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "python",
+        "javascript",
+        "typescript",
+        "java",
+        "kotlin",
+        "c#"
+      ],
+      "when": [
+        {
+          "regex": "(?i)(?:allow_origins|origins|allowedOrigins|WithOrigins)[^\\n]*[\\'\\\"]\\*[\\'\\\"][^\\n]*(?:allow_credentials|credentials|AllowCredentials)[^\\n]*(?:true)|(?:allow_credentials|credentials|AllowCredentials)[^\\n]*(?:true)[^\\n]*(?:allow_origins|origins|allowedOrigins|WithOrigins)[^\\n]*[\\'\\\"]\\*[\\'\\\"]",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-942"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Allow only explicit trusted origins when credentials are enabled.",
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.py.deserialize.pickle-api",
+      "message": "pickle deserialization executes object constructors and is unsafe for untrusted data.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "python"
+      ],
+      "when": [
+        {
+          "regex": "\\bpickle\\.(?:load|loads)\\s*\\(",
+          "same_line": true
+        }
+      ],
+      "confidence": "LOW",
+      "cwe": [
+        "CWE-502"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Use a non-executable serialization format for untrusted input.",
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.py.deserialize.yaml-unsafe-load",
+      "message": "yaml.unsafe_load may construct arbitrary Python objects.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "python"
+      ],
+      "when": [
+        {
+          "regex": "\\byaml\\.unsafe_load\\s*\\(",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-502"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Use yaml.safe_load for untrusted YAML.",
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.php.deserialize.unserialize-api",
+      "message": "PHP unserialize can invoke object gadget chains with untrusted input.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "php"
+      ],
+      "when": [
+        {
+          "regex": "\\bunserialize\\s*\\(",
+          "same_line": true
+        }
+      ],
+      "confidence": "LOW",
+      "cwe": [
+        "CWE-502"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Prefer JSON or constrain allowed_classes and keep input trusted.",
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.ruby.deserialize.marshal-load",
+      "message": "Marshal.load can instantiate attacker-controlled objects.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "ruby"
+      ],
+      "when": [
+        {
+          "regex": "\\bMarshal\\.load\\s*\\(",
+          "same_line": true
+        }
+      ],
+      "confidence": "LOW",
+      "cwe": [
+        "CWE-502"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Do not deserialize Marshal data from untrusted sources.",
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.csharp.deserialize.binaryformatter",
+      "message": "BinaryFormatter-style deserialization is dangerous for untrusted data.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "c#"
+      ],
+      "when": [
+        {
+          "regex": "\\bBinaryFormatter\\s*\\(|\\.Deserialize\\s*\\(",
+          "same_line": true
+        }
+      ],
+      "confidence": "LOW",
+      "cwe": [
+        "CWE-502"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Use safe serializers and do not deserialize attacker-controlled object graphs.",
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.py.logging.sensitive-value",
+      "message": "A credential-like value is passed to a logging API.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "python"
+      ],
+      "when": [
+        {
+          "regex": "(?i)\\b(?:logging|logger|log)\\.(?:debug|info|warning|error|critical|exception)\\s*\\([^\\n]*(?:password|passwd|secret|api[_-]?key|access[_-]?token|authorization|session[_-]?id)",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-532"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Redact credentials, tokens, authorization headers and session identifiers before logging.",
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.js.logging.sensitive-value",
+      "message": "A credential-like value is passed to a logging API.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "when": [
+        {
+          "regex": "(?i)\\b(?:console|logger|log)\\.(?:log|debug|info|warn|error)\\s*\\([^\\n]*(?:password|passwd|secret|api[_-]?key|access[_-]?token|authorization|session[_-]?id)",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-532"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Redact credentials and session/authentication material before logging.",
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.jvm.logging.sensitive-value",
+      "message": "A credential-like value is passed to a logging API.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "java",
+        "kotlin",
+        "scala"
+      ],
+      "when": [
+        {
+          "regex": "(?i)\\b(?:log|logger)\\.(?:trace|debug|info|warn|error)\\s*\\([^\\n]*(?:password|passwd|secret|api[_-]?key|access[_-]?token|authorization|session[_-]?id)",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-532"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Redact credentials and session/authentication material before logging.",
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.csharp.logging.sensitive-value",
+      "message": "A credential-like value is passed to a logging API.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "c#"
+      ],
+      "when": [
+        {
+          "regex": "(?i)\\b(?:logger|_logger)\\.(?:LogTrace|LogDebug|LogInformation|LogWarning|LogError|LogCritical)\\s*\\([^\\n]*(?:password|passwd|secret|api[_-]?key|access[_-]?token|authorization|session[_-]?id)",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-532"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Redact credentials and session/authentication material before logging.",
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.go.logging.sensitive-value",
+      "message": "A credential-like value is passed to a logging API.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "go"
+      ],
+      "when": [
+        {
+          "regex": "(?i)\\b(?:log|logger)\\.(?:Print|Printf|Println|Debug|Info|Warn|Error)\\s*\\([^\\n]*(?:password|passwd|secret|api[_-]?key|access[_-]?token|authorization|session[_-]?id)",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-532"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Redact credentials and session/authentication material before logging.",
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.py.random.security-token",
+      "message": "Security-sensitive material is generated with the non-cryptographic random module.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "python"
+      ],
+      "when": [
+        {
+          "regex": "(?i)\\b(?:token|secret|session[_-]?id|nonce|reset[_-]?code)\\w*\\s*=\\s*random\\.(?:random|randint|randrange|choice|choices|getrandbits)\\s*\\(",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-338"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "recommendation": "Use secrets or SystemRandom for security-sensitive values.",
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.js.random.security-token",
+      "message": "Security-sensitive material is generated with Math.random().",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "when": [
+        {
+          "regex": "(?i)\\b(?:token|secret|session[_-]?id|nonce|reset[_-]?code)\\w*\\s*=\\s*Math\\.random\\s*\\(",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-338"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "recommendation": "Use crypto.randomBytes/randomUUID/getRandomValues.",
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.php.random.security-token",
+      "message": "Security-sensitive material is generated with a non-cryptographic PRNG.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "php"
+      ],
+      "when": [
+        {
+          "regex": "(?i)\\$(?:token|secret|session[_-]?id|nonce|reset[_-]?code)\\w*\\s*=\\s*(?:rand|mt_rand)\\s*\\(",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-338"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "recommendation": "Use random_bytes/random_int.",
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.c.memory.gets",
+      "message": "gets() cannot enforce a destination buffer bound.",
+      "severity": "CRITICAL",
+      "category": "security",
+      "languages": [
+        "c",
+        "c++"
+      ],
+      "when": [
+        {
+          "regex": "(?<![A-Za-z0-9_])gets\\s*\\(",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-120"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Use fgets or a length-bounded input API.",
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.c.memory.strcpy",
+      "message": "strcpy() performs no destination bound check.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "c",
+        "c++"
+      ],
+      "when": [
+        {
+          "regex": "(?<![A-Za-z0-9_])strcpy\\s*\\(",
+          "same_line": true
+        }
+      ],
+      "confidence": "LOW",
+      "cwe": [
+        "CWE-120"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Use a bounded copy with verified destination capacity.",
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.c.memory.sprintf",
+      "message": "sprintf() can overflow a fixed-size destination buffer.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "c",
+        "c++"
+      ],
+      "when": [
+        {
+          "regex": "(?<![A-Za-z0-9_])sprintf\\s*\\(",
+          "same_line": true
+        }
+      ],
+      "confidence": "LOW",
+      "cwe": [
+        "CWE-120"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Use snprintf with a correct destination bound.",
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.c.memory.scanf-string",
+      "message": "scanf(\"%s\") has no width bound for the destination buffer.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "c",
+        "c++"
+      ],
+      "when": [
+        {
+          "regex": "(?<![A-Za-z0-9_])scanf\\s*\\(\\s*[\\'\\\"]%s[\\'\\\"]",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-120"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "recommendation": "Specify a maximum field width or use fgets.",
+      "exclude_comments": true
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+rules:
+  - id: dede.javascript.security.eval-detected
+    message: "Detected eval() which can lead to code injection (CWE-95)."
+    languages: [javascript, typescript]
+    severity: ERROR
+    metadata:
+      cwe: ["CWE-95"]
+      owasp: ["A03:2021"]
+      category: security
+    pattern: eval(...)
+
+  - id: dede.javascript.security.child-process-exec
+    message: "Detected child_process exec/execSync which may allow command injection (CWE-78)."
+    languages: [javascript, typescript]
+    severity: ERROR
+    metadata:
+      cwe: ["CWE-78"]
+      owasp: ["A03:2021"]
+      category: security
+    pattern-either:
+      - pattern: child_process.exec(...)
+      - pattern: child_process.execSync(...)
+      - pattern: require('child_process').exec(...)
+      - pattern: require("child_process").exec(...)
+      - pattern: require('child_process').execSync(...)
+      - pattern: require("child_process").execSync(...)
+
+  - id: dede.javascript.security.dangerously-set-inner-html
+    message: "dangerouslySetInnerHTML can introduce XSS if content is unsanitized (CWE-79)."
+    languages: [javascript, typescript]
+    severity: WARNING
+    metadata:
+      cwe: ["CWE-79"]
+      owasp: ["A03:2021"]
+      category: security
+      technology: [react]
+    pattern: |
+      <$X dangerouslySetInnerHTML=... />
+
+  - id: dede.javascript.security.insecure-http-url
+    message: "Hardcoded http:// URL may be used where TLS is expected (CWE-319)."
+    languages: [javascript, typescript]
+    severity: INFO
+    metadata:
+      cwe: ["CWE-319"]
+      owasp: ["A02:2021"]
+      category: security
+    pattern-regex: '["'']http://(?!localhost|127\.0\.0\.1)[^"'']+["'']'

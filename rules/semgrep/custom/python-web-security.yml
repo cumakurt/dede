@@ -1,0 +1,228 @@
+rules:
+  - id: dede.python.web.unsafe-deserialization
+    languages: [python]
+    mode: taint
+    severity: ERROR
+    message: Untrusted request data reaches native object deserialization.
+    metadata:
+      category: security
+      cwe: [CWE-502]
+      confidence: HIGH
+      analysis: taint
+      recommendation: Use a data-only format and validate its schema; do not deserialize untrusted Python objects.
+      references: [https://cwe.mitre.org/data/definitions/502.html]
+    pattern-sources:
+      - pattern-either:
+          - pattern: flask.request.args.get(...)
+          - pattern: flask.request.args[...]
+          - pattern: flask.request.form.get(...)
+          - pattern: flask.request.form[...]
+          - pattern: flask.request.values.get(...)
+          - pattern: flask.request.values[...]
+          - pattern: flask.request.get_json(...)
+          - pattern: flask.request.data
+          - pattern: flask.request.cookies.get(...)
+          - pattern: $REQ.GET.get(...)
+          - pattern: $REQ.GET[...]
+          - pattern: $REQ.POST.get(...)
+          - pattern: $REQ.POST[...]
+          - pattern: input(...)
+        exact: true
+    pattern-sinks:
+      - patterns:
+          - pattern-either:
+              - pattern: pickle.loads($DATA, ...)
+              - pattern: dill.loads($DATA, ...)
+              - pattern: jsonpickle.decode($DATA, ...)
+          - focus-metavariable: $DATA
+
+  - id: dede.python.web.template-injection
+    languages: [python]
+    mode: taint
+    severity: ERROR
+    message: Request input controls template source rather than a template variable.
+    metadata:
+      category: security
+      cwe: [CWE-1336]
+      confidence: HIGH
+      analysis: taint
+      recommendation: Keep template source constant and pass untrusted values as template variables.
+      references: [https://cwe.mitre.org/data/definitions/1336.html]
+    pattern-sources:
+      - pattern-either:
+          - pattern: flask.request.args.get(...)
+          - pattern: flask.request.args[...]
+          - pattern: flask.request.form.get(...)
+          - pattern: flask.request.form[...]
+          - pattern: flask.request.values.get(...)
+          - pattern: flask.request.values[...]
+          - pattern: flask.request.get_json(...)
+          - pattern: flask.request.data
+          - pattern: flask.request.cookies.get(...)
+          - pattern: $REQ.GET.get(...)
+          - pattern: $REQ.GET[...]
+          - pattern: $REQ.POST.get(...)
+          - pattern: $REQ.POST[...]
+          - pattern: input(...)
+        exact: true
+    pattern-sinks:
+      - patterns:
+          - pattern-either:
+              - pattern: flask.render_template_string($TEMPLATE, ...)
+              - pattern: jinja2.Template($TEMPLATE, ...)
+          - focus-metavariable: $TEMPLATE
+
+  - id: dede.python.web.code-injection
+    languages: [python]
+    mode: taint
+    severity: ERROR
+    message: Request input reaches dynamic Python code evaluation.
+    metadata:
+      category: security
+      cwe: [CWE-95]
+      confidence: HIGH
+      analysis: taint
+      recommendation: Replace dynamic evaluation with explicit operations and a validated data schema.
+      references: [https://cwe.mitre.org/data/definitions/95.html]
+    pattern-sources:
+      - pattern-either:
+          - pattern: flask.request.args.get(...)
+          - pattern: flask.request.args[...]
+          - pattern: flask.request.form.get(...)
+          - pattern: flask.request.form[...]
+          - pattern: flask.request.values.get(...)
+          - pattern: flask.request.values[...]
+          - pattern: flask.request.get_json(...)
+          - pattern: flask.request.data
+          - pattern: flask.request.cookies.get(...)
+          - pattern: $REQ.GET.get(...)
+          - pattern: $REQ.GET[...]
+          - pattern: $REQ.POST.get(...)
+          - pattern: $REQ.POST[...]
+          - pattern: input(...)
+        exact: true
+    pattern-sinks:
+      - patterns:
+          - pattern-either:
+              - pattern: eval($CODE, ...)
+              - pattern: exec($CODE, ...)
+          - focus-metavariable: $CODE
+
+  - id: dede.python.web.open-redirect
+    languages: [python]
+    mode: taint
+    severity: WARNING
+    message: Request input controls a redirect destination; validate the destination host and scheme.
+    metadata:
+      category: security
+      cwe: [CWE-601]
+      confidence: MEDIUM
+      analysis: taint
+      recommendation: Map an allowed destination identifier to a fixed local path; do not accept arbitrary URLs.
+      references: [https://cwe.mitre.org/data/definitions/601.html]
+    pattern-sources:
+      - pattern-either:
+          - pattern: flask.request.args.get(...)
+          - pattern: flask.request.args[...]
+          - pattern: flask.request.form.get(...)
+          - pattern: flask.request.form[...]
+          - pattern: flask.request.values.get(...)
+          - pattern: flask.request.values[...]
+          - pattern: flask.request.get_json(...)
+          - pattern: flask.request.data
+          - pattern: flask.request.cookies.get(...)
+          - pattern: $REQ.GET.get(...)
+          - pattern: $REQ.GET[...]
+          - pattern: $REQ.POST.get(...)
+          - pattern: $REQ.POST[...]
+          - pattern: input(...)
+        exact: true
+    pattern-sinks:
+      - patterns:
+          - pattern-either:
+              - pattern: flask.redirect($URL, ...)
+              - pattern: django.shortcuts.redirect($URL, ...)
+          - focus-metavariable: $URL
+
+  - id: dede.python.web.xpath-injection
+    languages: [python]
+    mode: taint
+    severity: ERROR
+    message: Request input controls an XPath expression.
+    metadata:
+      category: security
+      cwe: [CWE-643]
+      confidence: MEDIUM
+      analysis: taint
+      recommendation: Use a fixed XPath expression with bound variables instead of constructing expressions from input.
+      references: [https://cwe.mitre.org/data/definitions/643.html]
+    pattern-sources:
+      - pattern-either:
+          - pattern: flask.request.args.get(...)
+          - pattern: flask.request.args[...]
+          - pattern: flask.request.form.get(...)
+          - pattern: flask.request.form[...]
+          - pattern: flask.request.values.get(...)
+          - pattern: flask.request.values[...]
+          - pattern: flask.request.get_json(...)
+          - pattern: flask.request.data
+          - pattern: flask.request.cookies.get(...)
+          - pattern: $REQ.GET.get(...)
+          - pattern: $REQ.GET[...]
+          - pattern: $REQ.POST.get(...)
+          - pattern: $REQ.POST[...]
+          - pattern: input(...)
+        exact: true
+    pattern-sinks:
+      - patterns:
+          - pattern: $XML.xpath($QUERY, ...)
+          - focus-metavariable: $QUERY
+
+  - id: dede.python.web.unsafe-yaml-loader
+    languages: [python]
+    severity: WARNING
+    message: An unsafe YAML loader can construct Python objects; review the input trust boundary.
+    metadata:
+      category: security
+      cwe: [CWE-502]
+      confidence: MEDIUM
+      recommendation: Use yaml.safe_load or yaml.SafeLoader for data-only configuration.
+      references: [https://cwe.mitre.org/data/definitions/502.html]
+    pattern-either:
+      - pattern: yaml.unsafe_load(...)
+      - pattern: yaml.unsafe_load_all(...)
+      - pattern: yaml.load(..., Loader=yaml.Loader, ...)
+      - pattern: yaml.load(..., Loader=yaml.UnsafeLoader, ...)
+      - pattern: yaml.load(..., Loader=yaml.CLoader, ...)
+      - pattern: yaml.load(..., Loader=yaml.CUnsafeLoader, ...)
+
+  - id: dede.python.web.jwt-signature-disabled
+    languages: [python]
+    severity: ERROR
+    message: JWT decoding explicitly disables signature verification; decoded claims are not authenticated.
+    metadata:
+      category: security
+      cwe: [CWE-347]
+      confidence: HIGH
+      recommendation: Verify JWT signatures with a trusted key and a fixed algorithm allowlist before trusting claims.
+      references: [https://cwe.mitre.org/data/definitions/347.html]
+    pattern: 'jwt.decode(..., options={..., "verify_signature": False, ...}, ...)'
+
+  - id: dede.python.web.tls-verification-disabled
+    languages: [python]
+    severity: ERROR
+    message: Outbound TLS certificate verification is explicitly disabled.
+    metadata:
+      category: security
+      cwe: [CWE-295]
+      confidence: HIGH
+      recommendation: Enable certificate verification and configure the appropriate CA bundle.
+      references: [https://cwe.mitre.org/data/definitions/295.html]
+    pattern-either:
+      - pattern: requests.get(..., verify=False, ...)
+      - pattern: requests.post(..., verify=False, ...)
+      - pattern: requests.request(..., verify=False, ...)
+      - pattern: httpx.get(..., verify=False, ...)
+      - pattern: httpx.Client(..., verify=False, ...)
+      - pattern: httpx.AsyncClient(..., verify=False, ...)
+      - pattern: ssl._create_unverified_context(...)

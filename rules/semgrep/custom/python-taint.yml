@@ -1,0 +1,130 @@
+rules:
+  - id: dede.python.taint.sql-injection
+    languages: [python]
+    mode: taint
+    severity: ERROR
+    message: "Untrusted input reaches SQL query text."
+    metadata:
+      cwe: ["CWE-89"]
+      category: security
+      confidence: HIGH
+      analysis: taint
+      recommendation: "Use a constant SQL query with bound parameters."
+    pattern-sources:
+      - pattern-either:
+          - pattern: flask.request.args.get(...)
+          - pattern: flask.request.args[...]
+          - pattern: flask.request.form.get(...)
+          - pattern: flask.request.form[...]
+          - pattern: flask.request.values.get(...)
+          - pattern: $REQ.GET.get(...)
+          - pattern: $REQ.GET[...]
+          - pattern: $REQ.POST.get(...)
+          - pattern: $REQ.POST[...]
+          - pattern: input(...)
+        exact: true
+    pattern-sinks:
+      - patterns:
+          - pattern-either:
+              - pattern: $CUR.execute($QUERY, ...)
+              - pattern: $CUR.executemany($QUERY, ...)
+          - focus-metavariable: $QUERY
+
+  - id: dede.python.taint.command-injection
+    languages: [python]
+    mode: taint
+    severity: ERROR
+    message: "Untrusted input reaches a shell command."
+    metadata:
+      cwe: ["CWE-78"]
+      category: security
+      confidence: HIGH
+      analysis: taint
+      recommendation: "Use an argument list with shell=False and validate allowed commands."
+    pattern-sources:
+      - pattern-either:
+          - pattern: flask.request.args.get(...)
+          - pattern: flask.request.args[...]
+          - pattern: flask.request.form.get(...)
+          - pattern: flask.request.form[...]
+          - pattern: flask.request.values.get(...)
+          - pattern: $REQ.GET.get(...)
+          - pattern: $REQ.GET[...]
+          - pattern: $REQ.POST.get(...)
+          - pattern: $REQ.POST[...]
+          - pattern: input(...)
+        exact: true
+    pattern-sinks:
+      - patterns:
+          - pattern-either:
+              - pattern: os.system($CMD)
+              - pattern: os.popen($CMD, ...)
+              - pattern: subprocess.run($CMD, ..., shell=True, ...)
+              - pattern: subprocess.call($CMD, ..., shell=True, ...)
+              - pattern: subprocess.Popen($CMD, ..., shell=True, ...)
+          - focus-metavariable: $CMD
+
+  - id: dede.python.taint.path-traversal
+    languages: [python]
+    mode: taint
+    severity: ERROR
+    message: "Untrusted input reaches a filesystem path."
+    metadata:
+      cwe: ["CWE-22"]
+      category: security
+      confidence: HIGH
+      analysis: taint
+      recommendation: "Resolve paths against an allowed directory and reject paths outside it."
+    pattern-sources:
+      - pattern-either:
+          - pattern: flask.request.args.get(...)
+          - pattern: flask.request.args[...]
+          - pattern: flask.request.form.get(...)
+          - pattern: flask.request.form[...]
+          - pattern: flask.request.values.get(...)
+          - pattern: $REQ.GET.get(...)
+          - pattern: $REQ.GET[...]
+          - pattern: $REQ.POST.get(...)
+          - pattern: $REQ.POST[...]
+          - pattern: input(...)
+        exact: true
+    pattern-sinks:
+      - patterns:
+          - pattern-either:
+              - pattern: open($PATH, ...)
+              - pattern: flask.send_file($PATH, ...)
+          - focus-metavariable: $PATH
+
+  - id: dede.python.taint.ssrf
+    languages: [python]
+    mode: taint
+    severity: ERROR
+    message: "Untrusted input controls an outbound request URL."
+    metadata:
+      cwe: ["CWE-918"]
+      category: security
+      confidence: HIGH
+      analysis: taint
+      recommendation: "Allowlist URL schemes and destinations and reject private or local addresses."
+    pattern-sources:
+      - pattern-either:
+          - pattern: flask.request.args.get(...)
+          - pattern: flask.request.args[...]
+          - pattern: flask.request.form.get(...)
+          - pattern: flask.request.form[...]
+          - pattern: flask.request.values.get(...)
+          - pattern: $REQ.GET.get(...)
+          - pattern: $REQ.GET[...]
+          - pattern: $REQ.POST.get(...)
+          - pattern: $REQ.POST[...]
+          - pattern: input(...)
+        exact: true
+    pattern-sinks:
+      - patterns:
+          - pattern-either:
+              - pattern: requests.get($URL, ...)
+              - pattern: requests.post($URL, ...)
+              - pattern: requests.request($METHOD, $URL, ...)
+              - pattern: httpx.get($URL, ...)
+              - pattern: urllib.request.urlopen($URL, ...)
+          - focus-metavariable: $URL

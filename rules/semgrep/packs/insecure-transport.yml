@@ -1,0 +1,2828 @@
+rules:
+- id: problem-based-packs.insecure-transport.js-node.telnet-request.telnet-request
+  message: Checks for creation of telnet servers or attempts to connect through telnet.
+    This is insecure as the telnet protocol supports no encryption, and data passes
+    through unencrypted.
+  severity: WARNING
+  metadata:
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    category: security
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    owasp: A03:2017 - Sensitive Data Exposure
+    references:
+    - https://www.npmjs.com/package/telnet
+    - https://www.npmjs.com/package/telnet-client
+    subcategory:
+    - vuln
+    technology:
+    - node.js
+    vulnerability: Insecure Transport
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/problem-based-packs.insecure-transport.js-node.telnet-request.telnet-request
+    shortlink: https://sg.run/weoA
+    semgrep.dev:
+      rule:
+        r_id: 9429
+        rv_id: 946073
+        rule_id: EwU2GA
+        version_id: DkTNpJJ
+        url: https://semgrep.dev/playground/r/DkTNpJJ/problem-based-packs.insecure-transport.js-node.telnet-request.telnet-request
+        origin: community
+  languages:
+  - javascript
+  patterns:
+  - pattern-either:
+    - pattern-inside: |
+        $TEL = require('telnet-client');
+        ...
+        $SERVER = new $TEL();
+        ...
+    - pattern-inside: |
+        $SERVER = require('telnet');
+        ...
+  - pattern-either:
+    - pattern: |
+        $SERVER.on(...)
+    - pattern: |
+        $SERVER.connect(...)
+    - pattern: |
+        $SERVER.createServer(...)
+- id: problem-based-packs.insecure-transport.js-node.bypass-tls-verification.bypass-tls-verification
+  message: Checks for setting the environment variable NODE_TLS_REJECT_UNAUTHORIZED
+    to 0, which disables TLS verification. This should only be used for debugging
+    purposes. Setting the option rejectUnauthorized to false bypasses verification
+    against the list of trusted CAs, which also leads to insecure transport. These
+    options lead to vulnerability to MTM attacks, and should not be used.
+  severity: WARNING
+  metadata:
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    category: security
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    owasp: A03:2017 - Sensitive Data Exposure
+    references:
+    - https://nodejs.org/api/https.html#https_https_request_options_callback
+    - https://stackoverflow.com/questions/20433287/node-js-request-cert-has-expired#answer-29397100
+    subcategory:
+    - vuln
+    technology:
+    - node.js
+    vulnerability: Insecure Transport
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/problem-based-packs.insecure-transport.js-node.bypass-tls-verification.bypass-tls-verification
+    shortlink: https://sg.run/9oxr
+    semgrep.dev:
+      rule:
+        r_id: 9423
+        rv_id: 946067
+        rule_id: OrU3Y6
+        version_id: JdTDybO
+        url: https://semgrep.dev/playground/r/JdTDybO/problem-based-packs.insecure-transport.js-node.bypass-tls-verification.bypass-tls-verification
+        origin: community
+  languages:
+  - javascript
+  - typescript
+  pattern-either:
+  - pattern: |
+      process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
+  - pattern: |
+      {rejectUnauthorized:false}
+- id: problem-based-packs.insecure-transport.js-node.http-request.http-request
+  message: Checks for requests sent to http:// URLs. This is dangerous as the server
+    is attempting to connect to a website that does not encrypt traffic with TLS.
+    Instead, only send requests to https:// URLs.
+  severity: WARNING
+  metadata:
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    category: security
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    owasp: A03:2017 - Sensitive Data Exposure
+    references:
+    - https://nodejs.org/api/http.html#http_http_request_options_callback
+    subcategory:
+    - vuln
+    technology:
+    - node.js
+    vulnerability: Insecure Transport
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/problem-based-packs.insecure-transport.js-node.http-request.http-request
+    shortlink: https://sg.run/N4Qy
+    semgrep.dev:
+      rule:
+        r_id: 9427
+        rv_id: 946071
+        rule_id: ZqU5r3
+        version_id: A8TJz8O
+        url: https://semgrep.dev/playground/r/A8TJz8O/problem-based-packs.insecure-transport.js-node.http-request.http-request
+        origin: community
+  languages:
+  - javascript
+  patterns:
+  - pattern-inside: |
+      $HTTP = require('http');
+      ...
+  - pattern-either:
+    - pattern: |
+        $HTTP.request("=~/http://.*/",...);
+    - pattern: |
+        $HTTP.get("=~/http://.*/", ...)
+    - pattern: |
+        $VAR = new URL("=~/http://.*/");
+        ...
+        $HTTP.request($VAR, ...);
+    - pattern: |
+        $VAR = {...,hostname: "..."};
+        ...
+        $HTTP.request(..., $VAR, ...);
+    - pattern: |
+        $HTTP.request(..., {...,hostname: "..."}, ...);
+  - pattern-not: |
+      $VAR = {...,protocol: "https"};
+      ...
+      $HTTP.request(..., $VAR, ...);
+  - pattern-not: |
+      $HTTP.request(..., {...,protocol: "https"}, ...);
+- id: problem-based-packs.insecure-transport.js-node.disallow-old-tls-versions2.disallow-old-tls-versions2
+  message: Detects creations of $HTTPS servers from option objects that don't disallow
+    SSL v2, SSL v3, and TLS v1. These protocols are deprecated due to POODLE, man
+    in the middle attacks, and other vulnerabilities.
+  severity: WARNING
+  metadata:
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    category: security
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    owasp: A03:2017 - Sensitive Data Exposure
+    references:
+    - https://us-cert.cisa.gov/ncas/alerts/TA14-290A
+    - https://stackoverflow.com/questions/40434934/how-to-disable-the-ssl-3-0-and-tls-1-0-in-nodejs
+    - https://nodejs.org/api/https.html#https_https_createserver_options_requestlistener
+    subcategory:
+    - vuln
+    technology:
+    - node.js
+    vulnerability: Insecure Transport
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/problem-based-packs.insecure-transport.js-node.disallow-old-tls-versions2.disallow-old-tls-versions2
+    shortlink: https://sg.run/rdKe
+    semgrep.dev:
+      rule:
+        r_id: 9425
+        rv_id: 946069
+        rule_id: v8UnPO
+        version_id: GxTP7y5
+        url: https://semgrep.dev/playground/r/GxTP7y5/problem-based-packs.insecure-transport.js-node.disallow-old-tls-versions2.disallow-old-tls-versions2
+        origin: community
+  languages:
+  - javascript
+  - typescript
+  patterns:
+  - pattern-either:
+    - pattern-inside: |
+        $CONST = require('crypto');
+        ...
+    - pattern-inside: |
+        $CONST = require('constants');
+        ...
+  - pattern-inside: |
+      $HTTPS = require('https');
+      ...
+  - pattern: |
+      $OPTIONS = {};
+      ...
+      $HTTPS.createServer($OPTIONS, ...);
+  - pattern-not: |
+      $OPTIONS = {secureOptions: $CONST.SSL_OP_NO_TLSv1 | $CONST.SSL_OP_NO_SSLv3 | $CONST.SSL_OP_NO_SSLv2};
+      ...
+      $HTTPS.createServer($OPTIONS, ...);
+  - pattern-not: |
+      $OPTIONS = {secureOptions: $CONST.SSL_OP_NO_TLSv1 | $CONST.SSL_OP_NO_SSLv2 | $CONST.SSL_OP_NO_SSLv3};
+      ...
+      $HTTPS.createServer($OPTIONS, ...);
+  - pattern-not: |
+      $OPTIONS = {secureOptions: $CONST.SSL_OP_NO_SSLv2  | $CONST.SSL_OP_NO_TLSv1 | $CONST.SSL_OP_NO_SSLv3};
+      ...
+      $HTTPS.createServer($OPTIONS, ...);
+  - pattern-not: |
+      $OPTIONS = {secureOptions: $CONST.SSL_OP_NO_SSLv2 | $CONST.SSL_OP_NO_SSLv3 | $CONST.SSL_OP_NO_TLSv1};
+      ...
+      $HTTPS.createServer($OPTIONS, ...);
+  - pattern-not: |
+      $OPTIONS = {secureOptions: $CONST.SSL_OP_NO_SSLv3 | $CONST.SSL_OP_NO_SSLv2 | $CONST.SSL_OP_NO_TLSv1};
+      ...
+      $HTTPS.createServer($OPTIONS, ...);
+  - pattern-not: |
+      $OPTIONS = {secureOptions: $CONST.SSL_OP_NO_SSLv3 | $CONST.SSL_OP_NO_TLSv1 | $CONST.SSL_OP_NO_SSLv2};
+      ...
+      $HTTPS.createServer($OPTIONS, ...);
+- id: problem-based-packs.insecure-transport.js-node.disallow-old-tls-versions1.disallow-old-tls-versions1
+  message: Detects direct creations of $HTTPS servers that don't disallow SSL v2,
+    SSL v3, and TLS v1. These protocols are deprecated due to POODLE, man in the middle
+    attacks, and other vulnerabilities.
+  severity: WARNING
+  metadata:
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    category: security
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    owasp: A03:2017 - Sensitive Data Exposure
+    references:
+    - https://us-cert.cisa.gov/ncas/alerts/TA14-290A
+    - https://stackoverflow.com/questions/40434934/how-to-disable-the-ssl-3-0-and-tls-1-0-in-nodejs
+    - https://nodejs.org/api/https.html#https_https_createserver_options_requestlistener
+    subcategory:
+    - vuln
+    technology:
+    - node.js
+    vulnerability: Insecure Transport
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/problem-based-packs.insecure-transport.js-node.disallow-old-tls-versions1.disallow-old-tls-versions1
+    shortlink: https://sg.run/ydpP
+    semgrep.dev:
+      rule:
+        r_id: 9424
+        rv_id: 946068
+        rule_id: eqU8nr
+        version_id: 5PT9Ojl
+        url: https://semgrep.dev/playground/r/5PT9Ojl/problem-based-packs.insecure-transport.js-node.disallow-old-tls-versions1.disallow-old-tls-versions1
+        origin: community
+  languages:
+  - javascript
+  - typescript
+  patterns:
+  - pattern-either:
+    - pattern-inside: |
+        $CONST = require('crypto');
+        ...
+    - pattern-inside: |
+        $CONST = require('constants');
+        ...
+  - pattern-inside: |
+      $HTTPS = require('https');
+      ...
+  - pattern: |
+      $HTTPS.createServer(...).$FUNC(...);
+  - pattern-not: |
+      $HTTPS.createServer({secureOptions: $CONST.SSL_OP_NO_TLSv1 | $CONST.SSL_OP_NO_SSLv3 | $CONST.SSL_OP_NO_SSLv2 }, ...).$FUNC(...);
+  - pattern-not: |
+      $HTTPS.createServer({secureOptions: $CONST.SSL_OP_NO_TLSv1 | $CONST.SSL_OP_NO_SSLv2 |$CONST.SSL_OP_NO_SSLv3 }, ...).$FUNC(...);
+  - pattern-not: |
+      $HTTPS.createServer({secureOptions: $CONST.SSL_OP_NO_SSLv2 |$CONST.SSL_OP_NO_SSLv3 |$CONST.SSL_OP_NO_TLSv1 }, ...).$FUNC(...);
+  - pattern-not: |
+      $HTTPS.createServer({secureOptions: $CONST.SSL_OP_NO_SSLv2 |$CONST.SSL_OP_NO_TLSv1 | $CONST.SSL_OP_NO_SSLv3}, ...).$FUNC(...);
+  - pattern-not: |
+      $HTTPS.createServer({secureOptions:$CONST.SSL_OP_NO_SSLv3 | $CONST.SSL_OP_NO_SSLv2 |$CONST.SSL_OP_NO_TLSv1}, ...).$FUNC(...);
+  - pattern-not: |
+      $HTTPS.createServer({secureOptions:$CONST.SSL_OP_NO_SSLv3 | $CONST.SSL_OP_NO_TLSv1| $CONST.SSL_OP_NO_SSLv2}, ...).$FUNC(...);
+- id: problem-based-packs.insecure-transport.js-node.rest-http-client-support.rest-http-client-support
+  message: Checks for requests to http (unencrypted) sites using some of node js's
+    most popular REST/HTTP libraries, including node-rest-client, axios, and got.
+  severity: WARNING
+  metadata:
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    category: security
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    owasp: A03:2017 - Sensitive Data Exposure
+    references:
+    - https://www.npmjs.com/package/axios
+    - https://www.npmjs.com/package/got
+    - https://www.npmjs.com/package/node-rest-client
+    subcategory:
+    - vuln
+    technology:
+    - node.js
+    vulnerability: Insecure Transport
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/problem-based-packs.insecure-transport.js-node.rest-http-client-support.rest-http-client-support
+    shortlink: https://sg.run/kXGP
+    semgrep.dev:
+      rule:
+        r_id: 9428
+        rv_id: 946072
+        rule_id: nJUzKP
+        version_id: BjT1N5l
+        url: https://semgrep.dev/playground/r/BjT1N5l/problem-based-packs.insecure-transport.js-node.rest-http-client-support.rest-http-client-support
+        origin: community
+  languages:
+  - javascript
+  patterns:
+  - pattern-either:
+    - pattern-inside: |
+        $CLIENT = require('node-rest-client').Client;
+        ...
+        $C = new $CLIENT();
+        ...
+    - pattern-inside: |
+        $C = require('axios');
+        ...
+    - pattern-inside: |
+        $C = require('got');
+        ...
+  - pattern-either:
+    - pattern: |
+        $C.$REQ("=~/http://.*/", ...)
+    - pattern: |
+        $C("=~/http://.*/", ...)
+    - pattern: |
+        $C({...,url: "=~/http://.*/"})
+    - pattern: |
+        $C.$REQ({...,url: "=~/http://.*/"})
+- id: problem-based-packs.insecure-transport.js-node.ftp-request.ftp-request
+  message: 'Checks for lack of usage of the "secure: true" option when sending ftp
+    requests through the nodejs ftp module. This leads to unencrypted traffic being
+    sent to the ftp server. There are other options such as "implicit" that still
+    does not encrypt all traffic. ftp is the most utilized npm ftp module.'
+  severity: WARNING
+  metadata:
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    category: security
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    owasp: A03:2017 - Sensitive Data Exposure
+    references:
+    - https://www.npmjs.com/package/ftp
+    - https://openbase.io/js/ftp
+    subcategory:
+    - vuln
+    technology:
+    - node.js
+    vulnerability: Insecure Transport
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/problem-based-packs.insecure-transport.js-node.ftp-request.ftp-request
+    shortlink: https://sg.run/b7QW
+    semgrep.dev:
+      rule:
+        r_id: 9426
+        rv_id: 946070
+        rule_id: d8UjZ6
+        version_id: RGTAg7Z
+        url: https://semgrep.dev/playground/r/RGTAg7Z/problem-based-packs.insecure-transport.js-node.ftp-request.ftp-request
+        origin: community
+  languages:
+  - javascript
+  - typescript
+  patterns:
+  - pattern-inside: |
+      $X = require('ftp');
+      ...
+      $C = new $X();
+      ...
+  - pattern-not-inside: |
+      $OPTIONS = {secure: true};
+      ...
+  - pattern: |
+      $C.connect($OPTIONS,...);
+  - pattern-not: |
+      $C.connect({...,secure: true});
+- id: problem-based-packs.insecure-transport.js-node.using-http-server.using-http-server
+  message: Checks for any usage of http servers instead of https servers. Encourages
+    the usage of https protocol instead of http, which does not have TLS and is therefore
+    unencrypted. Using http can lead to man-in-the-middle attacks in which the attacker
+    is able to read sensitive information.
+  severity: WARNING
+  metadata:
+    likelihood: LOW
+    impact: MEDIUM
+    confidence: LOW
+    category: security
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    owasp:
+    - A02:2021 - Cryptographic Failures
+    - A03:2017 - Sensitive Data Exposure
+    - A04:2025 - Cryptographic Failures
+    references:
+    - https://nodejs.org/api/http.html#http_class_http_agent
+    - https://groups.google.com/g/rubyonrails-security/c/NCCsca7TEtY
+    subcategory:
+    - audit
+    technology:
+    - node.js
+    vulnerability: Insecure Transport
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/problem-based-packs.insecure-transport.js-node.using-http-server.using-http-server
+    shortlink: https://sg.run/x1zL
+    semgrep.dev:
+      rule:
+        r_id: 9430
+        rv_id: 1263329
+        rule_id: 7KUQAE
+        version_id: 9lT4bNd
+        url: https://semgrep.dev/playground/r/9lT4bNd/problem-based-packs.insecure-transport.js-node.using-http-server.using-http-server
+        origin: community
+  languages:
+  - javascript
+  patterns:
+  - pattern-inside: |
+      $HTTP = require('http');
+      ...
+  - pattern-either:
+    - pattern: |
+        $HTTP.$FUNC(...);
+    - pattern: |
+        new $HTTP.$FUNC2(...);
+  - pattern: $HTTP
+- id: problem-based-packs.insecure-transport.go-stdlib.telnet-request.telnet-request
+  message: Checks for attempts to connect to an insecure telnet server using the package
+    telnet. This is bad because it can lead to man in the middle attacks.
+  severity: WARNING
+  metadata:
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    category: security
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    owasp: A03:2017 - Sensitive Data Exposure
+    references:
+    - https://godoc.org/github.com/reiver/go-telnet
+    subcategory:
+    - vuln
+    technology:
+    - go-telnet
+    vulnerability: Insecure Transport
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/problem-based-packs.insecure-transport.go-stdlib.telnet-request.telnet-request
+    shortlink: https://sg.run/Do4P
+    semgrep.dev:
+      rule:
+        r_id: 9408
+        rv_id: 946051
+        rule_id: oqUewD
+        version_id: 3ZTOPnj
+        url: https://semgrep.dev/playground/r/3ZTOPnj/problem-based-packs.insecure-transport.go-stdlib.telnet-request.telnet-request
+        origin: community
+  languages:
+  - go
+  pattern: |
+    telnet.DialToAndCall(...)
+- id: problem-based-packs.insecure-transport.go-stdlib.grequests-http-request.grequests-http-request
+  message: Checks for requests to http (unencrypted) sites using grequests, a popular
+    HTTP client library. This is dangerous because it could result in plaintext PII
+    being passed around the network.
+  severity: WARNING
+  metadata:
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    category: security
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    owasp: A03:2017 - Sensitive Data Exposure
+    references:
+    - https://godoc.org/github.com/levigross/grequests#DoRegularRequest
+    - https://github.com/levigross/grequests
+    subcategory:
+    - vuln
+    technology:
+    - grequests
+    vulnerability: Insecure Transport
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/problem-based-packs.insecure-transport.go-stdlib.grequests-http-request.grequests-http-request
+    shortlink: https://sg.run/Ge5q
+    semgrep.dev:
+      rule:
+        r_id: 9404
+        rv_id: 946047
+        rule_id: qNUjy3
+        version_id: LjTXyO2
+        url: https://semgrep.dev/playground/r/LjTXyO2/problem-based-packs.insecure-transport.go-stdlib.grequests-http-request.grequests-http-request
+        origin: community
+  languages:
+  - go
+  patterns:
+  - pattern-either:
+    - pattern: |
+        grequests.$FUNC(...,"=~/[hH][tT][tT][pP]://.*/", ...)
+    - pattern: |
+        $FUNC(...,"=~/[hH][tT][tT][pP]://.*/", ...)
+  - metavariable-regex:
+      metavariable: $FUNC
+      regex: (Get|Head|Post|Put|Delete|Patch|Options|Req|DoRegularRequest)
+- id: problem-based-packs.insecure-transport.go-stdlib.bypass-tls-verification.bypass-tls-verification
+  message: Checks for disabling of TLS/SSL certificate verification. This should only
+    be used for debugging purposes because it leads to vulnerability to MTM attacks.
+  severity: WARNING
+  metadata:
+    likelihood: HIGH
+    impact: MEDIUM
+    confidence: MEDIUM
+    category: security
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    owasp: A03:2017 - Sensitive Data Exposure
+    references:
+    - https://stackoverflow.com/questions/12122159/how-to-do-a-https-request-with-bad-certificate
+    subcategory:
+    - vuln
+    technology:
+    - go
+    vulnerability: Insecure Transport
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/problem-based-packs.insecure-transport.go-stdlib.bypass-tls-verification.bypass-tls-verification
+    shortlink: https://sg.run/4xj5
+    semgrep.dev:
+      rule:
+        r_id: 9400
+        rv_id: 946043
+        rule_id: DbUpjg
+        version_id: ZRT358j
+        url: https://semgrep.dev/playground/r/ZRT358j/problem-based-packs.insecure-transport.go-stdlib.bypass-tls-verification.bypass-tls-verification
+        origin: community
+  languages:
+  - go
+  pattern-either:
+  - pattern: |
+      tls.Config{..., InsecureSkipVerify: true, ...}
+  - pattern: |
+      $CONFIG = &tls.Config{...}
+      ...
+      $CONFIG.InsecureSkipVerify = true
+- id: problem-based-packs.insecure-transport.go-stdlib.http-request.http-request
+  message: Checks for requests sent via http.$FUNC to http:// URLS. This is dangerous
+    because the server is attempting to connect to a website that does not encrypt
+    traffic with TLS. Instead, send requests only to https:// URLS.
+  severity: WARNING
+  metadata:
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    category: security
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    owasp: A03:2017 - Sensitive Data Exposure
+    references:
+    - https://golang.org/pkg/net/http/#Get
+    subcategory:
+    - vuln
+    technology:
+    - go
+    vulnerability: Insecure Transport
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/problem-based-packs.insecure-transport.go-stdlib.http-request.http-request
+    shortlink: https://sg.run/Avd2
+    semgrep.dev:
+      rule:
+        r_id: 9406
+        rv_id: 946049
+        rule_id: YGUR70
+        version_id: gETe1jW
+        url: https://semgrep.dev/playground/r/gETe1jW/problem-based-packs.insecure-transport.go-stdlib.http-request.http-request
+        origin: community
+  languages:
+  - go
+  fix-regex:
+    regex: '[Hh][Tt][Tt][Pp]://'
+    replacement: https://
+    count: 1
+  patterns:
+  - pattern-either:
+    - pattern: |
+        http.$FUNC("=~/[hH][tT][tT][pP]://.*/", ...)
+    - patterns:
+      - pattern-inside: |
+          $CLIENT := &http.Client{...}
+          ...
+      - pattern: |
+          client.$FUNC("=~/[hH][tT][tT][pP]://.*/", ...)
+  - pattern-not: http.$FUNC("=~/[hH][tT][tT][pP]://127.0.0.1.*/", ...)
+  - pattern-not: client.$FUNC("=~/[hH][tT][tT][pP]://127.0.0.1.*/", ...)
+  - pattern-not: http.$FUNC("=~/[hH][tT][tT][pP]://localhost.*/", ...)
+  - pattern-not: client.$FUNC("=~/[hH][tT][tT][pP]://localhost.*/", ...)
+  - metavariable-regex:
+      metavariable: $FUNC
+      regex: (Get|Post|Head|PostForm)
+- id: problem-based-packs.insecure-transport.go-stdlib.gorequest-http-request.gorequest-http-request
+  message: Checks for requests to http (unencrypted) sites using gorequest, a popular
+    HTTP client library. This is dangerous because it could result in plaintext PII
+    being passed around the network.
+  severity: WARNING
+  metadata:
+    likelihood: HIGH
+    impact: MEDIUM
+    confidence: MEDIUM
+    category: security
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    owasp: A03:2017 - Sensitive Data Exposure
+    references:
+    - https://github.com/parnurzeal/gorequest
+    subcategory:
+    - vuln
+    technology:
+    - gorequest
+    vulnerability: Insecure Transport
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/problem-based-packs.insecure-transport.go-stdlib.gorequest-http-request.gorequest-http-request
+    shortlink: https://sg.run/5Q10
+    semgrep.dev:
+      rule:
+        r_id: 9403
+        rv_id: 946046
+        rule_id: KxUbXx
+        version_id: 7ZTrQdD
+        url: https://semgrep.dev/playground/r/7ZTrQdD/problem-based-packs.insecure-transport.go-stdlib.gorequest-http-request.gorequest-http-request
+        origin: community
+  languages:
+  - go
+  pattern-either:
+  - patterns:
+    - pattern-inside: |
+        $REQ = gorequest.New()
+        ...
+        $RES = ...
+    - pattern: |
+        $REQ.$FUNC("=~/[hH][tT][tT][pP]://.*/")
+    - metavariable-regex:
+        metavariable: $FUNC
+        regex: (Get|Post|Delete|Head|Put|Patch)
+  - patterns:
+    - pattern: gorequest.New().$FUNC("=~/[hH][tT][tT][pP]://.*/")
+    - metavariable-regex:
+        metavariable: $FUNC
+        regex: (Get|Post|Delete|Head|Put|Patch)
+- id: problem-based-packs.insecure-transport.go-stdlib.http-customized-request.http-customized-request
+  message: Checks for requests sent via http.NewRequest to http:// URLS. This is dangerous
+    because the server is attempting to connect to a website that does not encrypt
+    traffic with TLS. Instead, send requests only to https:// URLS.
+  severity: WARNING
+  metadata:
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    category: security
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    owasp: A03:2017 - Sensitive Data Exposure
+    references:
+    - https://golang.org/pkg/net/http/#NewRequest
+    subcategory:
+    - vuln
+    technology:
+    - go
+    vulnerability: Insecure Transport
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/problem-based-packs.insecure-transport.go-stdlib.http-customized-request.http-customized-request
+    shortlink: https://sg.run/RoYq
+    semgrep.dev:
+      rule:
+        r_id: 9405
+        rv_id: 946048
+        rule_id: lBU90n
+        version_id: 8KTKjXj
+        url: https://semgrep.dev/playground/r/8KTKjXj/problem-based-packs.insecure-transport.go-stdlib.http-customized-request.http-customized-request
+        origin: community
+  languages:
+  - go
+  fix-regex:
+    regex: '[Hh][Tt][Tt][Pp]://'
+    replacement: https://
+    count: 1
+  pattern: |
+    http.NewRequest(..., "=~/[hH][tT][tT][pP]://.*/", ...)
+- id: problem-based-packs.insecure-transport.go-stdlib.sling-http-request.sling-http-request
+  message: Checks for requests to http (unencrypted) sites using gorequest, a popular
+    HTTP client library. This is dangerous because it could result in plaintext PII
+    being passed around the network.
+  severity: WARNING
+  metadata:
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    category: security
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    owasp: A03:2017 - Sensitive Data Exposure
+    references:
+    - https://godoc.org/github.com/dghubble/sling#Sling.Add
+    - https://github.com/dghubble/sling
+    subcategory:
+    - vuln
+    technology:
+    - sling
+    vulnerability: Insecure Transport
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/problem-based-packs.insecure-transport.go-stdlib.sling-http-request.sling-http-request
+    shortlink: https://sg.run/BkZA
+    semgrep.dev:
+      rule:
+        r_id: 9407
+        rv_id: 946050
+        rule_id: 6JUjoX
+        version_id: QkTZzDp
+        url: https://semgrep.dev/playground/r/QkTZzDp/problem-based-packs.insecure-transport.go-stdlib.sling-http-request.sling-http-request
+        origin: community
+  languages:
+  - go
+  pattern-either:
+  - patterns:
+    - pattern-inside: |
+        $REQ = sling.New()
+        ...
+        $RES = ...
+    - pattern: |
+        $REQ.$FUNC("=~/[hH][tT][tT][pP]://.*/")
+    - metavariable-regex:
+        metavariable: $FUNC
+        regex: (Get|Post|Delete|Head|Put|Options|Patch|Base|Connect)
+  - patterns:
+    - pattern: sling.New().$FUNC("=~/[hH][tT][tT][pP]://.*/")
+    - metavariable-regex:
+        metavariable: $FUNC
+        regex: (Get|Post|Delete|Head|Put|Options|Patch|Base|Connect)
+  - patterns:
+    - pattern-inside: |
+        $REQ = sling.New()
+        ...
+        $URL = "=~/[hH][tT][tT][pP]://.*/"
+        ...
+        $RES = ...
+    - pattern: |
+        $REQ.$FUNC($URL)
+    - metavariable-regex:
+        metavariable: $FUNC
+        regex: (Get|Post|Delete|Head|Put|Options|Patch|Base|Connect)
+  - patterns:
+    - pattern-inside: |
+        $URL = "=~/[hH][tT][tT][pP]://.*/"
+        ...
+        $RES = ...
+    - pattern: |
+        sling.New().$FUNC($URL)
+    - metavariable-regex:
+        metavariable: $FUNC
+        regex: (Get|Post|Delete|Head|Put|Options|Patch|Base|Connect)
+- id: problem-based-packs.insecure-transport.go-stdlib.disallow-old-tls-versions.disallow-old-tls-versions
+  message: Detects creations of tls configuration objects with an insecure MinVersion
+    of TLS. These protocols are deprecated due to POODLE, man in the middle attacks,
+    and other vulnerabilities.
+  severity: WARNING
+  metadata:
+    likelihood: HIGH
+    impact: MEDIUM
+    confidence: HIGH
+    category: security
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    owasp: A03:2017 - Sensitive Data Exposure
+    references:
+    - https://stackoverflow.com/questions/26429751/java-http-clients-and-poodle
+    subcategory:
+    - vuln
+    technology:
+    - go
+    vulnerability: Insecure Transport
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/problem-based-packs.insecure-transport.go-stdlib.disallow-old-tls-versions.disallow-old-tls-versions
+    shortlink: https://sg.run/PJqz
+    semgrep.dev:
+      rule:
+        r_id: 9401
+        rv_id: 946044
+        rule_id: WAUow9
+        version_id: nWTpzjW
+        url: https://semgrep.dev/playground/r/nWTpzjW/problem-based-packs.insecure-transport.go-stdlib.disallow-old-tls-versions.disallow-old-tls-versions
+        origin: community
+  languages:
+  - go
+  patterns:
+  - pattern-either:
+    - pattern: |
+        tls.Config{..., MinVersion: $TLS.$VERSION, ...}
+    - pattern: |
+        $CONFIG = &tls.Config{...}
+        ...
+        $CONFIG.MinVersion = $TLS.$VERSION
+  - metavariable-regex:
+      metavariable: $VERSION
+      regex: (VersionTLS10|VersionTLS11|VersionSSL30)
+- id: problem-based-packs.insecure-transport.go-stdlib.ftp-request.ftp-request
+  message: Checks for outgoing connections to ftp servers with the ftp package. FTP
+    does not encrypt traffic, possibly leading to PII being sent plaintext over the
+    network. Instead, connect via the SFTP protocol.
+  severity: WARNING
+  metadata:
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    category: security
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    owasp: A03:2017 - Sensitive Data Exposure
+    references:
+    - https://godoc.org/github.com/jlaffaye/ftp#Dial
+    - https://github.com/jlaffaye/ftp
+    subcategory:
+    - vuln
+    technology:
+    - ftp
+    vulnerability: Insecure Transport
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/problem-based-packs.insecure-transport.go-stdlib.ftp-request.ftp-request
+    shortlink: https://sg.run/J9Ay
+    semgrep.dev:
+      rule:
+        r_id: 9402
+        rv_id: 946045
+        rule_id: 0oU5XN
+        version_id: ExTg2Oj
+        url: https://semgrep.dev/playground/r/ExTg2Oj/problem-based-packs.insecure-transport.go-stdlib.ftp-request.ftp-request
+        origin: community
+  languages:
+  - go
+  fix-regex:
+    regex: '[fF][tT][pP]://'
+    replacement: sftp://
+    count: 1
+  pattern-either:
+  - pattern: |
+      ftp.Dial("=~/^[fF][tT][pP]://.*/", ...)
+  - pattern: |
+      ftp.DialTimeout("=~/^[fF][tT][pP]://.*/", ...)
+  - pattern: |
+      ftp.Connect("=~/^[fF][tT][pP]://.*/")
+  - pattern: |
+      $URL = "=~/^[fF][tT][pP]://.*/"
+      ...
+      ftp.Dial($URL, ...)
+  - pattern: |
+      $URL = "=~/^[fF][tT][pP]://.*/"
+      ...
+      ftp.DialTimeout($URL, ...)
+  - pattern: |
+      $URL = "=~/^[fF][tT][pP]://.*/"
+      ...
+      ftp.Connect($URL)
+- id: problem-based-packs.insecure-transport.java-spring.bypass-tls-verification.bypass-tls-verification
+  message: Checks for redefinitions of functions that check TLS/SSL certificate verification.
+    This can lead to vulnerabilities, as simple errors in the code can result in lack
+    of proper certificate validation. This should only be used for debugging purposes
+    because it leads to vulnerability to MTM attacks.
+  severity: WARNING
+  metadata:
+    likelihood: HIGH
+    impact: MEDIUM
+    confidence: MEDIUM
+    category: security
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    owasp: A03:2017 - Sensitive Data Exposure
+    references:
+    - https://stackoverflow.com/questions/4072585/disabling-ssl-certificate-validation-in-spring-resttemplate
+    - https://stackoverflow.com/questions/35530558/how-to-fix-unsafe-implementation-of-x509trustmanager-in-android-app?rq=1
+    subcategory:
+    - vuln
+    technology:
+    - spring
+    vulnerability: Insecure Transport
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/problem-based-packs.insecure-transport.java-spring.bypass-tls-verification.bypass-tls-verification
+    shortlink: https://sg.run/W822
+    semgrep.dev:
+      rule:
+        r_id: 9409
+        rv_id: 946052
+        rule_id: zdUkZZ
+        version_id: 44TZkpg
+        url: https://semgrep.dev/playground/r/44TZkpg/problem-based-packs.insecure-transport.java-spring.bypass-tls-verification.bypass-tls-verification
+        origin: community
+  languages:
+  - java
+  pattern-either:
+  - pattern: |
+      new HostnameVerifier() {
+        ...
+        public boolean verify(String hostname, SSLSession session) {
+          ...
+        }
+        ...
+      };
+  - pattern: |
+      public RestTemplate restTemplate() throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
+        ...
+        TrustStrategy $FUNCNAME = (X509Certificate[] chain, String authType) -> ...;
+        ...
+      }
+  - pattern: |
+      TrustStrategy $FUNCNAME= new TrustStrategy() {
+        ...
+        public boolean isTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
+          ...
+        }
+        ...
+      };
+- id: problem-based-packs.insecure-transport.java-spring.spring-http-request.spring-http-request
+  message: Checks for requests sent via Java Spring RestTemplate API to http:// URLS.
+    This is dangerous because the server is attempting to connect to a website that
+    does not encrypt traffic with TLS. Instead, send requests only to https:// URLS.
+  severity: WARNING
+  metadata:
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    category: security
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    owasp: A03:2017 - Sensitive Data Exposure
+    references:
+    - https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/web/client/RestTemplate.html#delete-java.lang.String-java.util.Map-
+    - https://www.baeldung.com/rest-template
+    subcategory:
+    - vuln
+    technology:
+    - spring
+    vulnerability: Insecure Transport
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/problem-based-packs.insecure-transport.java-spring.spring-http-request.spring-http-request
+    shortlink: https://sg.run/KlB5
+    semgrep.dev:
+      rule:
+        r_id: 9411
+        rv_id: 946054
+        rule_id: 2ZUbjg
+        version_id: JdTDybo
+        url: https://semgrep.dev/playground/r/JdTDybo/problem-based-packs.insecure-transport.java-spring.spring-http-request.spring-http-request
+        origin: community
+  languages:
+  - java
+  fix-regex:
+    regex: '[Hh][Tt][Tt][Pp]://'
+    replacement: https://
+    count: 1
+  patterns:
+  - pattern-either:
+    - pattern: |
+        $RESTTEMP = new RestTemplate(...);
+        ...
+        $RESTTEMP.$FUNC("=~/[hH][tT][tT][pP]://.*/", ...);
+    - pattern: |
+        $RESTTEMP = new RestTemplate(...);
+        ...
+        String $URL = "=~/[hH][tT][tT][pP]://.*/";
+        ...
+        $RESTTEMP.$FUNC($URL, ...);
+    - pattern: |
+        $RESTTEMP = new RestTemplate(...);
+        ...
+        $URL = new URI(..., "=~/[hH][tT][tT][pP]://.*/", ...);
+        ...
+        $RESTTEMP.$FUNC($URL, ...);
+  - metavariable-regex:
+      metavariable: $FUNC
+      regex: (delete|doExecute|exchange|getForEntity|getForObject|headForHeaders|optionsForAllow|patchForObject|postForEntity|postForLocation|postForObject|put)
+- id: problem-based-packs.insecure-transport.java-spring.spring-ftp-request.spring-ftp-request
+  message: Checks for outgoing connections to ftp servers via Spring plugin ftpSessionFactory.
+    FTP does not encrypt traffic, possibly leading to PII being sent plaintext over
+    the network.
+  severity: WARNING
+  metadata:
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    category: security
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    owasp: A03:2017 - Sensitive Data Exposure
+    references:
+    - https://docs.spring.io/spring-integration/api/org/springframework/integration/ftp/session/AbstractFtpSessionFactory.html#setClientMode-int-
+    subcategory:
+    - vuln
+    technology:
+    - spring
+    vulnerability: Insecure Transport
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/problem-based-packs.insecure-transport.java-spring.spring-ftp-request.spring-ftp-request
+    shortlink: https://sg.run/0Qzj
+    semgrep.dev:
+      rule:
+        r_id: 9410
+        rv_id: 946053
+        rule_id: pKUOYW
+        version_id: PkTQZvx
+        url: https://semgrep.dev/playground/r/PkTQZvx/problem-based-packs.insecure-transport.java-spring.spring-ftp-request.spring-ftp-request
+        origin: community
+  languages:
+  - java
+  fix-regex:
+    regex: '[fF][tT][pP]://'
+    replacement: sftp://
+    count: 1
+  pattern-either:
+  - pattern: |
+      $SF = new DefaultFtpSessionFactory(...);
+      ...
+      $SF.setHost("=~/^[fF][tT][pP]://.*/");
+      ...
+      $SF.$FUNC(...);
+  - pattern: |
+      $SF = new DefaultFtpSessionFactory(...);
+      ...
+      String $URL = "=~/^[fF][tT][pP]://.*/";
+      ...
+      $SF.setHost($URL);
+      ...
+      $SF.$FUNC(...);
+- id: problem-based-packs.insecure-transport.java-stdlib.http-components-request.http-components-request
+  message: Checks for requests sent via Apache HTTP Components to http:// URLS. This
+    is dangerous because the server is attempting to connect to a website that does
+    not encrypt traffic with TLS. Instead, send requests only to https:// URLS.
+  severity: WARNING
+  metadata:
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    category: security
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    owasp: A03:2017 - Sensitive Data Exposure
+    references:
+    - https://hc.apache.org/httpcomponents-client-ga/quickstart.html
+    subcategory:
+    - vuln
+    technology:
+    - java
+    vulnerability: Insecure Transport
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/problem-based-packs.insecure-transport.java-stdlib.http-components-request.http-components-request
+    shortlink: https://sg.run/oxD0
+    semgrep.dev:
+      rule:
+        r_id: 9416
+        rv_id: 946059
+        rule_id: yyUnjk
+        version_id: BjT1N5b
+        url: https://semgrep.dev/playground/r/BjT1N5b/problem-based-packs.insecure-transport.java-stdlib.http-components-request.http-components-request
+        origin: community
+  languages:
+  - java
+  fix-regex:
+    regex: '[Hh][Tt][Tt][Pp]://'
+    replacement: https://
+    count: 1
+  pattern-either:
+  - pattern: |
+      $HTTPCLIENT = HttpClients.$CREATE(...);
+      ...
+      $HTTPREQ = new $HTTPFUNC("=~/[hH][tT][tT][pP]://.*/");
+      ...
+      $RESPONSE = $HTTPCLIENT.execute($HTTPREQ);
+  - pattern: |
+      $HTTPCLIENT = HttpClients.$CREATE(...);
+      ...
+      $RESPONSE = $HTTPCLIENT.execute(new $HTTPFUNC("=~/[hH][tT][tT][pP]://.*/"));
+- id: problem-based-packs.insecure-transport.java-stdlib.telnet-request.telnet-request
+  message: Checks for attempts to connect through telnet. This is insecure as the
+    telnet protocol supports no encryption, and data passes through unencrypted.
+  severity: WARNING
+  metadata:
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    category: security
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    owasp: A03:2017 - Sensitive Data Exposure
+    references:
+    - https://commons.apache.org/proper/commons-net/javadocs/api-3.6/org/apache/commons/net/telnet/TelnetClient.html
+    subcategory:
+    - vuln
+    technology:
+    - java
+    vulnerability: Insecure Transport
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/problem-based-packs.insecure-transport.java-stdlib.telnet-request.telnet-request
+    shortlink: https://sg.run/XBQB
+    semgrep.dev:
+      rule:
+        r_id: 9420
+        rv_id: 946064
+        rule_id: kxUkXk
+        version_id: qkT4jGK
+        url: https://semgrep.dev/playground/r/qkT4jGK/problem-based-packs.insecure-transport.java-stdlib.telnet-request.telnet-request
+        origin: community
+  languages:
+  - java
+  pattern: |
+    $TELNETCLIENT = new TelnetClient(...);
+    ...
+    $TELNETCLIENT.connect(...);
+- id: problem-based-packs.insecure-transport.java-stdlib.unirest-http-request.unirest-http-request
+  message: Checks for requests sent via Unirest to http:// URLS. This is dangerous
+    because the server is attempting to connect to a website that does not encrypt
+    traffic with TLS. Instead, send requests only to https:// URLS.
+  severity: WARNING
+  metadata:
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    category: security
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    owasp: A03:2017 - Sensitive Data Exposure
+    references:
+    - https://kong.github.io/unirest-java/#requests
+    subcategory:
+    - vuln
+    technology:
+    - unirest
+    vulnerability: Insecure Transport
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/problem-based-packs.insecure-transport.java-stdlib.unirest-http-request.unirest-http-request
+    shortlink: https://sg.run/1Z1G
+    semgrep.dev:
+      rule:
+        r_id: 9422
+        rv_id: 946066
+        rule_id: x8Uno2
+        version_id: YDTvR5x
+        url: https://semgrep.dev/playground/r/YDTvR5x/problem-based-packs.insecure-transport.java-stdlib.unirest-http-request.unirest-http-request
+        origin: community
+  languages:
+  - java
+  fix-regex:
+    regex: '[Hh][Tt][Tt][Pp]://'
+    replacement: https://
+    count: 1
+  pattern-either:
+  - pattern: |
+      Unirest.get("=~/[hH][tT][tT][pP]://.*/")
+  - pattern: |
+      Unirest.post("=~/[hH][tT][tT][pP]://.*/")
+- id: problem-based-packs.insecure-transport.java-stdlib.socket-request.socket-request
+  message: Insecure transport rules to catch socket connections to http, telnet, and
+    ftp servers. This is dangerous because these are protocols that do not encrypt
+    traffic.
+  severity: WARNING
+  metadata:
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: LOW
+    category: security
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    owasp: A03:2017 - Sensitive Data Exposure
+    references:
+    - https://docs.oracle.com/javase/8/docs/api/java/net/Socket.html
+    subcategory:
+    - audit
+    technology:
+    - java
+    vulnerability: Insecure Transport
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/problem-based-packs.insecure-transport.java-stdlib.socket-request.socket-request
+    shortlink: https://sg.run/2x9L
+    semgrep.dev:
+      rule:
+        r_id: 9419
+        rv_id: 946063
+        rule_id: NbUkl9
+        version_id: K3TJbeQ
+        url: https://semgrep.dev/playground/r/K3TJbeQ/problem-based-packs.insecure-transport.java-stdlib.socket-request.socket-request
+        origin: community
+  languages:
+  - java
+  pattern-either:
+  - pattern: |
+      $SOCKET = new Socket("=~/[tT][eE][lL][nN][eE][tT]://.*/", ...);
+      ...
+      $OUT = new PrintWriter($SOCKET.getOutputStream(...), ...);
+      ...
+      $OUT.$FUNC(...);
+  - pattern: |
+      $SOCKET = new Socket("=~/^[fF][tT][pP]://.*/", ...);
+      ...
+      $OUT = new PrintWriter($SOCKET.getOutputStream(...), ...);
+      ...
+      $OUT.$FUNC(...);
+  - pattern: |
+      $SOCKET = new Socket("=~/[hH][tT][tT][pP]://.*/", ...);
+      ...
+      $OUT = new PrintWriter($SOCKET.getOutputStream(...), ...);
+      ...
+      $OUT.$FUNC(...);
+- id: problem-based-packs.insecure-transport.java-stdlib.bypass-tls-verification.bypass-tls-verification
+  message: Checks for redefinitions of the checkServerTrusted function in the X509TrustManager
+    class that disables TLS/SSL certificate verification. This should only be used
+    for debugging purposes because it leads to vulnerability to MTM attacks.
+  severity: WARNING
+  metadata:
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    category: security
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    owasp: A03:2017 - Sensitive Data Exposure
+    references:
+    - https://riptutorial.com/java/example/16517/temporarily-disable-ssl-verification--for-testing-purposes-
+    - https://stackoverflow.com/questions/35530558/how-to-fix-unsafe-implementation-of-x509trustmanager-in-android-app?rq=1
+    subcategory:
+    - vuln
+    technology:
+    - java
+    vulnerability: Insecure Transport
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/problem-based-packs.insecure-transport.java-stdlib.bypass-tls-verification.bypass-tls-verification
+    shortlink: https://sg.run/qxD7
+    semgrep.dev:
+      rule:
+        r_id: 9412
+        rv_id: 946055
+        rule_id: X5U8qv
+        version_id: 5PT9Oj9
+        url: https://semgrep.dev/playground/r/5PT9Oj9/problem-based-packs.insecure-transport.java-stdlib.bypass-tls-verification.bypass-tls-verification
+        origin: community
+  languages:
+  - java
+  patterns:
+  - pattern: |
+      new X509TrustManager() {
+        ...
+        public void checkClientTrusted(X509Certificate[] certs, String authType) {...}
+        ...
+      }
+  - pattern-not: |
+      new X509TrustManager() {
+        ...
+        public void checkServerTrusted(X509Certificate[] certs, String authType) {
+          ...
+          throw new CertificateException(...);
+          ...
+        }
+        ...
+      }
+  - pattern-not: |
+      new X509TrustManager() {
+        ...
+        public void checkServerTrusted(X509Certificate[] certs, String authType) {
+          ...
+          throw new IllegalArgumentException(...);
+          ...
+        }
+        ...
+      }
+- id: problem-based-packs.insecure-transport.java-stdlib.disallow-old-tls-versions2.disallow-old-tls-versions2
+  message: Detects setting client protocols to insecure versions of TLS and SSL. These
+    protocols are deprecated due to POODLE, man in the middle attacks, and other vulnerabilities.
+  severity: WARNING
+  metadata:
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    category: security
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    owasp: A03:2017 - Sensitive Data Exposure
+    references:
+    - https://stackoverflow.com/questions/26504653/is-it-possible-to-disable-sslv3-for-all-java-applications
+    subcategory:
+    - vuln
+    technology:
+    - java
+    vulnerability: Insecure Transport
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/problem-based-packs.insecure-transport.java-stdlib.disallow-old-tls-versions2.disallow-old-tls-versions2
+    shortlink: https://sg.run/Yvjy
+    semgrep.dev:
+      rule:
+        r_id: 9414
+        rv_id: 946057
+        rule_id: 10UKvx
+        version_id: RGTAg7R
+        url: https://semgrep.dev/playground/r/RGTAg7R/problem-based-packs.insecure-transport.java-stdlib.disallow-old-tls-versions2.disallow-old-tls-versions2
+        origin: community
+  languages:
+  - java
+  patterns:
+  - pattern: $VALUE. ... .setProperty("jdk.tls.client.protocols", "$PATTERNS");
+  - metavariable-pattern:
+      metavariable: $PATTERNS
+      language: generic
+      patterns:
+      - pattern-either:
+        - pattern: TLS1
+        - pattern-regex: ^(.*TLSv1|.*SSLv.*)$
+        - pattern-regex: ^(.*TLSv1,.*)
+- id: problem-based-packs.insecure-transport.java-stdlib.disallow-old-tls-versions1.disallow-old-tls-versions1
+  message: Detects direct creations of SSLConnectionSocketFactories that don't disallow
+    SSL v2, SSL v3, and TLS v1. SSLSocketFactory can be used to validate the identity
+    of the HTTPS server against a list of trusted certificates. These protocols are
+    deprecated due to POODLE, man in the middle attacks, and other vulnerabilities.
+  severity: WARNING
+  metadata:
+    likelihood: HIGH
+    impact: MEDIUM
+    confidence: MEDIUM
+    category: security
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    owasp: A03:2017 - Sensitive Data Exposure
+    references:
+    - https://stackoverflow.com/questions/26429751/java-http-clients-and-poodle
+    subcategory:
+    - vuln
+    technology:
+    - java
+    vulnerability: Insecure Transport
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/problem-based-packs.insecure-transport.java-stdlib.disallow-old-tls-versions1.disallow-old-tls-versions1
+    shortlink: https://sg.run/l25E
+    semgrep.dev:
+      rule:
+        r_id: 9413
+        rv_id: 946056
+        rule_id: j2Uv2K
+        version_id: GxTP7y6
+        url: https://semgrep.dev/playground/r/GxTP7y6/problem-based-packs.insecure-transport.java-stdlib.disallow-old-tls-versions1.disallow-old-tls-versions1
+        origin: community
+  languages:
+  - java
+  patterns:
+  - pattern: |
+      new SSLConnectionSocketFactory(...);
+  - pattern-not: |
+      new SSLConnectionSocketFactory(..., new String[] {"TLSv1.2", "TLSv1.3"}, ...);
+  - pattern-not: |
+      new SSLConnectionSocketFactory(..., new String[] {"TLSv1.3", "TLSv1.2"}, ...);
+  - pattern-not: |
+      new SSLConnectionSocketFactory(..., new String[] {"TLSv1.3"}, ...);
+  - pattern-not: |
+      new SSLConnectionSocketFactory(..., new String[] {"TLSv1.2"}, ...);
+  - pattern-not-inside: |
+      (SSLConnectionSocketFactory $SF) = new SSLConnectionSocketFactory(...); ... (TlsConfig $TLSCONFIG) = TlsConfig.custom(). ... .setSupportedProtocols(TLS.V_1_2). ... .build(); ... HttpClientConnectionManager cm = $CM.create(). ... .setSSLSocketFactory($SF). ... .setDefaultTlsConfig($TLSCONFIG). ... .build();
+  - pattern-not-inside: |
+      (SSLConnectionSocketFactory $SF) = new SSLConnectionSocketFactory(...); ... (TlsConfig $TLSCONFIG) = TlsConfig.custom(). ... .setSupportedProtocols(TLS.V_1_3). ... .build(); ... HttpClientConnectionManager cm = $CM.create(). ... .setSSLSocketFactory($SF). ... .setDefaultTlsConfig($TLSCONFIG). ... .build();
+- id: problem-based-packs.insecure-transport.java-stdlib.httpclient-http-request.httpclient-http-request
+  message: Checks for requests sent via HttpClient to http:// URLS. This is dangerous
+    because the server is attempting to connect to a website that does not encrypt
+    traffic with TLS. Instead, send requests only to https:// URLS.
+  severity: WARNING
+  metadata:
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    category: security
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    owasp: A03:2017 - Sensitive Data Exposure
+    references:
+    - https://openjdk.java.net/groups/net/httpclient/intro.html
+    subcategory:
+    - vuln
+    technology:
+    - java
+    vulnerability: Insecure Transport
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/problem-based-packs.insecure-transport.java-stdlib.httpclient-http-request.httpclient-http-request
+    shortlink: https://sg.run/zv2d
+    semgrep.dev:
+      rule:
+        r_id: 9417
+        rv_id: 946060
+        rule_id: r6Ur3y
+        version_id: DkTNpJw
+        url: https://semgrep.dev/playground/r/DkTNpJw/problem-based-packs.insecure-transport.java-stdlib.httpclient-http-request.httpclient-http-request
+        origin: community
+  languages:
+  - java
+  fix-regex:
+    regex: '[Hh][Tt][Tt][Pp]://'
+    replacement: https://
+    count: 1
+  pattern-either:
+  - patterns:
+    - pattern: |
+        URI.create("=~/[hH][tT][tT][pP]://.*/", ...)
+    - pattern-inside: |
+        HttpClient $CLIENT = ...;
+        ...
+        HttpRequest $REQ = ...;
+        ...
+        $CLIENT.sendAsync(...);
+  - patterns:
+    - pattern: |
+        URI.create("=~/[hH][tT][tT][pP]://.*/", ...)
+    - pattern-inside: |
+        HttpClient $CLIENT = ...;
+        ...
+        HttpRequest $REQ = ...;
+        ...
+        $CLIENT.send(...);
+  - patterns:
+    - pattern: |
+        URI.create($URI)
+    - pattern-inside: |
+        String $URI = "=~/[hH][tT][tT][pP]://.*/";
+        ...
+        HttpClient $CLIENT = ...;
+        ...
+        HttpRequest $REQ = ...;
+        ...
+        $CLIENT.send(...);
+  - patterns:
+    - pattern: |
+        URI.create($URI)
+    - pattern-inside: |
+        String $URI = "=~/[hH][tT][tT][pP]://.*/";
+        ...
+        HttpClient $CLIENT = ...;
+        ...
+        HttpRequest $REQ = ...;
+        ...
+        $CLIENT.sendAsync(...);
+- id: problem-based-packs.insecure-transport.java-stdlib.tls-renegotiation.tls-renegotiation
+  message: Checks for cases where java applications are allowing unsafe renegotiation.
+    This leaves the application vulnerable to a man-in-the-middle attack where chosen
+    plain text is injected as prefix to a TLS connection.
+  severity: WARNING
+  metadata:
+    likelihood: LOW
+    impact: MEDIUM
+    confidence: MEDIUM
+    category: security
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    owasp: A03:2017 - Sensitive Data Exposure
+    references:
+    - https://www.oracle.com/java/technologies/javase/tlsreadme.html
+    subcategory:
+    - vuln
+    technology:
+    - java
+    vulnerability: Insecure Transport
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/problem-based-packs.insecure-transport.java-stdlib.tls-renegotiation.tls-renegotiation
+    shortlink: https://sg.run/jR5N
+    semgrep.dev:
+      rule:
+        r_id: 9421
+        rv_id: 946065
+        rule_id: wdUJw8
+        version_id: l4Tx9be
+        url: https://semgrep.dev/playground/r/l4Tx9be/problem-based-packs.insecure-transport.java-stdlib.tls-renegotiation.tls-renegotiation
+        origin: community
+  languages:
+  - java
+  pattern: |
+    java.lang.System.setProperty("sun.security.ssl.allowUnsafeRenegotiation", true);
+- id: problem-based-packs.insecure-transport.java-stdlib.ftp-request.ftp-request
+  message: Checks for outgoing connections to ftp servers. FTP does not encrypt traffic,
+    possibly leading to PII being sent plaintext over the network.
+  severity: WARNING
+  metadata:
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    category: security
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    owasp: A03:2017 - Sensitive Data Exposure
+    references:
+    - https://www.codejava.net/java-se/ftp/connect-and-login-to-a-ftp-server
+    - https://commons.apache.org/proper/commons-net/apidocs/org/apache/commons/net/ftp/FTPClient.html
+    subcategory:
+    - vuln
+    technology:
+    - java
+    vulnerability: Insecure Transport
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/problem-based-packs.insecure-transport.java-stdlib.ftp-request.ftp-request
+    shortlink: https://sg.run/6n91
+    semgrep.dev:
+      rule:
+        r_id: 9415
+        rv_id: 946058
+        rule_id: 9AU1wD
+        version_id: A8TJz8g
+        url: https://semgrep.dev/playground/r/A8TJz8g/problem-based-packs.insecure-transport.java-stdlib.ftp-request.ftp-request
+        origin: community
+  languages:
+  - java
+  fix-regex:
+    regex: '[fF][tT][pP]://'
+    replacement: sftp://
+    count: 1
+  pattern-either:
+  - pattern: |
+      FTPClient $FTPCLIENT = new FTPClient();
+      ...
+      $FTPCLIENT.connect(...);
+  - pattern: |
+      URL $URL = new URL("=~/^[fF][tT][pP]://.*/");
+      ...
+      URLConnection $CONN = $URL.openConnection(...);
+- id: problem-based-packs.insecure-transport.java-stdlib.httpurlconnection-http-request.httpurlconnection-http-request
+  message: Detected an HTTP request sent via HttpURLConnection. This could lead to
+    sensitive information being sent over an insecure channel. Instead, it is recommended
+    to send requests over HTTPS.
+  severity: WARNING
+  metadata:
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    category: security
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    owasp: A03:2017 - Sensitive Data Exposure
+    references:
+    - https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/net/URLConnection.html
+    - https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/net/URL.html#openConnection()
+    subcategory:
+    - vuln
+    technology:
+    - java
+    vulnerability: Insecure Transport
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/problem-based-packs.insecure-transport.java-stdlib.httpurlconnection-http-request.httpurlconnection-http-request
+    shortlink: https://sg.run/px3Z
+    semgrep.dev:
+      rule:
+        r_id: 9418
+        rv_id: 946062
+        rule_id: bwUwvR
+        version_id: 0bT15Bq
+        url: https://semgrep.dev/playground/r/0bT15Bq/problem-based-packs.insecure-transport.java-stdlib.httpurlconnection-http-request.httpurlconnection-http-request
+        origin: community
+  languages:
+  - java
+  fix-regex:
+    regex: '[Hh][Tt][Tt][Pp]://'
+    replacement: https://
+    count: 1
+  patterns:
+  - pattern: |
+      "=~/[Hh][Tt][Tt][Pp]://.*/"
+  - pattern-either:
+    - pattern-inside: |
+        URL $URL = new URL ("=~/[Hh][Tt][Tt][Pp]://.*/", ...);
+        ...
+        $CON = (HttpURLConnection) $URL.openConnection(...);
+        ...
+        $CON.$FUNC(...);
+    - pattern-inside: |
+        URL $URL = new URL ("=~/[Hh][Tt][Tt][Pp]://.*/", ...);
+        ...
+        $CON = $URL.openConnection(...);
+        ...
+        $CON.$FUNC(...);
+- id: python.lang.security.audit.insecure-transport.urllib.insecure-openerdirector-open.insecure-openerdirector-open
+  message: Detected an unsecured transmission channel. 'OpenerDirector.open(...)'
+    is being used with 'http://'. Use 'https://' instead to secure the channel.
+  metadata:
+    owasp:
+    - A03:2017 - Sensitive Data Exposure
+    - A02:2021 - Cryptographic Failures
+    - A04:2025 - Cryptographic Failures
+    cwe:
+    - 'CWE-319: Cleartext Transmission of Sensitive Information'
+    references:
+    - https://docs.python.org/3/library/urllib.request.html#urllib.request.OpenerDirector.open
+    category: security
+    technology:
+    - urllib
+    subcategory:
+    - audit
+    likelihood: LOW
+    impact: LOW
+    confidence: LOW
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/python.lang.security.audit.insecure-transport.urllib.insecure-openerdirector-open.insecure-openerdirector-open
+    shortlink: https://sg.run/qxKz
+    semgrep.dev:
+      rule:
+        r_id: 9656
+        rv_id: 1263489
+        rule_id: pKUO9Q
+        version_id: 7ZTE3ld
+        url: https://semgrep.dev/playground/r/7ZTE3ld/python.lang.security.audit.insecure-transport.urllib.insecure-openerdirector-open.insecure-openerdirector-open
+        origin: community
+  severity: WARNING
+  languages:
+  - python
+  fix-regex:
+    regex: '[Hh][Tt][Tt][Pp]://'
+    replacement: https://
+    count: 1
+  pattern-either:
+  - pattern: urllib.request.OpenerDirector(...).open("=~/[Hh][Tt][Tt][Pp]://.*/",
+      ...)
+  - patterns:
+    - pattern-inside: |
+        $OPENERDIRECTOR = urllib.request.OpenerDirector(...)
+        ...
+    - pattern: $OPENERDIRECTOR.open("=~/[Hh][Tt][Tt][Pp]://.*/", ...)
+  - patterns:
+    - pattern-inside: |
+        $OPENERDIRECTOR = urllib.request.OpenerDirector(...)
+        ...
+    - pattern: |
+        $URL = "=~/[Hh][Tt][Tt][Pp]://.*/"
+        ...
+        $OPENERDIRECTOR.open($URL, ...)
+  - pattern: |
+      $URL = "=~/[Hh][Tt][Tt][Pp]://.*/"
+      ...
+      urllib.request.OpenerDirector(...).open($URL, ...)
+  - patterns:
+    - pattern-inside: |
+        def $FUNC(..., $URL = "=~/[Hh][Tt][Tt][Pp]://.*/", ...):
+          ...
+    - pattern-either:
+      - pattern: urllib.request.OpenerDirector(...).open($URL, ...)
+      - patterns:
+        - pattern-inside: |
+            $OPENERDIRECTOR = urllib.request.OpenerDirector(...)
+            ...
+        - pattern: $OPENERDIRECTOR.open($URL, ...)
+- id: python.lang.security.audit.insecure-transport.urllib.insecure-urlretrieve.insecure-urlretrieve
+  message: Detected 'urllib.urlretrieve()' using 'http://'. This request will not
+    be encrypted. Use 'https://' instead.
+  metadata:
+    owasp:
+    - A03:2017 - Sensitive Data Exposure
+    - A02:2021 - Cryptographic Failures
+    - A04:2025 - Cryptographic Failures
+    cwe:
+    - 'CWE-319: Cleartext Transmission of Sensitive Information'
+    references:
+    - https://docs.python.org/3/library/urllib.request.html#urllib.request.urlretrieve
+    category: security
+    technology:
+    - urllib
+    subcategory:
+    - audit
+    likelihood: LOW
+    impact: LOW
+    confidence: LOW
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/python.lang.security.audit.insecure-transport.urllib.insecure-urlretrieve.insecure-urlretrieve
+    shortlink: https://sg.run/1Zqw
+    semgrep.dev:
+      rule:
+        r_id: 9666
+        rv_id: 1263499
+        rule_id: kxUk4N
+        version_id: GxTkenQ
+        url: https://semgrep.dev/playground/r/GxTkenQ/python.lang.security.audit.insecure-transport.urllib.insecure-urlretrieve.insecure-urlretrieve
+        origin: community
+  severity: WARNING
+  languages:
+  - python
+  fix-regex:
+    regex: '[Hh][Tt][Tt][Pp]://'
+    replacement: https://
+  pattern-either:
+  - pattern: urllib.request.urlretrieve("=~/[Hh][Tt][Tt][Pp]://.*/", ...)
+  - pattern: |
+      $URL = "=~/[Hh][Tt][Tt][Pp]://.*/"
+      ...
+      urllib.request.urlretrieve($URL, ...)
+  - pattern: |
+      def $FUNC(..., $URL = "=~/[Hh][Tt][Tt][Pp]://.*/", ...):
+        ...
+        urllib.request.urlretrieve($URL, ...)
+- id: python.lang.security.audit.insecure-transport.urllib.insecure-urlopener-open.insecure-urlopener-open
+  message: Detected an unsecured transmission channel. 'URLopener.open(...)' is being
+    used with 'http://'. Use 'https://' instead to secure the channel.
+  metadata:
+    owasp:
+    - A03:2017 - Sensitive Data Exposure
+    - A02:2021 - Cryptographic Failures
+    - A04:2025 - Cryptographic Failures
+    cwe:
+    - 'CWE-319: Cleartext Transmission of Sensitive Information'
+    references:
+    - https://docs.python.org/3/library/urllib.request.html#urllib.request.URLopener.open
+    category: security
+    technology:
+    - urllib
+    subcategory:
+    - audit
+    likelihood: LOW
+    impact: LOW
+    confidence: LOW
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/python.lang.security.audit.insecure-transport.urllib.insecure-urlopener-open.insecure-urlopener-open
+    shortlink: https://sg.run/pxWg
+    semgrep.dev:
+      rule:
+        r_id: 9662
+        rv_id: 1263495
+        rule_id: yyUnwW
+        version_id: 44TEjLq
+        url: https://semgrep.dev/playground/r/44TEjLq/python.lang.security.audit.insecure-transport.urllib.insecure-urlopener-open.insecure-urlopener-open
+        origin: community
+  severity: WARNING
+  languages:
+  - python
+  fix-regex:
+    regex: '[Hh][Tt][Tt][Pp]://'
+    replacement: https://
+    count: 1
+  pattern-either:
+  - pattern: urllib.request.URLopener(...).open("=~/[Hh][Tt][Tt][Pp]://.*/", ...)
+  - patterns:
+    - pattern-inside: |
+        $OPENERDIRECTOR = urllib.request.URLopener(...)
+        ...
+    - pattern: $OPENERDIRECTOR.open("=~/[Hh][Tt][Tt][Pp]://.*/", ...)
+  - patterns:
+    - pattern-inside: |
+        $OPENERDIRECTOR = urllib.request.URLopener(...)
+        ...
+    - pattern: |
+        $URL = "=~/[Hh][Tt][Tt][Pp]://.*/"
+        ...
+        $OPENERDIRECTOR.open($URL, ...)
+  - pattern: |
+      $URL = "=~/[Hh][Tt][Tt][Pp]://.*/"
+      ...
+      urllib.request.URLopener(...).open($URL, ...)
+  - patterns:
+    - pattern-inside: |
+        def $FUNC(..., $URL = "=~/[Hh][Tt][Tt][Pp]://.*/", ...):
+          ...
+    - pattern-either:
+      - pattern: urllib.request.URLopener(...).open($URL, ...)
+      - patterns:
+        - pattern-inside: |
+            $OPENERDIRECTOR = urllib.request.URLopener(...)
+            ...
+        - pattern: $OPENERDIRECTOR.open($URL, ...)
+- id: python.lang.security.audit.insecure-transport.urllib.insecure-urlopener-retrieve.insecure-urlopener-retrieve
+  message: Detected an unsecured transmission channel. 'URLopener.retrieve(...)' is
+    being used with 'http://'. Use 'https://' instead to secure the channel.
+  metadata:
+    owasp:
+    - A03:2017 - Sensitive Data Exposure
+    - A02:2021 - Cryptographic Failures
+    - A04:2025 - Cryptographic Failures
+    cwe:
+    - 'CWE-319: Cleartext Transmission of Sensitive Information'
+    references:
+    - https://docs.python.org/3/library/urllib.request.html#urllib.request.URLopener.retrieve
+    category: security
+    technology:
+    - urllib
+    subcategory:
+    - audit
+    likelihood: LOW
+    impact: LOW
+    confidence: LOW
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/python.lang.security.audit.insecure-transport.urllib.insecure-urlopener-retrieve.insecure-urlopener-retrieve
+    shortlink: https://sg.run/XBGK
+    semgrep.dev:
+      rule:
+        r_id: 9664
+        rv_id: 1263497
+        rule_id: bwUw0n
+        version_id: JdTzxBj
+        url: https://semgrep.dev/playground/r/JdTzxBj/python.lang.security.audit.insecure-transport.urllib.insecure-urlopener-retrieve.insecure-urlopener-retrieve
+        origin: community
+  severity: WARNING
+  languages:
+  - python
+  fix-regex:
+    regex: '[Hh][Tt][Tt][Pp]://'
+    replacement: https://
+    count: 1
+  pattern-either:
+  - pattern: urllib.request.URLopener(...).retrieve("=~/[Hh][Tt][Tt][Pp]://.*/", ...)
+  - patterns:
+    - pattern-inside: |
+        $OPENERDIRECTOR = urllib.request.URLopener(...)
+        ...
+    - pattern: $OPENERDIRECTOR.retrieve("=~/[Hh][Tt][Tt][Pp]://.*/", ...)
+  - patterns:
+    - pattern-inside: |
+        $OPENERDIRECTOR = urllib.request.URLopener(...)
+        ...
+    - pattern: |
+        $URL = "=~/[Hh][Tt][Tt][Pp]://.*/"
+        ...
+        $OPENERDIRECTOR.retrieve($URL, ...)
+  - pattern: |
+      $URL = "=~/[Hh][Tt][Tt][Pp]://.*/"
+      ...
+      urllib.request.URLopener(...).retrieve($URL, ...)
+  - patterns:
+    - pattern-inside: |
+        def $FUNC(..., $URL = "=~/[Hh][Tt][Tt][Pp]://.*/", ...):
+          ...
+    - pattern-either:
+      - pattern: urllib.request.URLopener(...).retrieve($URL, ...)
+      - patterns:
+        - pattern-inside: |
+            $OPENERDIRECTOR = urllib.request.URLopener(...)
+            ...
+        - pattern: $OPENERDIRECTOR.retrieve($URL, ...)
+- id: python.lang.security.audit.insecure-transport.ssl.no-set-ciphers.no-set-ciphers
+  pattern: $CONTEXT.set_ciphers(...)
+  message: The 'ssl' module disables insecure cipher suites by default. Therefore,
+    use of 'set_ciphers()' should only be used when you have very specialized requirements.
+    Otherwise, you risk lowering the security of the SSL channel.
+  metadata:
+    owasp:
+    - A03:2017 - Sensitive Data Exposure
+    - A02:2021 - Cryptographic Failures
+    - A04:2025 - Cryptographic Failures
+    cwe:
+    - 'CWE-326: Inadequate Encryption Strength'
+    asvs:
+      section: V9 Communications Verification Requirements
+      control_id: 9.1.3 Weak TLS
+      control_url: https://github.com/OWASP/ASVS/blob/master/4.0/en/0x17-V9-Communications.md#v91-client-communications-security-requirements
+      version: '4'
+    references:
+    - https://docs.python.org/3/library/ssl.html#cipher-selection
+    - https://docs.python.org/3/library/ssl.html#ssl.SSLContext.set_ciphers
+    category: security
+    technology:
+    - ssl
+    subcategory:
+    - audit
+    likelihood: LOW
+    impact: LOW
+    confidence: LOW
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Cryptographic Issues
+    source: https://semgrep.dev/r/python.lang.security.audit.insecure-transport.ssl.no-set-ciphers.no-set-ciphers
+    shortlink: https://sg.run/0Q0v
+    semgrep.dev:
+      rule:
+        r_id: 9654
+        rv_id: 1263487
+        rule_id: oqUeYJ
+        version_id: nWT2Lbb
+        url: https://semgrep.dev/playground/r/nWT2Lbb/python.lang.security.audit.insecure-transport.ssl.no-set-ciphers.no-set-ciphers
+        origin: community
+  languages:
+  - python
+  severity: WARNING
+- id: problem-based-packs.insecure-transport.ruby-stdlib.net-http-request.net-http-request
+  message: Checks for requests sent to http:// URLs. This is dangerous as the server
+    is attempting to connect to a website that does not encrypt traffic with TLS.
+    Instead, only send requests to https:// URLs.
+  severity: WARNING
+  metadata:
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    category: security
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    owasp: A03:2017 - Sensitive Data Exposure
+    references:
+    - https://ruby-doc.org/stdlib-2.6.5/libdoc/net/http/rdoc/Net/
+    subcategory:
+    - vuln
+    technology:
+    - ruby
+    vulnerability: Insecure Transport
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/problem-based-packs.insecure-transport.ruby-stdlib.net-http-request.net-http-request
+    shortlink: https://sg.run/vz6Y
+    semgrep.dev:
+      rule:
+        r_id: 9433
+        rv_id: 946077
+        rule_id: gxU1lE
+        version_id: qkT4jG8
+        url: https://semgrep.dev/playground/r/qkT4jG8/problem-based-packs.insecure-transport.ruby-stdlib.net-http-request.net-http-request
+        origin: community
+  languages:
+  - ruby
+  patterns:
+  - pattern-either:
+    - pattern: |
+        $URI = URI('=~/[hH][tT][tT][pP]://.*/')
+        ...
+        Net::HTTP::$FUNC.new $URI
+    - pattern: |
+        $URI = URI('=~/[hH][tT][tT][pP]://.*/')
+        ...
+        Net::HTTP.$FUNC($URI, ...)
+    - pattern: |
+        Net::HTTP.$FUNC(URI('=~/[hH][tT][tT][pP]://.*/'), ...)
+  - metavariable-regex:
+      metavariable: $FUNC
+      regex: ([gG]et|post_form|[pP]ost|get_response|get_print|Head|Patch|Put|Proppatch|Lock|Unlock|Options|Propfind|Delete|Move|Copy|Trace|Mkcol)
+- id: python.lang.security.audit.insecure-transport.urllib.insecure-openerdirector-open-ftp.insecure-openerdirector-open-ftp
+  message: Detected an unsecured transmission channel. 'OpenerDirector.open(...)'
+    is being used with 'ftp://'. Information sent over this connection will be unencrypted.
+    Consider using SFTP instead. urllib does not support SFTP, so consider a library
+    which supports SFTP.
+  metadata:
+    owasp:
+    - A03:2017 - Sensitive Data Exposure
+    - A02:2021 - Cryptographic Failures
+    - A04:2025 - Cryptographic Failures
+    cwe:
+    - 'CWE-319: Cleartext Transmission of Sensitive Information'
+    references:
+    - https://docs.python.org/3/library/urllib.request.html#urllib.request.OpenerDirector.open
+    category: security
+    technology:
+    - urllib
+    subcategory:
+    - audit
+    likelihood: LOW
+    impact: LOW
+    confidence: LOW
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/python.lang.security.audit.insecure-transport.urllib.insecure-openerdirector-open-ftp.insecure-openerdirector-open-ftp
+    shortlink: https://sg.run/Klj7
+    semgrep.dev:
+      rule:
+        r_id: 9655
+        rv_id: 1263488
+        rule_id: zdUkPQ
+        version_id: ExTExLl
+        url: https://semgrep.dev/playground/r/ExTExLl/python.lang.security.audit.insecure-transport.urllib.insecure-openerdirector-open-ftp.insecure-openerdirector-open-ftp
+        origin: community
+  severity: WARNING
+  languages:
+  - python
+  pattern-either:
+  - pattern: urllib.request.OpenerDirector(...).open("=~/^[Ff][Tt][Pp]://.*/", ...)
+  - patterns:
+    - pattern-inside: |
+        $OPENERDIRECTOR = urllib.request.OpenerDirector(...)
+        ...
+    - pattern: $OPENERDIRECTOR.open("=~/^[Ff][Tt][Pp]://.*/", ...)
+  - patterns:
+    - pattern-inside: |
+        $OPENERDIRECTOR = urllib.request.OpenerDirector(...)
+        ...
+    - pattern: |
+        $URL = "=~/^[Ff][Tt][Pp]://.*/"
+        ...
+        $OPENERDIRECTOR.open($URL, ...)
+  - pattern: |
+      $URL = "=~/^[Ff][Tt][Pp]://.*/"
+      ...
+      urllib.request.OpenerDirector(...).open($URL, ...)
+  - patterns:
+    - pattern-inside: |
+        def $FUNC(..., $URL = "=~/^[Ff][Tt][Pp]://.*/", ...):
+          ...
+    - pattern-either:
+      - pattern: urllib.request.OpenerDirector(...).open($URL, ...)
+      - patterns:
+        - pattern-inside: |
+            $OPENERDIRECTOR = urllib.request.OpenerDirector(...)
+            ...
+        - pattern: $OPENERDIRECTOR.open($URL, ...)
+- id: python.lang.security.audit.insecure-transport.requests.request-session-http-in-with-context.request-session-http-in-with-context
+  options:
+    symbolic_propagation: true
+  mode: taint
+  pattern-sources:
+  - patterns:
+    - pattern: |
+        "$URL"
+    - metavariable-pattern:
+        metavariable: $URL
+        language: regex
+        patterns:
+        - pattern-regex: http://
+        - pattern-not-regex: .*://localhost
+        - pattern-not-regex: .*://127\.0\.0\.1
+  pattern-sinks:
+  - patterns:
+    - pattern-inside: |
+        with requests.Session(...) as $SESSION:
+          ...
+    - pattern-either:
+      - pattern: $SESSION.$W($SINK, ...)
+      - pattern: $SESSION.request($METHOD, $SINK, ...)
+    - focus-metavariable: $SINK
+  fix-regex:
+    regex: '[Hh][Tt][Tt][Pp]://'
+    replacement: https://
+    count: 1
+  message: Detected a request using 'http://'. This request will be unencrypted. Use
+    'https://' instead.
+  metadata:
+    owasp:
+    - A03:2017 - Sensitive Data Exposure
+    - A02:2021 - Cryptographic Failures
+    - A04:2025 - Cryptographic Failures
+    cwe:
+    - 'CWE-319: Cleartext Transmission of Sensitive Information'
+    asvs:
+      section: V9 Communications Verification Requirements
+      control_id: 9.2.1 Weak TLS
+      control_url: https://github.com/OWASP/ASVS/blob/master/4.0/en/0x17-V9-Communications.md#v92-server-communications-security-requirements
+      version: '4'
+    category: security
+    technology:
+    - requests
+    references:
+    - https://owasp.org/Top10/A02_2021-Cryptographic_Failures
+    subcategory:
+    - audit
+    likelihood: LOW
+    impact: LOW
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/python.lang.security.audit.insecure-transport.requests.request-session-http-in-with-context.request-session-http-in-with-context
+    shortlink: https://sg.run/Bk5W
+    semgrep.dev:
+      rule:
+        r_id: 9651
+        rv_id: 1263484
+        rule_id: lBU9BZ
+        version_id: vdT06wb
+        url: https://semgrep.dev/playground/r/vdT06wb/python.lang.security.audit.insecure-transport.requests.request-session-http-in-with-context.request-session-http-in-with-context
+        origin: community
+  languages:
+  - python
+  severity: INFO
+- id: problem-based-packs.insecure-transport.ruby-stdlib.net-telnet-request.net-telnet-request
+  message: Checks for creation of telnet servers or attempts to connect through telnet.
+    This is insecure as the telnet protocol supports no encryption, and data passes
+    through unencrypted.
+  severity: WARNING
+  metadata:
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    category: security
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    owasp: A03:2017 - Sensitive Data Exposure
+    references:
+    - https://docs.ruby-lang.org/en/2.2.0/Net/Telnet.html
+    - https://www.rubydoc.info/gems/net-ssh-telnet2/0.1.0/Net/SSH/Telnet
+    subcategory:
+    - vuln
+    technology:
+    - ruby
+    vulnerability: Insecure Transport
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/problem-based-packs.insecure-transport.ruby-stdlib.net-telnet-request.net-telnet-request
+    shortlink: https://sg.run/dKQE
+    semgrep.dev:
+      rule:
+        r_id: 9434
+        rv_id: 946078
+        rule_id: QrUzo2
+        version_id: l4Tx9bO
+        url: https://semgrep.dev/playground/r/l4Tx9bO/problem-based-packs.insecure-transport.ruby-stdlib.net-telnet-request.net-telnet-request
+        origin: community
+  languages:
+  - ruby
+  pattern-either:
+  - pattern: |
+      Net::Telnet::new(...)
+  - pattern: |
+      Net::SSH::Telnet.new(...)
+- id: python.lang.security.audit.insecure-transport.urllib.insecure-urlretrieve-ftp.insecure-urlretrieve-ftp
+  message: Detected 'urllib.urlretrieve()' using 'ftp://'. This request will not be
+    encrypted. Use SFTP instead. urllib does not support SFTP, so consider switching
+    to a library which supports SFTP.
+  metadata:
+    owasp:
+    - A03:2017 - Sensitive Data Exposure
+    - A02:2021 - Cryptographic Failures
+    - A04:2025 - Cryptographic Failures
+    cwe:
+    - 'CWE-319: Cleartext Transmission of Sensitive Information'
+    references:
+    - https://docs.python.org/3/library/urllib.request.html#urllib.request.urlretrieve
+    category: security
+    technology:
+    - urllib
+    subcategory:
+    - audit
+    likelihood: LOW
+    impact: LOW
+    confidence: LOW
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/python.lang.security.audit.insecure-transport.urllib.insecure-urlretrieve-ftp.insecure-urlretrieve-ftp
+    shortlink: https://sg.run/jR8Y
+    semgrep.dev:
+      rule:
+        r_id: 9665
+        rv_id: 1263498
+        rule_id: NbUknL
+        version_id: 5PTo1Rw
+        url: https://semgrep.dev/playground/r/5PTo1Rw/python.lang.security.audit.insecure-transport.urllib.insecure-urlretrieve-ftp.insecure-urlretrieve-ftp
+        origin: community
+  severity: WARNING
+  languages:
+  - python
+  pattern-either:
+  - pattern: urllib.request.urlretrieve("=~/^[Ff][Tt][Pp]://.*/", ...)
+  - pattern: |
+      $URL = "=~/^[Ff][Tt][Pp]://.*/"
+      ...
+      urllib.request.urlretrieve($URL, ...)
+  - pattern: |-
+      def $FUNC(..., $URL = "=~/^[Ff][Tt][Pp]://.*/", ...):
+        ...
+        urllib.request.urlretrieve($URL, ...)
+- id: problem-based-packs.insecure-transport.ruby-stdlib.http-client-requests.http-client-requests
+  message: Checks for requests to http (unencrypted) sites using some of ruby's most
+    popular REST/HTTP libraries, including httparty and restclient.
+  severity: WARNING
+  metadata:
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    category: security
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    owasp: A03:2017 - Sensitive Data Exposure
+    references:
+    - https://github.com/rest-client/rest-client
+    - https://github.com/jnunemaker/httparty/tree/master/docs
+    subcategory:
+    - vuln
+    technology:
+    - httparty
+    - rest-client
+    vulnerability: Insecure Transport
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/problem-based-packs.insecure-transport.ruby-stdlib.http-client-requests.http-client-requests
+    shortlink: https://sg.run/OPQL
+    semgrep.dev:
+      rule:
+        r_id: 9431
+        rv_id: 946075
+        rule_id: L1UyKG
+        version_id: 0bT15Bn
+        url: https://semgrep.dev/playground/r/0bT15Bn/problem-based-packs.insecure-transport.ruby-stdlib.http-client-requests.http-client-requests
+        origin: community
+  languages:
+  - ruby
+  pattern-either:
+  - pattern: |
+      HTTParty.$PARTYVERB("=~/[hH][tT][tT][pP]://.*/", ...)
+  - pattern: |
+      $STRING = "=~/[hH][tT][tT][pP]://.*/"
+      ...
+      HTTParty.$PARTYVERB($STRING, ...)
+  - pattern: |
+      RestClient.$RESTVERB "=~/[hH][tT][tT][pP]://.*/", ...
+  - pattern: |
+      RestClient::Request.execute(..., url: "=~/[hH][tT][tT][pP]://.*/", ...)
+- id: python.lang.security.audit.insecure-transport.urllib.insecure-urlopener-open-ftp.insecure-urlopener-open-ftp
+  message: Detected an insecure transmission channel. 'URLopener.open(...)' is being
+    used with 'ftp://'. Use SFTP instead. urllib does not support SFTP, so consider
+    using a library which supports SFTP.
+  metadata:
+    owasp:
+    - A03:2017 - Sensitive Data Exposure
+    - A02:2021 - Cryptographic Failures
+    - A04:2025 - Cryptographic Failures
+    cwe:
+    - 'CWE-319: Cleartext Transmission of Sensitive Information'
+    references:
+    - https://docs.python.org/3/library/urllib.request.html#urllib.request.URLopener.open
+    category: security
+    technology:
+    - urllib
+    subcategory:
+    - audit
+    likelihood: LOW
+    impact: LOW
+    confidence: LOW
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/python.lang.security.audit.insecure-transport.urllib.insecure-urlopener-open-ftp.insecure-urlopener-open-ftp
+    shortlink: https://sg.run/zvwG
+    semgrep.dev:
+      rule:
+        r_id: 9661
+        rv_id: 1263494
+        rule_id: 9AU1DY
+        version_id: 3ZT4XGA
+        url: https://semgrep.dev/playground/r/3ZT4XGA/python.lang.security.audit.insecure-transport.urllib.insecure-urlopener-open-ftp.insecure-urlopener-open-ftp
+        origin: community
+  severity: WARNING
+  languages:
+  - python
+  pattern-either:
+  - pattern: urllib.request.URLopener(...).open("=~/[Ff][Tt][Pp]://.*/", ...)
+  - patterns:
+    - pattern-inside: |
+        $OPENERDIRECTOR = urllib.request.URLopener(...)
+        ...
+    - pattern: $OPENERDIRECTOR.open("=~/[Ff][Tt][Pp]://.*/", ...)
+  - patterns:
+    - pattern-inside: |
+        $OPENERDIRECTOR = urllib.request.URLopener(...)
+        ...
+    - pattern: |
+        $URL = "=~/[Ff][Tt][Pp]://.*/"
+        ...
+        $OPENERDIRECTOR.open($URL, ...)
+  - pattern: |
+      $URL = "=~/[Ff][Tt][Pp]://.*/"
+      ...
+      urllib.request.URLopener(...).open($URL, ...)
+  - patterns:
+    - pattern-inside: |
+        def $FUNC(..., $URL = "=~/[Ff][Tt][Pp]://.*/", ...):
+          ...
+    - pattern-either:
+      - pattern: urllib.request.URLopener(...).open($URL, ...)
+      - patterns:
+        - pattern-inside: |
+            $OPENERDIRECTOR = urllib.request.URLopener(...)
+            ...
+        - pattern: $OPENERDIRECTOR.open($URL, ...)
+- id: problem-based-packs.insecure-transport.ruby-stdlib.openuri-request.openuri-request
+  message: Checks for requests to http and ftp (unencrypted) sites using OpenURI.
+  severity: WARNING
+  metadata:
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    category: security
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    owasp: A03:2017 - Sensitive Data Exposure
+    references:
+    - https://ruby-doc.org/stdlib-2.6.3/libdoc/open-uri/rdoc/OpenURI.html
+    subcategory:
+    - vuln
+    technology:
+    - open-uri
+    vulnerability: Insecure Transport
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/problem-based-packs.insecure-transport.ruby-stdlib.openuri-request.openuri-request
+    shortlink: https://sg.run/ZvQw
+    semgrep.dev:
+      rule:
+        r_id: 9435
+        rv_id: 946079
+        rule_id: 3qUPNe
+        version_id: YDTvR5b
+        url: https://semgrep.dev/playground/r/YDTvR5b/problem-based-packs.insecure-transport.ruby-stdlib.openuri-request.openuri-request
+        origin: community
+  languages:
+  - ruby
+  pattern-either:
+  - pattern: |
+      URI.open('=~/[hH][tT][tT][pP]://.*/', ...)
+  - pattern: |
+      $URI = URI.parse('=~/[hH][tT][tT][pP]://.*/', ...)
+      ...
+      $URI.open
+  - pattern: |
+      URI.open('=~/^[fF][tT][pP]://.*/', ...)
+  - pattern: |
+      $URI = URI.parse('=~/^[fF][tT][pP]://.*/', ...)
+      ...
+      $URI.open
+- id: python.lang.security.audit.insecure-transport.requests.request-session-with-http.request-session-with-http
+  options:
+    symbolic_propagation: true
+  mode: taint
+  pattern-sources:
+  - patterns:
+    - pattern: |
+        "$URL"
+    - metavariable-pattern:
+        metavariable: $URL
+        language: regex
+        patterns:
+        - pattern-regex: http://
+        - pattern-not-regex: .*://localhost
+        - pattern-not-regex: .*://127\.0\.0\.1
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - pattern: requests.Session(...).$W($SINK, ...)
+      - pattern: requests.Session(...).request($METHOD, $SINK, ...)
+    - focus-metavariable: $SINK
+  fix-regex:
+    regex: '[Hh][Tt][Tt][Pp]://'
+    replacement: https://
+    count: 1
+  message: Detected a request using 'http://'. This request will be unencrypted. Use
+    'https://' instead.
+  languages:
+  - python
+  severity: INFO
+  metadata:
+    owasp:
+    - A03:2017 - Sensitive Data Exposure
+    - A02:2021 - Cryptographic Failures
+    - A04:2025 - Cryptographic Failures
+    cwe:
+    - 'CWE-319: Cleartext Transmission of Sensitive Information'
+    asvs:
+      section: V9 Communications Verification Requirements
+      control_id: 9.1.1 Weak TLS
+      control_url: https://github.com/OWASP/ASVS/blob/master/4.0/en/0x17-V9-Communications.md#v92-server-communications-security-requirements
+      version: '4'
+    category: security
+    technology:
+    - requests
+    references:
+    - https://owasp.org/Top10/A02_2021-Cryptographic_Failures
+    subcategory:
+    - audit
+    likelihood: LOW
+    impact: LOW
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/python.lang.security.audit.insecure-transport.requests.request-session-with-http.request-session-with-http
+    shortlink: https://sg.run/DoBY
+    semgrep.dev:
+      rule:
+        r_id: 9652
+        rv_id: 1263485
+        rule_id: YGURXw
+        version_id: d6Tyx02
+        url: https://semgrep.dev/playground/r/d6Tyx02/python.lang.security.audit.insecure-transport.requests.request-session-with-http.request-session-with-http
+        origin: community
+- id: python.lang.security.audit.insecure-transport.urllib.insecure-urlopen.insecure-urlopen
+  message: Detected 'urllib.urlopen()' using 'http://'. This request will not be encrypted.
+    Use 'https://' instead.
+  metadata:
+    owasp:
+    - A03:2017 - Sensitive Data Exposure
+    - A02:2021 - Cryptographic Failures
+    - A04:2025 - Cryptographic Failures
+    cwe:
+    - 'CWE-319: Cleartext Transmission of Sensitive Information'
+    references:
+    - https://docs.python.org/3/library/urllib.request.html#urllib.request.urlopen
+    category: security
+    technology:
+    - urllib
+    subcategory:
+    - audit
+    likelihood: LOW
+    impact: LOW
+    confidence: LOW
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/python.lang.security.audit.insecure-transport.urllib.insecure-urlopen.insecure-urlopen
+    shortlink: https://sg.run/oxB9
+    semgrep.dev:
+      rule:
+        r_id: 9660
+        rv_id: 1263493
+        rule_id: 10UKgW
+        version_id: QkTGqYe
+        url: https://semgrep.dev/playground/r/QkTGqYe/python.lang.security.audit.insecure-transport.urllib.insecure-urlopen.insecure-urlopen
+        origin: community
+  severity: WARNING
+  languages:
+  - python
+  fix-regex:
+    regex: '[Hh][Tt][Tt][Pp]://'
+    replacement: https://
+  pattern-either:
+  - pattern: urllib.request.urlopen("=~/[Hh][Tt][Tt][Pp]://.*/", ...)
+  - pattern: |
+      $URL = "=~/[Hh][Tt][Tt][Pp]://.*/"
+      ...
+      urllib.request.urlopen($URL, ...)
+  - pattern: |
+      def $FUNC(..., $URL = "=~/[Hh][Tt][Tt][Pp]://.*/", ...):
+        ...
+        urllib.request.urlopen($URL, ...)
+- id: python.lang.security.audit.insecure-transport.urllib.insecure-urlopen-ftp.insecure-urlopen-ftp
+  message: Detected 'urllib.urlopen()' using 'ftp://'. This request will not be encrypted.
+    Consider using SFTP instead. urllib does not support SFTP, so consider switching
+    to a library which supports SFTP.
+  metadata:
+    owasp:
+    - A03:2017 - Sensitive Data Exposure
+    - A02:2021 - Cryptographic Failures
+    - A04:2025 - Cryptographic Failures
+    cwe:
+    - 'CWE-319: Cleartext Transmission of Sensitive Information'
+    references:
+    - https://docs.python.org/3/library/urllib.request.html#urllib.request.urlopen
+    category: security
+    technology:
+    - urllib
+    subcategory:
+    - audit
+    likelihood: LOW
+    impact: LOW
+    confidence: LOW
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/python.lang.security.audit.insecure-transport.urllib.insecure-urlopen-ftp.insecure-urlopen-ftp
+    shortlink: https://sg.run/6n1o
+    semgrep.dev:
+      rule:
+        r_id: 9659
+        rv_id: 1263492
+        rule_id: j2UvOG
+        version_id: gETB7RN
+        url: https://semgrep.dev/playground/r/gETB7RN/python.lang.security.audit.insecure-transport.urllib.insecure-urlopen-ftp.insecure-urlopen-ftp
+        origin: community
+  severity: WARNING
+  languages:
+  - python
+  pattern-either:
+  - pattern: urllib.request.urlopen("=~/^[Ff][Tt][Pp]://.*/", ...)
+  - pattern: |
+      $URL = "=~/^[Ff][Tt][Pp]://.*/"
+      ...
+      urllib.request.urlopen($URL, ...)
+  - pattern: |-
+      def $FUNC(..., $URL = "=~/^[Ff][Tt][Pp]://.*/", ...):
+        ...
+        urllib.request.urlopen($URL, ...)
+- id: python.lang.security.audit.insecure-transport.urllib.insecure-urlopener-retrieve-ftp.insecure-urlopener-retrieve-ftp
+  message: Detected an insecure transmission channel. 'URLopener.retrieve(...)' is
+    being used with 'ftp://'. Use SFTP instead. urllib does not support SFTP, so consider
+    using a library which supports SFTP.
+  metadata:
+    owasp:
+    - A03:2017 - Sensitive Data Exposure
+    - A02:2021 - Cryptographic Failures
+    - A04:2025 - Cryptographic Failures
+    cwe:
+    - 'CWE-319: Cleartext Transmission of Sensitive Information'
+    references:
+    - https://docs.python.org/3/library/urllib.request.html#urllib.request.URLopener.retrieve
+    category: security
+    technology:
+    - urllib
+    subcategory:
+    - audit
+    likelihood: LOW
+    impact: LOW
+    confidence: LOW
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/python.lang.security.audit.insecure-transport.urllib.insecure-urlopener-retrieve-ftp.insecure-urlopener-retrieve-ftp
+    shortlink: https://sg.run/2xY0
+    semgrep.dev:
+      rule:
+        r_id: 9663
+        rv_id: 1263496
+        rule_id: r6UrPp
+        version_id: PkTR3l3
+        url: https://semgrep.dev/playground/r/PkTR3l3/python.lang.security.audit.insecure-transport.urllib.insecure-urlopener-retrieve-ftp.insecure-urlopener-retrieve-ftp
+        origin: community
+  severity: WARNING
+  languages:
+  - python
+  pattern-either:
+  - pattern: urllib.request.URLopener(...).retrieve("=~/[Ff][Tt][Pp]://.*/", ...)
+  - patterns:
+    - pattern-inside: |
+        $OPENERDIRECTOR = urllib.request.URLopener(...)
+        ...
+    - pattern: $OPENERDIRECTOR.retrieve("=~/[Ff][Tt][Pp]://.*/", ...)
+  - patterns:
+    - pattern-inside: |
+        $OPENERDIRECTOR = urllib.request.URLopener(...)
+        ...
+    - pattern: |
+        $URL = "=~/[Ff][Tt][Pp]://.*/"
+        ...
+        $OPENERDIRECTOR.retrieve($URL, ...)
+  - pattern: |
+      $URL = "=~/[Ff][Tt][Pp]://.*/"
+      ...
+      urllib.request.URLopener(...).retrieve($URL, ...)
+  - patterns:
+    - pattern-inside: |
+        def $FUNC(..., $URL = "=~/[Ff][Tt][Pp]://.*/", ...):
+          ...
+    - pattern-either:
+      - pattern: urllib.request.URLopener(...).retrieve($URL, ...)
+      - patterns:
+        - pattern-inside: |
+            $OPENERDIRECTOR = urllib.request.URLopener(...)
+            ...
+        - pattern: $OPENERDIRECTOR.retrieve($URL, ...)
+- id: python.lang.security.audit.insecure-transport.urllib.insecure-request-object.insecure-request-object
+  message: Detected a 'urllib.request.Request()' object using an insecure transport
+    protocol, 'http://'. This connection will not be encrypted. Use 'https://' instead.
+  metadata:
+    owasp:
+    - A03:2017 - Sensitive Data Exposure
+    - A02:2021 - Cryptographic Failures
+    - A04:2025 - Cryptographic Failures
+    cwe:
+    - 'CWE-319: Cleartext Transmission of Sensitive Information'
+    references:
+    - https://docs.python.org/3/library/urllib.request.html#urllib.request.Request
+    category: security
+    technology:
+    - urllib
+    subcategory:
+    - audit
+    likelihood: LOW
+    impact: LOW
+    confidence: LOW
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/python.lang.security.audit.insecure-transport.urllib.insecure-request-object.insecure-request-object
+    shortlink: https://sg.run/YvAe
+    semgrep.dev:
+      rule:
+        r_id: 9658
+        rv_id: 1263491
+        rule_id: X5U8Bp
+        version_id: 8KT5rJD
+        url: https://semgrep.dev/playground/r/8KT5rJD/python.lang.security.audit.insecure-transport.urllib.insecure-request-object.insecure-request-object
+        origin: community
+  severity: WARNING
+  languages:
+  - python
+  fix-regex:
+    regex: '[Hh][Tt][Tt][Pp]://'
+    replacement: https://
+    count: 1
+  pattern-either:
+  - pattern: urllib.request.Request("=~/[Hh][Tt][Tt][Pp]://.*/", ...)
+  - pattern: |
+      $URL = "=~/[Hh][Tt][Tt][Pp]://.*/"
+      ...
+      urllib.request.Request($URL, ...)
+  - pattern: |
+      def $FUNC(..., $URL = "=~/[Hh][Tt][Tt][Pp]://.*/", ...):
+        ...
+        urllib.request.Request($URL, ...)
+- id: python.lang.security.audit.insecure-transport.requests.request-with-http.request-with-http
+  fix-regex:
+    regex: '[Hh][Tt][Tt][Pp]://'
+    replacement: https://
+    count: 1
+  message: Detected a request using 'http://'. This request will be unencrypted, and
+    attackers could listen into traffic on the network and be able to obtain sensitive
+    information. Use 'https://' instead.
+  metadata:
+    owasp:
+    - A03:2017 - Sensitive Data Exposure
+    - A02:2021 - Cryptographic Failures
+    - A04:2025 - Cryptographic Failures
+    cwe:
+    - 'CWE-319: Cleartext Transmission of Sensitive Information'
+    asvs:
+      section: V9 Communications Verification Requirements
+      control_id: 9.1.1 Weak TLS
+      control_url: https://github.com/OWASP/ASVS/blob/master/4.0/en/0x17-V9-Communications.md#v92-server-communications-security-requirements
+      version: '4'
+    category: security
+    technology:
+    - requests
+    references:
+    - https://owasp.org/Top10/A02_2021-Cryptographic_Failures
+    subcategory:
+    - audit
+    likelihood: LOW
+    impact: LOW
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/python.lang.security.audit.insecure-transport.requests.request-with-http.request-with-http
+    shortlink: https://sg.run/W8J4
+    semgrep.dev:
+      rule:
+        r_id: 9653
+        rv_id: 1263486
+        rule_id: 6JUjpG
+        version_id: ZRTKA9v
+        url: https://semgrep.dev/playground/r/ZRTKA9v/python.lang.security.audit.insecure-transport.requests.request-with-http.request-with-http
+        origin: community
+  languages:
+  - python
+  severity: INFO
+  options:
+    symbolic_propagation: true
+  mode: taint
+  pattern-sources:
+  - patterns:
+    - pattern: |
+        "$URL"
+    - metavariable-pattern:
+        metavariable: $URL
+        language: regex
+        patterns:
+        - pattern-regex: http://
+        - pattern-not-regex: .*://localhost
+        - pattern-not-regex: .*://127\.0\.0\.1
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - pattern: requests.$W($SINK, ...)
+      - pattern: requests.request($METHOD, $SINK, ...)
+      - pattern: requests.Request($METHOD, $SINK, ...)
+    - focus-metavariable: $SINK
+- id: problem-based-packs.insecure-transport.ruby-stdlib.net-ftp-request.net-ftp-request
+  message: Checks for outgoing connections to ftp servers with the 'net/ftp' package.
+    FTP does not encrypt traffic, possibly leading to PII being sent plaintext over
+    the network. Instead, connect via the SFTP protocol.
+  severity: WARNING
+  metadata:
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    category: security
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    owasp: A03:2017 - Sensitive Data Exposure
+    references:
+    - https://docs.ruby-lang.org/en/2.0.0/Net/FTP.html
+    subcategory:
+    - vuln
+    technology:
+    - ruby
+    vulnerability: Insecure Transport
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/problem-based-packs.insecure-transport.ruby-stdlib.net-ftp-request.net-ftp-request
+    shortlink: https://sg.run/eLQ8
+    semgrep.dev:
+      rule:
+        r_id: 9432
+        rv_id: 946076
+        rule_id: 8GUj13
+        version_id: K3TJbe1
+        url: https://semgrep.dev/playground/r/K3TJbe1/problem-based-packs.insecure-transport.ruby-stdlib.net-ftp-request.net-ftp-request
+        origin: community
+  languages:
+  - ruby
+  pattern-either:
+  - pattern: |
+      $FTP = Net::FTP.new('...')
+      ...
+      $FTP.login
+  - pattern: |
+      Net::FTP.open('...') do |ftp|
+        ...
+        ftp.login
+      end
+- id: python.lang.security.audit.insecure-transport.urllib.insecure-request-object-ftp.insecure-request-object-ftp
+  message: Detected a 'urllib.request.Request()' object using an insecure transport
+    protocol, 'ftp://'. This connection will not be encrypted. Consider using SFTP
+    instead. urllib does not support SFTP natively, so consider using a library which
+    supports SFTP.
+  metadata:
+    owasp:
+    - A03:2017 - Sensitive Data Exposure
+    - A02:2021 - Cryptographic Failures
+    - A04:2025 - Cryptographic Failures
+    cwe:
+    - 'CWE-319: Cleartext Transmission of Sensitive Information'
+    references:
+    - https://docs.python.org/3/library/urllib.request.html#urllib.request.Request
+    category: security
+    technology:
+    - urllib
+    subcategory:
+    - audit
+    likelihood: LOW
+    impact: LOW
+    confidence: LOW
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/python.lang.security.audit.insecure-transport.urllib.insecure-request-object-ftp.insecure-request-object-ftp
+    shortlink: https://sg.run/l2Py
+    semgrep.dev:
+      rule:
+        r_id: 9657
+        rv_id: 1263490
+        rule_id: 2ZUbWA
+        version_id: LjTkgWZ
+        url: https://semgrep.dev/playground/r/LjTkgWZ/python.lang.security.audit.insecure-transport.urllib.insecure-request-object-ftp.insecure-request-object-ftp
+        origin: community
+  severity: WARNING
+  languages:
+  - python
+  pattern-either:
+  - pattern: urllib.request.Request("=~/^[Ff][Tt][Pp]://.*/", ...)
+  - pattern: |
+      $URL = "=~/^[Ff][Tt][Pp]://.*/"
+      ...
+      urllib.request.Request($URL, ...)
+  - pattern: |-
+      def $FUNC(..., $URL = "=~/^[Ff][Tt][Pp]://.*/", ...):
+        ...
+        urllib.request.Request($URL, ...)
+- id: python.lang.security.audit.insecure-transport.ftplib.use-ftp-tls.use-ftp-tls
+  patterns:
+  - pattern: ftplib.FTP(...)
+  - pattern-not: ftplib.FTP_TLS(...)
+  fix-regex:
+    regex: FTP(.*)\)
+    replacement: FTP_TLS\1, context=ssl.create_default_context())
+  message: The 'FTP' class sends information unencrypted. Consider using the 'FTP_TLS'
+    class instead.
+  metadata:
+    owasp:
+    - A03:2017 - Sensitive Data Exposure
+    - A02:2021 - Cryptographic Failures
+    - A04:2025 - Cryptographic Failures
+    cwe:
+    - 'CWE-319: Cleartext Transmission of Sensitive Information'
+    references:
+    - https://docs.python.org/3/library/ftplib.html#ftplib.FTP_TLS
+    category: security
+    technology:
+    - ftplib
+    subcategory:
+    - audit
+    likelihood: LOW
+    impact: LOW
+    confidence: LOW
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/python.lang.security.audit.insecure-transport.ftplib.use-ftp-tls.use-ftp-tls
+    shortlink: https://sg.run/AvPp
+    semgrep.dev:
+      rule:
+        r_id: 9650
+        rv_id: 1263483
+        rule_id: qNUjlR
+        version_id: e1TyjoY
+        url: https://semgrep.dev/playground/r/e1TyjoY/python.lang.security.audit.insecure-transport.ftplib.use-ftp-tls.use-ftp-tls
+        origin: community
+  severity: INFO
+  languages:
+  - python

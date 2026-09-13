@@ -1,0 +1,692 @@
+rules:
+- id: dede.csharp.advanced.sql-injection
+  languages:
+  - csharp
+  severity: ERROR
+  message: Request data reaches SQL command text.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-89
+    owasp:
+    - A05:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-1.2.4
+      microsoft-dotnet:
+      - CA3001
+    recommendation: Use constant SQL with bound parameters; use EF Core interpolated APIs with FormattableString,
+      not interpolated raw SQL.
+    references:
+    - https://cwe.mitre.org/data/definitions/89.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+    - https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca3001
+    analysis: taint
+  mode: taint
+  pattern-sources:
+  - pattern-either:
+    - pattern: Request.Query[$KEY]
+    - pattern: Request.QueryString[$KEY]
+    - pattern: Request.Form[$KEY]
+    - pattern: Request.Headers[$KEY]
+    - pattern: Request.Cookies[$KEY]
+    - pattern: $CTX.Request.Query[$KEY]
+    - pattern: $CTX.Request.QueryString[$KEY]
+    - pattern: $CTX.Request.Form[$KEY]
+    - pattern: $CTX.Request.Headers[$KEY]
+    - pattern: $CTX.Request.Cookies[$KEY]
+    exact: true
+  - patterns:
+    - pattern-inside: $RET $METHOD(..., [$ATTR] $TYPE $PARAM, ...) { ... }
+    - metavariable-regex:
+        metavariable: $ATTR
+        regex: ^(FromQuery|FromRoute|FromBody|FromForm|FromHeader)$
+    - focus-metavariable: $PARAM
+    exact: true
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - pattern: new SqlCommand($INPUT, ...)
+      - pattern: new Microsoft.Data.SqlClient.SqlCommand($INPUT, ...)
+      - pattern: $CMD.CommandText = $INPUT
+      - pattern: $DB.FromSqlRaw($INPUT, ...)
+      - pattern: $DB.ExecuteSqlRaw($INPUT, ...)
+      - pattern: $DB.Query($INPUT, ...)
+      - pattern: $DB.Execute($INPUT, ...)
+      - pattern: new System.Data.SqlClient.SqlCommand($INPUT, ...)
+    - focus-metavariable: $INPUT
+- id: dede.csharp.advanced.command-injection
+  languages:
+  - csharp
+  severity: ERROR
+  message: Request data controls a process executable or command argument string.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-78
+    owasp:
+    - A05:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-1.2.5
+      microsoft-dotnet:
+      - CA3006
+    recommendation: Use a fixed executable, avoid shells, and validate individual ArgumentList entries.
+    references:
+    - https://cwe.mitre.org/data/definitions/78.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+    - https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca3006
+    analysis: taint
+  mode: taint
+  pattern-sources:
+  - pattern-either:
+    - pattern: Request.Query[$KEY]
+    - pattern: Request.QueryString[$KEY]
+    - pattern: Request.Form[$KEY]
+    - pattern: Request.Headers[$KEY]
+    - pattern: Request.Cookies[$KEY]
+    - pattern: $CTX.Request.Query[$KEY]
+    - pattern: $CTX.Request.QueryString[$KEY]
+    - pattern: $CTX.Request.Form[$KEY]
+    - pattern: $CTX.Request.Headers[$KEY]
+    - pattern: $CTX.Request.Cookies[$KEY]
+    exact: true
+  - patterns:
+    - pattern-inside: $RET $METHOD(..., [$ATTR] $TYPE $PARAM, ...) { ... }
+    - metavariable-regex:
+        metavariable: $ATTR
+        regex: ^(FromQuery|FromRoute|FromBody|FromForm|FromHeader)$
+    - focus-metavariable: $PARAM
+    exact: true
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - pattern: Process.Start($INPUT, ...)
+      - pattern: Process.Start($EXE, $INPUT)
+      - pattern: $PSI.FileName = $INPUT
+      - pattern: $PSI.Arguments = $INPUT
+      - pattern: new ProcessStartInfo($INPUT, ...)
+      - pattern: new ProcessStartInfo($EXE, $INPUT)
+    - focus-metavariable: $INPUT
+- id: dede.csharp.advanced.path-traversal
+  languages:
+  - csharp
+  severity: ERROR
+  message: Request data controls a filesystem path.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-22
+    owasp:
+    - A01:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-5.3.2
+      microsoft-dotnet:
+      - CA3003
+    recommendation: Use server-generated filenames or enforce canonical path containment under an authorized
+      directory. Path.Combine/GetFullPath alone do not establish containment.
+    references:
+    - https://cwe.mitre.org/data/definitions/22.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+    - https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca3003
+    analysis: taint
+  mode: taint
+  pattern-sources:
+  - pattern-either:
+    - pattern: Request.Query[$KEY]
+    - pattern: Request.QueryString[$KEY]
+    - pattern: Request.Form[$KEY]
+    - pattern: Request.Headers[$KEY]
+    - pattern: Request.Cookies[$KEY]
+    - pattern: $CTX.Request.Query[$KEY]
+    - pattern: $CTX.Request.QueryString[$KEY]
+    - pattern: $CTX.Request.Form[$KEY]
+    - pattern: $CTX.Request.Headers[$KEY]
+    - pattern: $CTX.Request.Cookies[$KEY]
+    exact: true
+  - patterns:
+    - pattern-inside: $RET $METHOD(..., [$ATTR] $TYPE $PARAM, ...) { ... }
+    - metavariable-regex:
+        metavariable: $ATTR
+        regex: ^(FromQuery|FromRoute|FromBody|FromForm|FromHeader)$
+    - focus-metavariable: $PARAM
+    exact: true
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - pattern: File.ReadAllText($INPUT, ...)
+      - pattern: File.ReadAllBytes($INPUT, ...)
+      - pattern: File.OpenRead($INPUT)
+      - pattern: File.WriteAllText($INPUT, ...)
+      - pattern: new FileStream($INPUT, ...)
+      - pattern: PhysicalFile($INPUT, ...)
+    - focus-metavariable: $INPUT
+- id: dede.csharp.advanced.ssrf
+  languages:
+  - csharp
+  severity: ERROR
+  message: Request data controls an outbound HTTP destination.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-918
+    owasp:
+    - A01:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-1.3.6
+    recommendation: Allowlist destination schemes, hosts and ports; validate resolved addresses and redirect
+      destinations.
+    references:
+    - https://cwe.mitre.org/data/definitions/918.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+    analysis: taint
+  mode: taint
+  pattern-sources:
+  - pattern-either:
+    - pattern: Request.Query[$KEY]
+    - pattern: Request.QueryString[$KEY]
+    - pattern: Request.Form[$KEY]
+    - pattern: Request.Headers[$KEY]
+    - pattern: Request.Cookies[$KEY]
+    - pattern: $CTX.Request.Query[$KEY]
+    - pattern: $CTX.Request.QueryString[$KEY]
+    - pattern: $CTX.Request.Form[$KEY]
+    - pattern: $CTX.Request.Headers[$KEY]
+    - pattern: $CTX.Request.Cookies[$KEY]
+    exact: true
+  - patterns:
+    - pattern-inside: $RET $METHOD(..., [$ATTR] $TYPE $PARAM, ...) { ... }
+    - metavariable-regex:
+        metavariable: $ATTR
+        regex: ^(FromQuery|FromRoute|FromBody|FromForm|FromHeader)$
+    - focus-metavariable: $PARAM
+    exact: true
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - pattern: $HTTP.GetAsync($INPUT, ...)
+      - pattern: $HTTP.GetStringAsync($INPUT, ...)
+      - pattern: $HTTP.GetByteArrayAsync($INPUT, ...)
+      - pattern: $HTTP.PostAsync($INPUT, ...)
+      - pattern: new HttpRequestMessage($METHOD, $INPUT)
+    - focus-metavariable: $INPUT
+- id: dede.csharp.advanced.xss
+  languages:
+  - csharp
+  severity: ERROR
+  message: Request data reaches unencoded HTML output.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-79
+    owasp:
+    - A05:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-1.2.1
+      microsoft-dotnet:
+      - CA3002
+    recommendation: Use framework output encoding. HTML encoding is only a sanitizer for HTML text, not
+      JavaScript, CSS or URLs.
+    references:
+    - https://cwe.mitre.org/data/definitions/79.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+    - https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca3002
+    analysis: taint
+  mode: taint
+  pattern-sources:
+  - pattern-either:
+    - pattern: Request.Query[$KEY]
+    - pattern: Request.QueryString[$KEY]
+    - pattern: Request.Form[$KEY]
+    - pattern: Request.Headers[$KEY]
+    - pattern: Request.Cookies[$KEY]
+    - pattern: $CTX.Request.Query[$KEY]
+    - pattern: $CTX.Request.QueryString[$KEY]
+    - pattern: $CTX.Request.Form[$KEY]
+    - pattern: $CTX.Request.Headers[$KEY]
+    - pattern: $CTX.Request.Cookies[$KEY]
+    exact: true
+  - patterns:
+    - pattern-inside: $RET $METHOD(..., [$ATTR] $TYPE $PARAM, ...) { ... }
+    - metavariable-regex:
+        metavariable: $ATTR
+        regex: ^(FromQuery|FromRoute|FromBody|FromForm|FromHeader)$
+    - focus-metavariable: $PARAM
+    exact: true
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - pattern: Html.Raw($INPUT)
+      - pattern: $HTML.Raw($INPUT)
+      - pattern: Response.Write($INPUT)
+      - pattern: $CTX.Response.WriteAsync($INPUT)
+    - focus-metavariable: $INPUT
+  pattern-sanitizers:
+  - pattern: System.Net.WebUtility.HtmlEncode(...)
+    exact: true
+  - pattern: System.Web.HttpUtility.HtmlEncode(...)
+    exact: true
+  - pattern: System.Text.Encodings.Web.HtmlEncoder.Default.Encode(...)
+    exact: true
+- id: dede.csharp.advanced.open-redirect
+  languages:
+  - csharp
+  severity: ERROR
+  message: Request data controls a redirect destination.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-601
+    owasp:
+    - A01:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-3.7.2
+      microsoft-dotnet:
+      - CA3007
+    recommendation: Use LocalRedirect for local destinations or an explicit destination allowlist.
+    references:
+    - https://cwe.mitre.org/data/definitions/601.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+    - https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca3007
+    analysis: taint
+  mode: taint
+  pattern-sources:
+  - pattern-either:
+    - pattern: Request.Query[$KEY]
+    - pattern: Request.QueryString[$KEY]
+    - pattern: Request.Form[$KEY]
+    - pattern: Request.Headers[$KEY]
+    - pattern: Request.Cookies[$KEY]
+    - pattern: $CTX.Request.Query[$KEY]
+    - pattern: $CTX.Request.QueryString[$KEY]
+    - pattern: $CTX.Request.Form[$KEY]
+    - pattern: $CTX.Request.Headers[$KEY]
+    - pattern: $CTX.Request.Cookies[$KEY]
+    exact: true
+  - patterns:
+    - pattern-inside: $RET $METHOD(..., [$ATTR] $TYPE $PARAM, ...) { ... }
+    - metavariable-regex:
+        metavariable: $ATTR
+        regex: ^(FromQuery|FromRoute|FromBody|FromForm|FromHeader)$
+    - focus-metavariable: $PARAM
+    exact: true
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - pattern: Redirect($INPUT)
+      - pattern: RedirectPermanent($INPUT)
+      - pattern: Response.Redirect($INPUT, ...)
+      - pattern: Results.Redirect($INPUT, ...)
+    - focus-metavariable: $INPUT
+- id: dede.csharp.advanced.xpath-injection
+  languages:
+  - csharp
+  severity: ERROR
+  message: Request data reaches an XPath expression.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-643
+    owasp:
+    - A05:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-1.2.7
+      microsoft-dotnet:
+      - CA3008
+    recommendation: Use a constant compiled XPath expression and bind variables.
+    references:
+    - https://cwe.mitre.org/data/definitions/643.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+    - https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca3008
+    analysis: taint
+  mode: taint
+  pattern-sources:
+  - pattern-either:
+    - pattern: Request.Query[$KEY]
+    - pattern: Request.QueryString[$KEY]
+    - pattern: Request.Form[$KEY]
+    - pattern: Request.Headers[$KEY]
+    - pattern: Request.Cookies[$KEY]
+    - pattern: $CTX.Request.Query[$KEY]
+    - pattern: $CTX.Request.QueryString[$KEY]
+    - pattern: $CTX.Request.Form[$KEY]
+    - pattern: $CTX.Request.Headers[$KEY]
+    - pattern: $CTX.Request.Cookies[$KEY]
+    exact: true
+  - patterns:
+    - pattern-inside: $RET $METHOD(..., [$ATTR] $TYPE $PARAM, ...) { ... }
+    - metavariable-regex:
+        metavariable: $ATTR
+        regex: ^(FromQuery|FromRoute|FromBody|FromForm|FromHeader)$
+    - focus-metavariable: $PARAM
+    exact: true
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - pattern: $XML.SelectNodes($INPUT, ...)
+      - pattern: $XML.SelectSingleNode($INPUT, ...)
+      - pattern: $XML.Evaluate($INPUT, ...)
+    - focus-metavariable: $INPUT
+- id: dede.csharp.advanced.regex-injection
+  languages:
+  - csharp
+  severity: ERROR
+  message: Request data controls a regular expression pattern.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-1333
+    owasp:
+    - A05:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-1.2.9
+      microsoft-dotnet:
+      - CA3012
+    recommendation: Escape literal input with Regex.Escape and apply a finite match timeout.
+    references:
+    - https://cwe.mitre.org/data/definitions/1333.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+    - https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca3012
+    analysis: taint
+  mode: taint
+  pattern-sources:
+  - pattern-either:
+    - pattern: Request.Query[$KEY]
+    - pattern: Request.QueryString[$KEY]
+    - pattern: Request.Form[$KEY]
+    - pattern: Request.Headers[$KEY]
+    - pattern: Request.Cookies[$KEY]
+    - pattern: $CTX.Request.Query[$KEY]
+    - pattern: $CTX.Request.QueryString[$KEY]
+    - pattern: $CTX.Request.Form[$KEY]
+    - pattern: $CTX.Request.Headers[$KEY]
+    - pattern: $CTX.Request.Cookies[$KEY]
+    exact: true
+  - patterns:
+    - pattern-inside: $RET $METHOD(..., [$ATTR] $TYPE $PARAM, ...) { ... }
+    - metavariable-regex:
+        metavariable: $ATTR
+        regex: ^(FromQuery|FromRoute|FromBody|FromForm|FromHeader)$
+    - focus-metavariable: $PARAM
+    exact: true
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - pattern: new System.Text.RegularExpressions.Regex($INPUT, ...)
+      - pattern: System.Text.RegularExpressions.Regex.IsMatch($TEXT, $INPUT, ...)
+    - focus-metavariable: $INPUT
+  pattern-sanitizers:
+  - pattern: System.Text.RegularExpressions.Regex.Escape(...)
+    exact: true
+- id: dede.csharp.advanced.json-type-handling
+  languages:
+  - csharp
+  severity: WARNING
+  message: Json.NET polymorphic type handling requires a strict type binder review.
+  metadata:
+    category: security
+    confidence: MEDIUM
+    cwe:
+    - CWE-502
+    owasp:
+    - A08:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-1.5.2
+      microsoft-dotnet:
+      - CA2326
+    recommendation: Prefer TypeNameHandling.None; where required, restrict all deserialized types with
+      a reviewed allowlist binder.
+    references:
+    - https://cwe.mitre.org/data/definitions/502.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+    - https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca2326
+  pattern-either:
+  - pattern: TypeNameHandling.All
+  - pattern: TypeNameHandling.Auto
+  - pattern: TypeNameHandling.Objects
+  - pattern: TypeNameHandling.Arrays
+- id: dede.csharp.advanced.tls-validation-disabled
+  languages:
+  - csharp
+  severity: ERROR
+  message: TLS server certificate validation is disabled.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-295
+    owasp:
+    - A04:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-12.3.2
+      microsoft-dotnet:
+      - CA5359
+    recommendation: Retain platform certificate and hostname validation.
+    references:
+    - https://cwe.mitre.org/data/definitions/295.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+    - https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca5359
+  pattern-either:
+  - pattern: HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+  - pattern: $H.ServerCertificateCustomValidationCallback = ($A, $B, $C, $D) => true
+  - pattern: $H.ServerCertificateValidationCallback += ($A, $B, $C, $D) => true
+- id: dede.csharp.advanced.jwt-signature-disabled
+  languages:
+  - csharp
+  severity: ERROR
+  message: JWT signature requirements are disabled.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-347
+    owasp:
+    - A07:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-9.1.1
+    recommendation: Require signed tokens and validate the signature using trusted issuer keys.
+    references:
+    - https://cwe.mitre.org/data/definitions/347.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+  pattern-either:
+  - pattern: $O.RequireSignedTokens = false
+  - pattern: new TokenValidationParameters { ..., RequireSignedTokens = false, ... }
+- id: dede.csharp.advanced.jwt-lifetime-disabled
+  languages:
+  - csharp
+  severity: ERROR
+  message: JWT lifetime validation is explicitly disabled.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-613
+    owasp:
+    - A07:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-9.2.1
+    recommendation: Validate expiration and not-before claims with a bounded clock skew.
+    references:
+    - https://cwe.mitre.org/data/definitions/613.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+  pattern-either:
+  - pattern: $O.ValidateLifetime = false
+  - pattern: new TokenValidationParameters { ..., ValidateLifetime = false, ... }
+- id: dede.csharp.advanced.jwt-audience-disabled
+  languages:
+  - csharp
+  severity: ERROR
+  message: JWT audience validation is explicitly disabled.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-345
+    owasp:
+    - A07:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-9.2.3
+    recommendation: Require an audience allowlist for the receiving service.
+    references:
+    - https://cwe.mitre.org/data/definitions/345.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+  pattern-either:
+  - pattern: $O.ValidateAudience = false
+  - pattern: new TokenValidationParameters { ..., ValidateAudience = false, ... }
+- id: dede.csharp.advanced.xml-dtd-enabled
+  languages:
+  - csharp
+  severity: WARNING
+  message: XML DTD processing is enabled; review external resolution and entity expansion.
+  metadata:
+    category: security
+    confidence: MEDIUM
+    cwe:
+    - CWE-611
+    owasp:
+    - A02:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-1.5.1
+      microsoft-dotnet:
+      - CA3075
+    recommendation: Prohibit DTD processing and use a null resolver for untrusted XML.
+    references:
+    - https://cwe.mitre.org/data/definitions/611.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+    - https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca3075
+  pattern-either:
+  - pattern: $O.DtdProcessing = DtdProcessing.Parse
+  - pattern: new XmlReaderSettings { ..., DtdProcessing = DtdProcessing.Parse, ... }
+- id: dede.csharp.advanced.xslt-script-enabled
+  languages:
+  - csharp
+  severity: ERROR
+  message: XSLT script execution is enabled.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-94
+    owasp:
+    - A05:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-1.3.5
+      microsoft-dotnet:
+      - CA3076
+    recommendation: Disable XSLT scripting and external document access for untrusted stylesheets.
+    references:
+    - https://cwe.mitre.org/data/definitions/94.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+    - https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca3076
+  pattern-either:
+  - pattern: new XsltSettings($DOC, true)
+  - pattern: $O.EnableScript = true
+- id: dede.csharp.advanced.ecb-mode
+  languages:
+  - csharp
+  severity: ERROR
+  message: ECB encryption exposes repeated plaintext patterns.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-327
+    owasp:
+    - A04:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-11.3.1
+      microsoft-dotnet:
+      - CA5358
+    recommendation: Use authenticated encryption such as AES-GCM with unique nonces.
+    references:
+    - https://cwe.mitre.org/data/definitions/327.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+    - https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca5358
+  pattern-either:
+  - pattern: CipherMode.ECB
+- id: dede.csharp.advanced.cors-credentials-any-origin
+  languages:
+  - csharp
+  severity: ERROR
+  message: Credentialed CORS accepts arbitrary origins.
+  metadata:
+    category: security
+    confidence: HIGH
+    cwe:
+    - CWE-942
+    owasp:
+    - A02:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-3.4.2
+    recommendation: Allow only explicitly trusted origins when credentials are enabled.
+    references:
+    - https://cwe.mitre.org/data/definitions/942.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+  pattern-either:
+  - pattern: $B.SetIsOriginAllowed($ORIGIN => true).AllowCredentials()
+  - pattern: $B.AllowAnyOrigin().AllowCredentials()
+  - pattern: $B.AllowCredentials().AllowAnyOrigin()
+- id: dede.csharp.advanced.antiforgery-disabled
+  languages:
+  - csharp
+  severity: WARNING
+  message: Endpoint antiforgery protection is explicitly disabled; review browser-authenticated state
+    changes.
+  metadata:
+    category: security
+    confidence: MEDIUM
+    cwe:
+    - CWE-352
+    owasp:
+    - A01:2025
+    standards:
+      owasp-asvs-5.0.0:
+      - v5.0.0-3.5.1
+    recommendation: Enable antiforgery validation for cookie-authenticated state changes. Review intentional
+      API exemptions.
+    references:
+    - https://cwe.mitre.org/data/definitions/352.html
+    - https://owasp.org/Top10/2025/
+    - https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release
+  pattern-either:
+  - pattern: $ENDPOINT.DisableAntiforgery()

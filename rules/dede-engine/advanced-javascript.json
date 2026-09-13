@@ -1,0 +1,517 @@
+{
+  "schema": 1,
+  "rules": [
+    {
+      "id": "dede.js.proto.pollution-bracket",
+      "message": "Bracket-notation property write with user-controlled key may set __proto__ or constructor; prototype pollution risk.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "when": [
+        {
+          "regex": "(__proto__|[.\\[]['\"]?prototype['\"]?[.\\[]|[.\\[]['\"]?constructor['\"]?[.\\[])",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-1321"
+      ],
+      "owasp": [
+        "A03:2025"
+      ],
+      "asvs": [
+        "v5.0.0-5.3.3"
+      ],
+      "recommendation": "Use Object.create(null) for dictionaries, validate all user-supplied keys, and freeze Object.prototype.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/1321.html",
+        "https://portswigger.net/web-security/prototype-pollution"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.js.proto.pollution-merge-assign",
+      "message": "Deep object merge or assign with unvalidated user input; prototype pollution risk.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "when": [
+        {
+          "regex": "(?i)(deepMerge|extend|mergeWith|Object\\.assign|merge)\\s*\\(",
+          "same_line": true
+        },
+        {
+          "regex": "(?i)(req\\.(body|query|params)|JSON\\.parse|request\\.(body|query))",
+          "same_line": true,
+          "not_regex": "(?i)(?:sanitize|hasOwnProperty|Object\\.create\\(null\\)|//\\ dede:\\ safe)"
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-1321"
+      ],
+      "owasp": [
+        "A03:2025"
+      ],
+      "asvs": [
+        "v5.0.0-5.3.3"
+      ],
+      "recommendation": "Validate and sanitize all keys before merging; reject __proto__, constructor, and prototype keys.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/1321.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.js.eval.settimeout-string",
+      "message": "setTimeout/setInterval called with a string argument; equivalent to eval.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "when": [
+        {
+          "regex": "(?i)(setTimeout|setInterval)\\s*\\(\\s*['\"`]",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-95"
+      ],
+      "owasp": [
+        "A03:2025"
+      ],
+      "asvs": [
+        "v5.0.0-5.3.3"
+      ],
+      "recommendation": "Always pass a function reference to setTimeout/setInterval, never a string.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/95.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.js.eval.dynamic-require",
+      "message": "require() called with a dynamic/user-controlled argument; arbitrary module loading risk.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "when": [
+        {
+          "regex": "require\\s*\\(\\s*(?!['\"`][^'\"`]+['\"`])",
+          "same_line": true
+        },
+        {
+          "regex": "(?i)(req\\.(body|query|params)|process\\.env\\.|user)",
+          "same_line": true
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-95"
+      ],
+      "owasp": [
+        "A03:2025"
+      ],
+      "asvs": [
+        "v5.0.0-5.3.3"
+      ],
+      "recommendation": "Never build module paths from user input; use a static allowlist of permitted modules.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/95.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.js.cors.arbitrary-origin",
+      "message": "CORS origin reflected directly from the request; any attacker domain can make credentialed requests.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "when": [
+        {
+          "regex": "(?i)Access-Control-Allow-Origin['\"]?\\s*[,:=]\\s*req\\.",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-942"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "asvs": [
+        "v5.0.0-14.4.7"
+      ],
+      "recommendation": "Validate the request Origin against a static allowlist; never reflect the incoming Origin header directly.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/942.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.js.cors.credentials-wildcard",
+      "message": "CORS wildcard origin (*) combined with credentials:true; browsers silently ignore credentials but intent is dangerous.",
+      "severity": "MEDIUM",
+      "category": "security",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "when": [
+        {
+          "regex": "(?i)origins?:\\s*[\"']\\*[\"']",
+          "same_line": true
+        }
+      ],
+      "if": [
+        {
+          "contains_any": [
+            "credentials: true",
+            "allowCredentials: true",
+            "withCredentials: true"
+          ]
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-942"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "asvs": [
+        "v5.0.0-14.4.7"
+      ],
+      "recommendation": "Never combine wildcard origins with credentials; list each trusted origin explicitly.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/942.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.js.jwt.none-algorithm",
+      "message": "JWT verified with algorithm 'none'; signature verification bypassed.",
+      "severity": "CRITICAL",
+      "category": "security",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "when": [
+        {
+          "regex": "(?i)jwt\\.(verify|decode)\\s*\\(",
+          "same_line": true
+        },
+        {
+          "regex": "(?i)algorithm[s]?:\\s*['\"]none['\"]",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-347"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "asvs": [
+        "v5.0.0-3.5.1"
+      ],
+      "recommendation": "Always specify an explicit algorithm list (e.g. ['HS256']) and never include 'none'.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/347.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.js.regex.redos-catastrophic",
+      "message": "RegExp with nested quantifiers on user-controlled input; potential ReDoS (catastrophic backtracking).",
+      "severity": "MEDIUM",
+      "category": "security",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "when": [
+        {
+          "regex": "new RegExp\\s*\\(",
+          "same_line": true
+        },
+        {
+          "regex": "(?i)(req\\.(body|query|params)|user|input)",
+          "same_line": true,
+          "not_regex": "(?i)(?:safe\\-regex|//\\ dede:\\ safe)"
+        }
+      ],
+      "confidence": "LOW",
+      "cwe": [
+        "CWE-1333"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "asvs": [
+        "v5.0.0-5.3.3"
+      ],
+      "recommendation": "Use static regex literals or validate patterns with a safe-regex library; enforce a match timeout.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/1333.html",
+        "https://owasp.org/www-community/attacks/Regular_expression_Denial_of_Service_-_ReDoS"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.js.path.traversal-user-join",
+      "message": "File path joined from user-controlled input without normalization; path traversal risk.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "when": [
+        {
+          "regex": "(?i)path\\.(join|resolve)\\s*\\(",
+          "same_line": true
+        },
+        {
+          "regex": "(?i)(req\\.(body|query|params)|user|input)",
+          "same_line": true,
+          "not_regex": "(?i)(?:startsWith\\(base|path\\.normalize|//\\ dede:\\ safe)"
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-22"
+      ],
+      "owasp": [
+        "A01:2025"
+      ],
+      "asvs": [
+        "v5.0.0-12.3.1"
+      ],
+      "recommendation": "Resolve and normalize the path, then verify it starts with the expected base directory.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/22.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.js.ssrf.fetch-user-url",
+      "message": "fetch()/axios/node-fetch called with user-controlled URL; SSRF risk.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "when": [
+        {
+          "regex": "(?i)(fetch|axios\\.(get|post|request)|got|superagent|http\\.request)\\s*\\(",
+          "same_line": true
+        },
+        {
+          "regex": "(?i)(req\\.(body|query|params)|searchParams\\.get|request\\.url)",
+          "same_line": true,
+          "not_regex": "(?i)(?:allowlist|validateUrl|isInternalUrl|//\\ dede:\\ safe)"
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-918"
+      ],
+      "owasp": [
+        "A10:2025"
+      ],
+      "asvs": [
+        "v5.0.0-12.6.1"
+      ],
+      "recommendation": "Validate destination URLs against an allowlist; block requests to internal/loopback addresses.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/918.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.js.session.insecure-cookie",
+      "message": "Session cookie set without httpOnly and/or secure flags.",
+      "severity": "MEDIUM",
+      "category": "security",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "when": [
+        {
+          "regex": "(?i)(res\\.cookie|set-cookie|session\\().*httponly\\s*:\\s*false",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-614"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "asvs": [
+        "v5.0.0-3.4.2"
+      ],
+      "recommendation": "Set httpOnly:true and secure:true on all session cookies; add SameSite:Strict/Lax.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/614.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.js.npm.child-process-user-input",
+      "message": "child_process exec/execSync called with user-controlled input; command injection risk.",
+      "severity": "CRITICAL",
+      "category": "security",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "when": [
+        {
+          "regex": "(?i)(exec|execSync|spawn)\\s*\\(",
+          "same_line": true
+        },
+        {
+          "regex": "(?i)(req\\.(body|query|params)|user|input)",
+          "same_line": true,
+          "not_regex": "(?i)(?:shell:\\ false|escapeShell|sanitize|//\\ dede:\\ safe)"
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-78"
+      ],
+      "owasp": [
+        "A03:2025"
+      ],
+      "asvs": [
+        "v5.0.0-5.3.4"
+      ],
+      "recommendation": "Use execFile or spawn with shell:false; pass arguments as an array instead of a shell string.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/78.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.ts.type.any-unsafe-cast",
+      "message": "Type assertion to 'any' on external data bypasses TypeScript safety checks.",
+      "severity": "LOW",
+      "category": "quality",
+      "languages": [
+        "typescript"
+      ],
+      "when": [
+        {
+          "regex": "as\\s+any\\b",
+          "same_line": true
+        },
+        {
+          "regex": "(?i)(req\\.(body|query|params|json)|JSON\\.parse|response\\.data)",
+          "same_line": true
+        }
+      ],
+      "confidence": "LOW",
+      "cwe": [
+        "CWE-704"
+      ],
+      "recommendation": "Use proper TypeScript interfaces or Zod/io-ts to validate and type external data.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/704.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.js.sql.template-literal-query",
+      "message": "SQL query built with template literal and user input; SQL injection risk.",
+      "severity": "CRITICAL",
+      "category": "security",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "when": [
+        {
+          "regex": "(?i)`[^`]*(SELECT|INSERT|UPDATE|DELETE|WHERE)[^`]*\\$\\{",
+          "same_line": true,
+          "not_regex": "(?i)(?:sql\\.identifier|pgp\\.as\\.format|//\\ dede:\\ safe)"
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-89"
+      ],
+      "owasp": [
+        "A03:2025"
+      ],
+      "asvs": [
+        "v5.0.0-5.3.4"
+      ],
+      "recommendation": "Use parameterized queries with placeholders ($1, ?, :param) instead of template literals.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/89.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.js.open-redirect",
+      "message": "HTTP redirect target derived from user-controlled input; open redirect risk.",
+      "severity": "MEDIUM",
+      "category": "security",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "when": [
+        {
+          "regex": "(?i)(res\\.redirect|location\\.href|window\\.location)\\s*[=\\(]",
+          "same_line": true
+        },
+        {
+          "regex": "(?i)(req\\.(body|query|params)|searchParams\\.get|location\\.search)",
+          "same_line": true,
+          "not_regex": "(?i)(?:allowedRedirects|isLocalUrl|//\\ dede:\\ safe)"
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-601"
+      ],
+      "owasp": [
+        "A01:2025"
+      ],
+      "asvs": [
+        "v5.0.0-5.1.5"
+      ],
+      "recommendation": "Validate redirect destinations against an allowlist of known-safe paths/domains.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/601.html"
+      ],
+      "exclude_comments": true
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "name": "dede/spring",
+  "version": "1.0.0",
+  "models": {
+    "java": {
+      "sources": [],
+      "sinks": [
+        {
+          "call": "jdbcTemplate.query",
+          "kind": "sql-execution",
+          "cwe": "CWE-89",
+          "severity": "HIGH"
+        }
+      ],
+      "sanitizers": []
+    }
+  },
+  "integrity": {
+    "sha256": "eff79206d631f3399e059021ec5447c26b86da6a402205dc03a71b9e39be6edf"
+  }
+}

@@ -1,0 +1,55 @@
+rules:
+  - id: dede.python.security.exec-detected
+    message: "Detected use of os.system / subprocess(shell=True) which may allow command injection (CWE-78)."
+    languages: [python]
+    severity: ERROR
+    metadata:
+      cwe: ["CWE-78"]
+      owasp: ["A03:2021"]
+      category: security
+      technology: [python]
+    pattern-either:
+      - pattern: os.system(...)
+      - pattern: subprocess.call(..., shell=True)
+      - pattern: subprocess.Popen(..., shell=True)
+      - pattern: subprocess.run(..., shell=True)
+
+  - id: dede.python.security.eval-detected
+    message: "Detected use of eval()/exec() which can lead to code injection (CWE-95)."
+    languages: [python]
+    severity: ERROR
+    metadata:
+      cwe: ["CWE-95"]
+      owasp: ["A03:2021"]
+      category: security
+    pattern-either:
+      - pattern: eval(...)
+      - pattern: exec(...)
+
+  - id: dede.python.security.sql-injection-format
+    message: "Possible SQL injection via string formatting/concatenation into execute()."
+    languages: [python]
+    severity: WARNING
+    metadata:
+      cwe: ["CWE-89"]
+      owasp: ["A03:2021"]
+      category: security
+    patterns:
+      - pattern-either:
+          - pattern: $CUR.execute("..." % ...)
+          - pattern: $CUR.execute("...".format(...))
+          - pattern: $CUR.execute(f"...")
+          - pattern: $CUR.execute("..." + ...)
+
+  - id: dede.python.security.insecure-hash-md5
+    message: "Use of MD5 for security-sensitive hashing is weak (CWE-328)."
+    languages: [python]
+    severity: WARNING
+    metadata:
+      cwe: ["CWE-328"]
+      owasp: ["A02:2021"]
+      category: security
+    pattern-either:
+      - pattern: hashlib.md5(...)
+      - pattern: hashlib.new("md5", ...)
+      - pattern: hashlib.new('md5', ...)

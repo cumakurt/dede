@@ -1,0 +1,92 @@
+{% from "_macros.html.j2" import page_chrome with context %}
+
+{# ---------- Maintainability & Code Quality ---------- #}
+<section class="section" id="quality">
+  <p class="section-kicker">03b / Code Quality & Maintainability</p>
+  <h2>Code quality, duplication and maintainability</h2>
+
+  <div class="kpi-row">
+    <div class="kpi-card"><span class="kpi-label">Maintainability Rating</span><span class="kpi-value" style="font-size:2rem;font-weight:800;">{{ maintainability_rating }}</span></div>
+    <div class="kpi-card"><span class="kpi-label">Estimated Technical Debt</span><span class="kpi-value">{{ maintainability_debt_minutes }} min</span><span class="kpi-hint">{{ (maintainability_debt_ratio * 100)|round(1) }}% of clean-code baseline</span></div>
+    <div class="kpi-card"><span class="kpi-label">Duplicate Groups</span><span class="kpi-value">{{ smell_breakdown.get('duplicate:code', 0) }}</span><span class="kpi-hint">copy-paste occurrences</span></div>
+  </div>
+
+  <h3>Maintainability Rating</h3>
+  <p class="muted">Rating scale mirrors SonarQube-style A/B/C/D/E based on estimated debt relative to clean-code baseline.</p>
+  <table class="data">
+    <thead><tr><th>Rating</th><th>Debt Ratio</th><th>Interpretation</th></tr></thead>
+    <tbody>
+      <tr><td><span class="rating-A">A</span></td><td>&lt; 5%</td><td>Outstanding — minimal technical debt</td></tr>
+      <tr><td><span class="rating-B">B</span></td><td>5–10%</td><td>Good — manageable debt</td></tr>
+      <tr><td><span class="rating-C">C</span></td><td>10–20%</td><td>Technical debt present — plan remediation</td></tr>
+      <tr><td><span class="rating-D">D</span></td><td>20–30%</td><td>Significant debt — prioritize cleanup</td></tr>
+      <tr><td><span class="rating-E">E</span></td><td>&gt; 30%</td><td>Critical debt — large refactor recommended</td></tr>
+    </tbody>
+  </table>
+
+  <p class="footer-note">
+    Debt is estimated in minutes using static heuristics. It is advisory and not a confirmed effort estimate.
+    Unsuppressed findings contribute; AI-likely-false-positive findings are discounted.
+  </p>
+
+  <h3>Code Smell & Quality Breakdown</h3>
+  {% if smell_breakdown %}
+  <table class="data">
+    <thead><tr><th>Category</th><th>Rule</th><th>Occurrences</th></tr></thead>
+    <tbody>
+      {% for key, count in smell_breakdown.items() %}
+      <tr>
+        <td>{{ key.split(':')[0] }}</td>
+        <td class="mono">{{ key.split(':')[1] }}</td>
+        <td>{{ count }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="muted">No code smell or duplication findings reported.</p>
+  {% endif %}
+
+  <h3>Duplicate Code (Copy-Paste Detection)</h3>
+  <p class="muted">
+    Hash-based duplicate detection finds identical or near-identical code blocks that should be refactored into shared abstractions.
+  </p>
+  {% if smell_breakdown.get('duplicate:code', 0) > 0 %}
+  <table class="data">
+    <thead><tr><th>File</th><th>Lines</th><th>Primary Location</th><th>Occurrences</th></tr></thead>
+    <tbody>
+      {% for f in result.findings if f.category == 'duplicate' %}
+      <tr>
+        <td class="mono">{{ f.file }}:{{ f.start_line }}</td>
+        <td>{{ f.end_line - f.start_line + 1 }}</td>
+        <td class="mono">{{ f.message.split('Primary location:')[-1].strip() if 'Primary location:' in f.message else '—' }}</td>
+        <td>{{ f.source_tool_severity }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="muted">No significant duplicate code blocks detected.</p>
+  {% endif %}
+
+  <h3>Code Smell Highlights</h3>
+  {% set smell_findings = result.findings | selectattr('category', 'equalto', 'code_smell') | list %}
+  {% if smell_findings %}
+  <table class="data">
+    <thead><tr><th>File</th><th>Rule</th><th>Severity</th><th>Line</th><th>Message</th></tr></thead>
+    <tbody>
+      {% for f in smell_findings[:15] %}
+      <tr>
+        <td class="mono">{{ f.file }}:{{ f.start_line }}</td>
+        <td class="mono">{{ f.rule_id }}</td>
+        <td><span class="badge-{{ f.severity.value }}">{{ f.severity.value }}</span></td>
+        <td>{{ f.start_line }}</td>
+        <td>{{ f.message[:120] }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="muted">No code smell findings reported.</p>
+  {% endif %}
+</section>

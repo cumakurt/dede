@@ -1,0 +1,123 @@
+{% from "_macros.html.j2" import page_chrome, source_tag with context %}
+{{ page_chrome('10 / Remediation Roadmap') }}
+<section class="section" id="remediation">
+  <p class="section-kicker">10 / Remediation Roadmap</p>
+  <h2>Turn findings into an engineering plan</h2>
+
+  {% if pdf %}
+  <table class="three-col" role="presentation">
+    <tr>
+      <td class="col">
+        <p class="panel-title">Immediate · 0–48h</p>
+        <p class="muted">Critical findings with high confidence.</p>
+        <ul class="compact">
+          {% for row in remediation_groups.immediate[:6] %}
+          <li><span class="mono">{{ row.id }}</span> — {{ source_tag(row.title_origin) }} {{ row.finding }}</li>
+          {% else %}
+          <li class="muted">None</li>
+          {% endfor %}
+        </ul>
+      </td>
+      <td class="col">
+        <p class="panel-title">Short Term · 1–2 sprints</p>
+        <p class="muted">High findings and important Medium weaknesses.</p>
+        <ul class="compact">
+          {% for row in remediation_groups.short_term[:6] %}
+          <li><span class="mono">{{ row.id }}</span> — {{ source_tag(row.title_origin) }} {{ row.finding }}</li>
+          {% else %}
+          <li class="muted">None</li>
+          {% endfor %}
+        </ul>
+      </td>
+      <td class="col">
+        <p class="panel-title">Planned · Backlog</p>
+        <p class="muted">Hardening and lower-severity improvements.</p>
+        <ul class="compact">
+          {% for row in remediation_groups.planned[:6] %}
+          <li><span class="mono">{{ row.id }}</span> — {{ source_tag(row.title_origin) }} {{ row.finding }}</li>
+          {% else %}
+          <li class="muted">None</li>
+          {% endfor %}
+        </ul>
+      </td>
+    </tr>
+  </table>
+  {% else %}
+  <div class="three-col">
+    <div class="road-card">
+      <p class="panel-title">Immediate · 0–48h</p>
+      <p class="muted">Critical findings with high confidence.</p>
+      <ul class="compact">
+        {% for row in remediation_groups.immediate[:6] %}
+        <li><span class="mono">{{ row.id }}</span> — {{ source_tag(row.title_origin) }} {{ row.finding }}</li>
+        {% else %}<li class="muted">None</li>{% endfor %}
+      </ul>
+    </div>
+    <div class="road-card">
+      <p class="panel-title">Short Term · 1–2 sprints</p>
+      <p class="muted">High findings and important Medium weaknesses.</p>
+      <ul class="compact">
+        {% for row in remediation_groups.short_term[:6] %}
+        <li><span class="mono">{{ row.id }}</span> — {{ source_tag(row.title_origin) }} {{ row.finding }}</li>
+        {% else %}<li class="muted">None</li>{% endfor %}
+      </ul>
+    </div>
+    <div class="road-card">
+      <p class="panel-title">Planned · Backlog</p>
+      <p class="muted">Hardening and lower-severity improvements.</p>
+      <ul class="compact">
+        {% for row in remediation_groups.planned[:6] %}
+        <li><span class="mono">{{ row.id }}</span> — {{ source_tag(row.title_origin) }} {{ row.finding }}</li>
+        {% else %}<li class="muted">None</li>{% endfor %}
+      </ul>
+    </div>
+  </div>
+  {% endif %}
+
+  <h3>Prioritized Remediation Queue</h3>
+  <table class="data">
+    <thead>
+      <tr>
+        <th>Finding</th>
+        <th>Priority</th>
+        <th>Complexity</th>
+        <th>Recommended Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in remediation_groups.immediate %}
+      <tr>
+        <td><span class="mono">{{ row.id }}</span><br/>{{ source_tag(row.title_origin) }} {{ row.finding }}</td>
+        <td>Immediate</td>
+        <td>{{ row.complexity }}</td>
+        <td>{{ source_tag(row.action_origin) }} {{ row.action }}</td>
+      </tr>
+      {% endfor %}
+      {% for row in remediation_groups.short_term %}
+      <tr>
+        <td><span class="mono">{{ row.id }}</span><br/>{{ source_tag(row.title_origin) }} {{ row.finding }}</td>
+        <td>Short term</td>
+        <td>{{ row.complexity }}</td>
+        <td>{{ source_tag(row.action_origin) }} {{ row.action }}</td>
+      </tr>
+      {% endfor %}
+      {% for row in remediation_groups.planned[:8] %}
+      <tr>
+        <td><span class="mono">{{ row.id }}</span><br/>{{ source_tag(row.title_origin) }} {{ row.finding }}</td>
+        <td>Planned</td>
+        <td>{{ row.complexity }}</td>
+        <td>{{ source_tag(row.action_origin) }} {{ row.action }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% if quick_wins %}
+  <h3>Quick Wins</h3>
+  <ul class="compact">
+    {% for row in quick_wins %}
+    <li>{{ source_tag(row.action_origin) }} {{ row.action }} <span class="muted mono">({{ row.id }})</span></li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</section>

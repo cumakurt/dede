@@ -1,0 +1,3468 @@
+rules:
+- id: javascript.passport-jwt.security.passport-hardcode.hardcoded-passport-secret
+  message: A hard-coded credential was detected. It is not recommended to store credentials
+    in source-code, as this risks secrets being leaked and used by either an internal
+    or external malicious adversary. It is recommended to use environment variables
+    to securely provide credentials or retrieve credentials from a secure vault or
+    HSM (Hardware Security Module).
+  metadata:
+    cwe:
+    - 'CWE-798: Use of Hard-coded Credentials'
+    references:
+    - https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html
+    owasp:
+    - A07:2021 - Identification and Authentication Failures
+    - A07:2025 - Authentication Failures
+    asvs:
+      section: 'V3: Session Management Verification Requirements'
+      control_id: 3.5.2 Static API keys or secret
+      control_url: https://github.com/OWASP/ASVS/blob/master/4.0/en/0x12-V3-Session-management.md#v35-token-based-session-management
+      version: '4'
+    category: security
+    technology:
+    - jwt
+    - nodejs
+    - secrets
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: HIGH
+    impact: MEDIUM
+    confidence: HIGH
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Hard-coded Secrets
+    source: https://semgrep.dev/r/javascript.passport-jwt.security.passport-hardcode.hardcoded-passport-secret
+    shortlink: https://sg.run/vz70
+    semgrep.dev:
+      rule:
+        r_id: 9333
+        rv_id: 1263225
+        rule_id: QrUzq6
+        version_id: X0TzyoE
+        url: https://semgrep.dev/playground/r/X0TzyoE/javascript.passport-jwt.security.passport-hardcode.hardcoded-passport-secret
+        origin: community
+  languages:
+  - javascript
+  - typescript
+  severity: WARNING
+  mode: taint
+  pattern-sources:
+  - by-side-effect: true
+    patterns:
+    - pattern-either:
+      - pattern: |
+          {..., clientSecret: "...", ...}
+      - pattern: |
+          {..., secretOrKey: "...", ...}
+      - pattern: |
+          {..., consumerSecret: "...", ...}
+      - patterns:
+        - pattern-inside: |
+            $OBJ = {}
+            ...
+        - pattern-either:
+          - pattern: |
+              $OBJ.clientSecret = "..."
+          - pattern: |
+              $OBJ.secretOrKey = "..."
+          - pattern: |
+              $OBJ.consumerSecret = "..."
+        - pattern: $OBJ
+      - patterns:
+        - pattern-inside: |
+            $SECRET = '...'
+            ...
+        - pattern-either:
+          - pattern: |
+              {..., clientSecret: $SECRET, ...}
+          - pattern: |
+              {..., secretOrKey: $SECRET, ...}
+          - pattern: |
+              {..., consumerSecret: $SECRET, ...}
+      - patterns:
+        - pattern-inside: |
+            $SECRET = '...'
+            ...
+        - pattern-either:
+          - pattern-inside: |
+              $VALUE = {..., clientSecret: $SECRET, ...}
+              ...
+          - pattern-inside: |
+              $VALUE = {..., secretOrKey: $SECRET, ...}
+              ...
+          - pattern-inside: |
+              $VALUE = {..., consumerSecret: $SECRET, ...}
+              ...
+        - pattern: $VALUE
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - pattern-inside: |
+          $F = require("$I").Strategy
+          ...
+      - pattern-inside: |
+          $F = require("$I")
+          ...
+      - pattern-inside: |
+          import { $STRAT as $F } from '$I'
+          ...
+      - pattern-inside: |
+          import $F from '$I'
+          ...
+    - metavariable-regex:
+        metavariable: $I
+        regex: (passport-.*)
+    - pattern-inside: |
+        new $F($VALUE,...)
+    - focus-metavariable: $VALUE
+- id: javascript.express.security.audit.xss.direct-response-write.direct-response-write
+  message: Detected directly writing to a Response object from user-defined input.
+    This bypasses any HTML escaping and may expose your application to a Cross-Site-scripting
+    (XSS) vulnerability. Instead, use 'resp.render()' to render safely escaped HTML.
+  options:
+    interfile: true
+  metadata:
+    interfile: true
+    references:
+    - https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html
+    owasp:
+    - A07:2017 - Cross-Site Scripting (XSS)
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    cwe:
+    - 'CWE-79: Improper Neutralization of Input During Web Page Generation (''Cross-site
+      Scripting'')'
+    category: security
+    technology:
+    - express
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    vulnerability_class:
+    - Cross-Site-Scripting (XSS)
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    source: https://semgrep.dev/r/javascript.express.security.audit.xss.direct-response-write.direct-response-write
+    shortlink: https://sg.run/vzGl
+    semgrep.dev:
+      rule:
+        r_id: 9277
+        rv_id: 1263150
+        rule_id: 3qUPA1
+        version_id: JdTzxeg
+        url: https://semgrep.dev/playground/r/JdTzxeg/javascript.express.security.audit.xss.direct-response-write.direct-response-write
+        origin: community
+  languages:
+  - javascript
+  - typescript
+  severity: WARNING
+  mode: taint
+  pattern-sources:
+  - patterns:
+    - pattern-either:
+      - pattern-inside: function ... ($REQ, $RES) {...}
+      - pattern-inside: function ... ($REQ, $RES, $NEXT) {...}
+      - patterns:
+        - pattern-inside: $APP.$METHOD(..., function $FUNC($REQ, $RES) {...})
+        - metavariable-regex:
+            metavariable: $METHOD
+            regex: ^(get|post|put|head|delete|options)
+    - pattern-not-inside: |
+        function ... ($REQ, $RES) {
+            ...
+            $RES.$SET('Content-Type', '$TYPE')
+        }
+    - pattern-not-inside: |
+        $APP.$METHOD(..., function $FUNC($REQ, $RES) {
+            ...
+            $RES.$SET('Content-Type', '$TYPE')
+        })
+    - pattern-not-inside: |
+        function ... ($REQ, $RES, $NEXT) {
+            ...
+            $RES.$SET('Content-Type', '$TYPE')
+        }
+    - pattern-not-inside: |
+        function ... ($REQ, $RES) {
+            ...
+            $RES.set('$TYPE')
+        }
+    - pattern-not-inside: |
+        $APP.$METHOD(..., function $FUNC($REQ, $RES) {
+            ...
+            $RES.set('$TYPE')
+        })
+    - pattern-not-inside: |
+        function ... ($REQ, $RES, $NEXT) {
+            ...
+            $RES.set('$TYPE')
+        }
+    - pattern-either:
+      - pattern: $REQ.query
+      - pattern: $REQ.body
+      - pattern: $REQ.params
+  - patterns:
+    - pattern-either:
+      - pattern-inside: |
+          ({ $REQ }: Request,$RES: Response, $NEXT: NextFunction) =>
+          {...}
+      - pattern-inside: |
+          ({ $REQ }: Request,$RES: Response) => {...}
+    - pattern-not-inside: |
+        ({ $REQ }: Request,$RES: Response, $NEXT: NextFunction) =>
+        {
+            ...
+            $RES.$SET('Content-Type', '$TYPE')
+        }
+    - pattern-not-inside: |
+        ({ $REQ }: Request,$RES: Response) => {
+            ...
+            $RES.$SET('Content-Type', '$TYPE')
+        }
+    - pattern-not-inside: |
+        ({ $REQ }: Request,$RES: Response, $NEXT: NextFunction) =>
+        {
+            ...
+            $RES.set('$TYPE')
+        }
+    - focus-metavariable: $REQ
+    - pattern-either:
+      - pattern: params
+      - pattern: query
+      - pattern: body
+  pattern-sinks:
+  - patterns:
+    - pattern-inside: function ... (..., $RES,...) {...}
+    - pattern-either:
+      - pattern: $RES.write($ARG)
+      - pattern: $RES.send($ARG)
+    - pattern-not: $RES. ... .set('...'). ... .send($ARG)
+    - pattern-not: $RES. ... .type('...'). ... .send($ARG)
+    - pattern-not-inside: $RES.$METHOD({ ... })
+    - focus-metavariable: $ARG
+  pattern-sanitizers:
+  - patterns:
+    - pattern-either:
+      - pattern-inside: |
+          import $S from "underscore.string"
+          ...
+      - pattern-inside: |
+          import * as $S from "underscore.string"
+          ...
+      - pattern-inside: |
+          import $S from "underscore.string"
+          ...
+      - pattern-inside: |
+          $S = require("underscore.string")
+          ...
+    - pattern-either:
+      - pattern: $S.escapeHTML(...)
+  - patterns:
+    - pattern-either:
+      - pattern-inside: |
+          import $S from "dompurify"
+          ...
+      - pattern-inside: |
+          import { ..., $S,... } from "dompurify"
+          ...
+      - pattern-inside: |
+          import * as $S from "dompurify"
+          ...
+      - pattern-inside: |
+          $S = require("dompurify")
+          ...
+      - pattern-inside: |
+          import $S from "isomorphic-dompurify"
+          ...
+      - pattern-inside: |
+          import * as $S from "isomorphic-dompurify"
+          ...
+      - pattern-inside: |
+          $S = require("isomorphic-dompurify")
+          ...
+    - pattern-either:
+      - patterns:
+        - pattern-inside: |
+            $VALUE = $S(...)
+            ...
+        - pattern: $VALUE.sanitize(...)
+      - patterns:
+        - pattern-inside: |
+            $VALUE = $S.sanitize
+            ...
+        - pattern: $S(...)
+      - pattern: $S.sanitize(...)
+      - pattern: $S(...)
+  - patterns:
+    - pattern-either:
+      - pattern-inside: |
+          import $S from 'xss';
+          ...
+      - pattern-inside: |
+          import * as $S from 'xss';
+          ...
+      - pattern-inside: |
+          $S = require("xss")
+          ...
+    - pattern: $S(...)
+  - patterns:
+    - pattern-either:
+      - pattern-inside: |
+          import $S from 'sanitize-html';
+          ...
+      - pattern-inside: |
+          import * as $S from "sanitize-html";
+          ...
+      - pattern-inside: |
+          $S = require("sanitize-html")
+          ...
+    - pattern: $S(...)
+  - patterns:
+    - pattern-either:
+      - pattern-inside: |
+          $S = new Remarkable()
+          ...
+    - pattern: $S.render(...)
+  - patterns:
+    - pattern-either:
+      - pattern-inside: |
+          import $S from 'express-xss-sanitizer';
+          ...
+      - pattern-inside: |
+          import * as $S from "express-xss-sanitizer";
+          ...
+      - pattern-inside: |
+          const { ..., $S, ... } = require('express-xss-sanitizer');
+          ...
+      - pattern-inside: |
+          var { ..., $S, ... } = require('express-xss-sanitizer');
+          ...
+      - pattern-inside: |
+          let { ...,$S,... } = require('express-xss-sanitizer');
+          ...
+      - pattern-inside: |
+          $S = require("express-xss-sanitizer")
+          ...
+    - pattern: $S(...)
+  - patterns:
+    - pattern: $RES. ... .type('$F'). ... .send(...)
+    - metavariable-regex:
+        metavariable: $F
+        regex: (?!.*text/html)
+  - patterns:
+    - pattern-inside: |
+        $X = [...];
+        ...
+    - pattern: |
+        if(<... !$X.includes($SOURCE)...>) {
+            ...
+            return ...
+        }
+        ...
+    - pattern: $SOURCE
+- id: javascript.express.security.express-puppeteer-injection.express-puppeteer-injection
+  message: If unverified user data can reach the `puppeteer` methods it can result
+    in Server-Side Request Forgery vulnerabilities
+  metadata:
+    owasp:
+    - A10:2021 - Server-Side Request Forgery (SSRF)
+    - A01:2025 - Broken Access Control
+    cwe:
+    - 'CWE-918: Server-Side Request Forgery (SSRF)'
+    category: security
+    technology:
+    - express
+    references:
+    - https://pptr.dev/api/puppeteer.page
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Server-Side Request Forgery (SSRF)
+    source: https://semgrep.dev/r/javascript.express.security.express-puppeteer-injection.express-puppeteer-injection
+    shortlink: https://sg.run/0QJB
+    semgrep.dev:
+      rule:
+        r_id: 9254
+        rv_id: 1263168
+        rule_id: X5U8Nz
+        version_id: X0TzyJY
+        url: https://semgrep.dev/playground/r/X0TzyJY/javascript.express.security.express-puppeteer-injection.express-puppeteer-injection
+        origin: community
+  languages:
+  - javascript
+  - typescript
+  severity: ERROR
+  mode: taint
+  pattern-sources:
+  - patterns:
+    - pattern-either:
+      - pattern-inside: function ... ($REQ, $RES) {...}
+      - pattern-inside: function ... ($REQ, $RES, $NEXT) {...}
+      - patterns:
+        - pattern-either:
+          - pattern-inside: $APP.$METHOD(..., function $FUNC($REQ, $RES) {...})
+          - pattern-inside: $APP.$METHOD(..., function $FUNC($REQ, $RES, $NEXT) {...})
+        - metavariable-regex:
+            metavariable: $METHOD
+            regex: ^(get|post|put|head|delete|options)$
+    - pattern-either:
+      - pattern: $REQ.query
+      - pattern: $REQ.body
+      - pattern: $REQ.params
+      - pattern: $REQ.cookies
+      - pattern: $REQ.headers
+  - patterns:
+    - pattern-either:
+      - pattern-inside: |
+          ({ $REQ }: Request,$RES: Response, $NEXT: NextFunction) =>
+          {...}
+      - pattern-inside: |
+          ({ $REQ }: Request,$RES: Response) => {...}
+    - focus-metavariable: $REQ
+    - pattern-either:
+      - pattern: params
+      - pattern: query
+      - pattern: cookies
+      - pattern: headers
+      - pattern: body
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - pattern-inside: |
+          require('puppeteer');
+          ...
+      - pattern-inside: |
+          import 'puppeteer';
+          ...
+    - pattern-either:
+      - pattern: $PAGE.goto($SINK,...)
+      - pattern: $PAGE.setContent($SINK,...)
+      - pattern: $PAGE.evaluate($SINK,...)
+      - pattern: $PAGE.evaluate($CODE,$SINK,...)
+      - pattern: $PAGE.evaluateHandle($SINK,...)
+      - pattern: $PAGE.evaluateHandle($CODE,$SINK,...)
+      - pattern: $PAGE.evaluateOnNewDocument($SINK,...)
+      - pattern: $PAGE.evaluateOnNewDocument($CODE,$SINK,...)
+    - focus-metavariable: $SINK
+- id: javascript.express.security.audit.express-libxml-noent.express-libxml-noent
+  message: The libxml library processes user-input with the `noent` attribute is set
+    to `true` which can lead to being vulnerable to XML External Entities (XXE) type
+    attacks. It is recommended to set `noent` to `false` when using this feature to
+    ensure you are protected.
+  options:
+    interfile: true
+  metadata:
+    interfile: true
+    references:
+    - https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html
+    technology:
+    - express
+    category: security
+    cwe:
+    - 'CWE-611: Improper Restriction of XML External Entity Reference'
+    owasp:
+    - A04:2017 - XML External Entities (XXE)
+    - A05:2021 - Security Misconfiguration
+    - A02:2025 - Security Misconfiguration
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: HIGH
+    impact: HIGH
+    confidence: HIGH
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - XML Injection
+    source: https://semgrep.dev/r/javascript.express.security.audit.express-libxml-noent.express-libxml-noent
+    shortlink: https://sg.run/Z75x
+    semgrep.dev:
+      rule:
+        r_id: 22079
+        rv_id: 1263138
+        rule_id: pKUNeD
+        version_id: d6TyxpX
+        url: https://semgrep.dev/playground/r/d6TyxpX/javascript.express.security.audit.express-libxml-noent.express-libxml-noent
+        origin: community
+  languages:
+  - javascript
+  - typescript
+  severity: ERROR
+  mode: taint
+  pattern-sources:
+  - patterns:
+    - pattern-either:
+      - pattern-inside: function ... ($REQ, $RES) {...}
+      - pattern-inside: function ... ($REQ, $RES, $NEXT) {...}
+      - patterns:
+        - pattern-either:
+          - pattern-inside: $APP.$METHOD(..., function $FUNC($REQ, $RES) {...})
+          - pattern-inside: $APP.$METHOD(..., function $FUNC($REQ, $RES, $NEXT) {...})
+        - metavariable-regex:
+            metavariable: $METHOD
+            regex: ^(get|post|put|head|delete|options)$
+    - pattern-either:
+      - pattern: $REQ.query
+      - pattern: $REQ.body
+      - pattern: $REQ.params
+      - pattern: $REQ.cookies
+      - pattern: $REQ.headers
+      - pattern: $REQ.files.$ANYTHING.data.toString('utf8')
+      - pattern: $REQ.files.$ANYTHING['data'].toString('utf8')
+  - patterns:
+    - pattern-either:
+      - pattern-inside: |
+          ({ $REQ }: Request,$RES: Response, $NEXT: NextFunction) =>
+          {...}
+      - pattern-inside: |
+          ({ $REQ }: Request,$RES: Response) => {...}
+    - focus-metavariable: $REQ
+    - pattern-either:
+      - pattern: params
+      - pattern: query
+      - pattern: cookies
+      - pattern: headers
+      - pattern: body
+      - pattern: files.$ANYTHING.data.toString('utf8')
+      - pattern: files.$ANYTHING['data'].toString('utf8')
+  pattern-sinks:
+  - pattern-either:
+    - patterns:
+      - pattern-either:
+        - pattern-inside: |
+            $XML = require('$IMPORT')
+            ...
+        - pattern-inside: |
+            import $XML from '$IMPORT'
+              ...
+        - pattern-inside: |
+            import * as $XML from '$IMPORT'
+            ...
+      - metavariable-regex:
+          metavariable: $IMPORT
+          regex: ^(libxmljs|libxmljs2)$
+      - pattern-inside: $XML.$FUNC($QUERY, {...,noent:true,...})
+      - metavariable-regex:
+          metavariable: $FUNC
+          regex: ^(parseXmlString|parseXml)$
+      - focus-metavariable: $QUERY
+- id: javascript.express.security.express-phantom-injection.express-phantom-injection
+  message: If unverified user data can reach the `phantom` methods it can result in
+    Server-Side Request Forgery vulnerabilities
+  metadata:
+    owasp:
+    - A10:2021 - Server-Side Request Forgery (SSRF)
+    - A01:2025 - Broken Access Control
+    cwe:
+    - 'CWE-918: Server-Side Request Forgery (SSRF)'
+    category: security
+    technology:
+    - express
+    references:
+    - https://phantomjs.org/page-automation.html
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Server-Side Request Forgery (SSRF)
+    source: https://semgrep.dev/r/javascript.express.security.express-phantom-injection.express-phantom-injection
+    shortlink: https://sg.run/W8BL
+    semgrep.dev:
+      rule:
+        r_id: 9253
+        rv_id: 1263167
+        rule_id: 2ZUbx3
+        version_id: 2KTv26p
+        url: https://semgrep.dev/playground/r/2KTv26p/javascript.express.security.express-phantom-injection.express-phantom-injection
+        origin: community
+  languages:
+  - javascript
+  - typescript
+  severity: ERROR
+  mode: taint
+  pattern-sources:
+  - patterns:
+    - pattern-either:
+      - pattern-inside: function ... ($REQ, $RES) {...}
+      - pattern-inside: function ... ($REQ, $RES, $NEXT) {...}
+      - patterns:
+        - pattern-either:
+          - pattern-inside: $APP.$METHOD(..., function $FUNC($REQ, $RES) {...})
+          - pattern-inside: $APP.$METHOD(..., function $FUNC($REQ, $RES, $NEXT) {...})
+        - metavariable-regex:
+            metavariable: $METHOD
+            regex: ^(get|post|put|head|delete|options)$
+    - pattern-either:
+      - pattern: $REQ.query
+      - pattern: $REQ.body
+      - pattern: $REQ.params
+      - pattern: $REQ.cookies
+      - pattern: $REQ.headers
+  - patterns:
+    - pattern-either:
+      - pattern-inside: |
+          ({ $REQ }: Request,$RES: Response, $NEXT: NextFunction) =>
+          {...}
+      - pattern-inside: |
+          ({ $REQ }: Request,$RES: Response) => {...}
+    - focus-metavariable: $REQ
+    - pattern-either:
+      - pattern: params
+      - pattern: query
+      - pattern: cookies
+      - pattern: headers
+      - pattern: body
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - pattern-inside: |
+          require('phantom');
+          ...
+      - pattern-inside: |
+          import 'phantom';
+          ...
+    - pattern-either:
+      - pattern: $PAGE.open($SINK,...)
+      - pattern: $PAGE.setContent($SINK,...)
+      - pattern: $PAGE.openUrl($SINK,...)
+      - pattern: $PAGE.evaluateJavaScript($SINK,...)
+      - pattern: $PAGE.property("content",$SINK,...)
+    - focus-metavariable: $SINK
+- id: javascript.express.security.express-vm-injection.express-vm-injection
+  message: Make sure that unverified user data can not reach `$VM`.
+  metadata:
+    owasp:
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    references:
+    - https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html
+    cwe:
+    - 'CWE-94: Improper Control of Generation of Code (''Code Injection'')'
+    category: security
+    technology:
+    - express
+    cwe2022-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Code Injection
+    source: https://semgrep.dev/r/javascript.express.security.express-vm-injection.express-vm-injection
+    shortlink: https://sg.run/jkqJ
+    semgrep.dev:
+      rule:
+        r_id: 12821
+        rv_id: 1263170
+        rule_id: DbUKPX
+        version_id: 1QTypXQ
+        url: https://semgrep.dev/playground/r/1QTypXQ/javascript.express.security.express-vm-injection.express-vm-injection
+        origin: community
+  languages:
+  - javascript
+  - typescript
+  severity: ERROR
+  mode: taint
+  pattern-sources:
+  - patterns:
+    - pattern-either:
+      - pattern-inside: function ... ($REQ, $RES) {...}
+      - pattern-inside: function ... ($REQ, $RES, $NEXT) {...}
+      - patterns:
+        - pattern-either:
+          - pattern-inside: $APP.$METHOD(..., function $FUNC($REQ, $RES) {...})
+          - pattern-inside: $APP.$METHOD(..., function $FUNC($REQ, $RES, $NEXT) {...})
+        - metavariable-regex:
+            metavariable: $METHOD
+            regex: ^(get|post|put|head|delete|options)$
+    - pattern-either:
+      - pattern: $REQ.query
+      - pattern: $REQ.body
+      - pattern: $REQ.params
+      - pattern: $REQ.cookies
+      - pattern: $REQ.headers
+  - patterns:
+    - pattern-either:
+      - pattern-inside: |
+          ({ $REQ }: Request,$RES: Response, $NEXT: NextFunction) =>
+          {...}
+      - pattern-inside: |
+          ({ $REQ }: Request,$RES: Response) => {...}
+    - focus-metavariable: $REQ
+    - pattern-either:
+      - pattern: params
+      - pattern: query
+      - pattern: cookies
+      - pattern: headers
+      - pattern: body
+  pattern-sinks:
+  - patterns:
+    - pattern-inside: |
+        $VM = require('vm');
+        ...
+    - pattern-either:
+      - pattern: |
+          $VM.runInContext(...)
+      - pattern: |
+          $VM.runInNewContext(...)
+      - pattern: |
+          $VM.compileFunction(...)
+      - pattern: |
+          $VM.runInThisContext(...)
+      - pattern: new $VM.Script(...)
+- id: javascript.express.security.require-request.require-request
+  message: If an attacker controls the x in require(x) then they can cause code to
+    load that was not intended to run on the server.
+  options:
+    interfile: true
+  metadata:
+    interfile: true
+    owasp:
+    - A01:2021 - Broken Access Control
+    - A01:2025 - Broken Access Control
+    cwe:
+    - 'CWE-706: Use of Incorrectly-Resolved Name or Reference'
+    source-rule-url: https://nodesecroadmap.fyi/chapter-1/threat-UIR.html
+    category: security
+    technology:
+    - express
+    references:
+    - https://github.com/google/node-sec-roadmap/blob/master/chapter-2/dynamism.md#dynamism-when-you-need-it
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Improper Authorization
+    source: https://semgrep.dev/r/javascript.express.security.require-request.require-request
+    shortlink: https://sg.run/jRbl
+    semgrep.dev:
+      rule:
+        r_id: 9265
+        rv_id: 1263177
+        rule_id: OrU3WK
+        version_id: w8TRo0d
+        url: https://semgrep.dev/playground/r/w8TRo0d/javascript.express.security.require-request.require-request
+        origin: community
+  languages:
+  - javascript
+  - typescript
+  severity: ERROR
+  mode: taint
+  pattern-sources:
+  - patterns:
+    - pattern-either:
+      - pattern-inside: function ... ($REQ, $RES) {...}
+      - pattern-inside: function ... ($REQ, $RES, $NEXT) {...}
+      - patterns:
+        - pattern-either:
+          - pattern-inside: $APP.$METHOD(..., function $FUNC($REQ, $RES) {...})
+          - pattern-inside: $APP.$METHOD(..., function $FUNC($REQ, $RES, $NEXT) {...})
+        - metavariable-regex:
+            metavariable: $METHOD
+            regex: ^(get|post|put|head|delete|options)$
+    - pattern-either:
+      - pattern: $REQ.query
+      - pattern: $REQ.body
+      - pattern: $REQ.params
+      - pattern: $REQ.cookies
+      - pattern: $REQ.headers
+  - patterns:
+    - pattern-either:
+      - pattern-inside: |
+          ({ $REQ }: Request,$RES: Response, $NEXT: NextFunction) =>
+          {...}
+      - pattern-inside: |
+          ({ $REQ }: Request,$RES: Response) => {...}
+    - focus-metavariable: $REQ
+    - pattern-either:
+      - pattern: params
+      - pattern: query
+      - pattern: cookies
+      - pattern: headers
+      - pattern: body
+  pattern-sinks:
+  - patterns:
+    - pattern: require($SINK)
+    - focus-metavariable: $SINK
+- id: javascript.express.security.audit.express-ssrf.express-ssrf
+  message: 'The following request $REQUEST.$METHOD() was found to be crafted from
+    user-input `$REQ` which can lead to Server-Side Request Forgery (SSRF) vulnerabilities.
+    It is recommended where possible to not allow user-input to craft the base request,
+    but to be treated as part of the path or query parameter. When user-input is necessary
+    to craft the request, it is recommeneded to follow OWASP best practices to prevent
+    abuse. '
+  metadata:
+    references:
+    - https://cheatsheetseries.owasp.org/cheatsheets/Server_Side_Request_Forgery_Prevention_Cheat_Sheet.html
+    cwe:
+    - 'CWE-918: Server-Side Request Forgery (SSRF)'
+    technology:
+    - express
+    category: security
+    owasp:
+    - A10:2021 - Server-Side Request Forgery (SSRF)
+    - A01:2025 - Broken Access Control
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: HIGH
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Server-Side Request Forgery (SSRF)
+    source: https://semgrep.dev/r/javascript.express.security.audit.express-ssrf.express-ssrf
+    shortlink: https://sg.run/0PNw
+    semgrep.dev:
+      rule:
+        r_id: 22554
+        rv_id: 1263144
+        rule_id: eqU9l2
+        version_id: 8KT5rBr
+        url: https://semgrep.dev/playground/r/8KT5rBr/javascript.express.security.audit.express-ssrf.express-ssrf
+        origin: community
+  languages:
+  - javascript
+  - typescript
+  severity: WARNING
+  mode: taint
+  options:
+    taint_unify_mvars: true
+  pattern-sources:
+  - patterns:
+    - pattern-either:
+      - pattern-inside: function ... ($REQ, ...) {...}
+    - pattern-either:
+      - pattern: $REQ.query
+      - pattern: $REQ.body
+      - pattern: $REQ.params
+      - pattern: $REQ.cookies
+      - pattern: $REQ.headers
+  - patterns:
+    - pattern-either:
+      - pattern-inside: |
+          ({ $REQ }: Request,...) =>
+          {...}
+      - pattern-inside: |
+          ({ $REQ }: $EXPRESS.Request,...) => {...}
+    - focus-metavariable: $REQ
+    - pattern-either:
+      - pattern: params
+      - pattern: query
+      - pattern: cookies
+      - pattern: headers
+      - pattern: body
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - pattern-inside: |
+          $REQUEST = require('request')
+          ...
+      - pattern-inside: |
+          import * as $REQUEST from 'request'
+          ...
+      - pattern-inside: |
+          import $REQUEST from 'request'
+          ...
+    - pattern-either:
+      - pattern: $REQUEST.$METHOD("$HTTP"+$REQ. ... .$VALUE)
+      - pattern: $REQUEST.$METHOD("$HTTP"+$REQ. ... .$VALUE + $...A)
+      - pattern: $REQUEST.$METHOD(`$HTTP${$REQ. ... .$VALUE}...`)
+      - pattern: $REQUEST.$METHOD("$HTTP"+$REQ.$VALUE[...])
+      - pattern: $REQUEST.$METHOD("$HTTP"+$REQ.$VALUE[...] + $...A)
+      - pattern: $REQUEST.$METHOD(`$HTTP${$REQ.$VALUE[...]}...`)
+    - metavariable-regex:
+        metavariable: $METHOD
+        regex: ^(get|post|put|patch|del|head|delete)$
+    - metavariable-regex:
+        metavariable: $HTTP
+        regex: ^(https?:\/\/|//)$
+    - pattern-either:
+      - pattern: $REQ. ... .$VALUE
+  - patterns:
+    - pattern-either:
+      - pattern-inside: |
+          $REQUEST = require('request')
+          ...
+      - pattern-inside: |
+          import * as $REQUEST from 'request'
+          ...
+      - pattern-inside: |
+          import $REQUEST from 'request'
+          ...
+    - pattern-either:
+      - pattern: $REQUEST.$METHOD($REQ. ... .$VALUE,...)
+      - pattern: $REQUEST.$METHOD($REQ. ... .$VALUE + $...A,...)
+      - pattern: $REQUEST.$METHOD(`${$REQ. ... .$VALUE}...`,...)
+    - pattern: $REQ. ... .$VALUE
+    - metavariable-regex:
+        metavariable: $METHOD
+        regex: ^(get|post|put|patch|del|head|delete)$
+  - patterns:
+    - pattern-either:
+      - pattern-inside: |
+          $REQUEST = require('request')
+          ...
+      - pattern-inside: |
+          import * as $REQUEST from 'request'
+          ...
+      - pattern-inside: |
+          import $REQUEST from 'request'
+          ...
+    - pattern-either:
+      - pattern: $REQUEST.$METHOD($REQ.$VALUE['...'],...)
+      - pattern: $REQUEST.$METHOD($REQ.$VALUE['...'] + $...A,...)
+      - pattern: $REQUEST.$METHOD(`${$REQ.$VALUE['...']}...`,...)
+    - pattern: $REQ.$VALUE
+    - metavariable-regex:
+        metavariable: $METHOD
+        regex: ^(get|post|put|patch|del|head|delete)$
+  - patterns:
+    - pattern-either:
+      - pattern-inside: |
+          $REQUEST = require('request')
+          ...
+      - pattern-inside: |
+          import * as $REQUEST from 'request'
+          ...
+      - pattern-inside: |
+          import $REQUEST from 'request'
+          ...
+    - pattern-either:
+      - pattern-inside: |
+          $ASSIGN = $REQ. ... .$VALUE
+          ...
+      - pattern-inside: |
+          $ASSIGN = $REQ. ... .$VALUE['...']
+          ...
+      - pattern-inside: |
+          $ASSIGN = $REQ. ... .$VALUE + $...A
+          ...
+      - pattern-inside: "$ASSIGN = $REQ. ... .$VALUE['...'] + $...A\n...     \n"
+      - pattern-inside: |
+          $ASSIGN = `${$REQ. ... .$VALUE}...`
+          ...
+      - pattern-inside: "$ASSIGN = `${$REQ. ... .$VALUE['...']}...`\n... \n"
+      - patterns:
+        - pattern-either:
+          - pattern-inside: |
+              $ASSIGN = "$HTTP"+ $REQ. ... .$VALUE
+              ...
+          - pattern-inside: |
+              $ASSIGN = "$HTTP"+$REQ. ... .$VALUE + $...A
+              ...
+          - pattern-inside: |
+              $ASSIGN = "$HTTP"+$REQ.$VALUE[...]
+              ...
+          - pattern-inside: |
+              $ASSIGN = "$HTTP"+$REQ.$VALUE[...] + $...A
+              ...
+          - pattern-inside: |
+              $ASSIGN = `$HTTP${$REQ.$VALUE[...]}...`
+              ...
+        - metavariable-regex:
+            metavariable: $HTTP
+            regex: ^(https?:\/\/|//)$
+    - pattern-either:
+      - pattern: $REQUEST.$METHOD($ASSIGN,...)
+      - pattern: $REQUEST.$METHOD($ASSIGN + $...FOO,...)
+      - pattern: $REQUEST.$METHOD(`${$ASSIGN}...`,...)
+      - patterns:
+        - pattern-either:
+          - pattern: $REQUEST.$METHOD("$HTTP"+$ASSIGN,...)
+          - pattern: $REQUEST.$METHOD("$HTTP"+$ASSIGN + $...A,...)
+          - pattern: $REQUEST.$METHOD(`$HTTP${$ASSIGN}...`,...)
+        - metavariable-regex:
+            metavariable: $HTTP
+            regex: ^(https?:\/\/|//)$
+    - pattern: $ASSIGN
+    - metavariable-regex:
+        metavariable: $METHOD
+        regex: ^(get|post|put|patch|del|head|delete)$
+- id: javascript.express.security.express-xml2json-xxe.express-xml2json-xxe
+  message: Make sure that unverified user data can not reach the XML Parser, as it
+    can result in XML External or Internal Entity (XXE) Processing vulnerabilities
+  metadata:
+    owasp:
+    - A04:2017 - XML External Entities (XXE)
+    - A05:2021 - Security Misconfiguration
+    - A02:2025 - Security Misconfiguration
+    cwe:
+    - 'CWE-611: Improper Restriction of XML External Entity Reference'
+    asvs:
+      section: V5 Validation, Sanitization and Encoding
+      control_id: 5.5.2 Insecue XML Deserialization
+      control_url: https://github.com/OWASP/ASVS/blob/master/4.0/en/0x13-V5-Validation-Sanitization-Encoding.md#v55-deserialization-prevention
+      version: '4'
+    category: security
+    technology:
+    - express
+    references:
+    - https://www.npmjs.com/package/xml2json
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - XML Injection
+    source: https://semgrep.dev/r/javascript.express.security.express-xml2json-xxe.express-xml2json-xxe
+    shortlink: https://sg.run/XBD4
+    semgrep.dev:
+      rule:
+        r_id: 9264
+        rv_id: 1263174
+        rule_id: x8Uneb
+        version_id: bZT534J
+        url: https://semgrep.dev/playground/r/bZT534J/javascript.express.security.express-xml2json-xxe.express-xml2json-xxe
+        origin: community
+  languages:
+  - javascript
+  - typescript
+  severity: ERROR
+  mode: taint
+  pattern-sources:
+  - patterns:
+    - pattern-either:
+      - pattern-inside: function ... ($REQ, $RES) {...}
+      - pattern-inside: function ... ($REQ, $RES, $NEXT) {...}
+      - patterns:
+        - pattern-either:
+          - pattern-inside: $APP.$METHOD(..., function $FUNC($REQ, $RES) {...})
+          - pattern-inside: $APP.$METHOD(..., function $FUNC($REQ, $RES, $NEXT) {...})
+        - metavariable-regex:
+            metavariable: $METHOD
+            regex: ^(get|post|put|head|delete|options)$
+    - pattern-either:
+      - pattern: $REQ.query
+      - pattern: $REQ.body
+      - pattern: $REQ.params
+      - pattern: $REQ.cookies
+      - pattern: $REQ.headers
+      - pattern: $REQ.files.$ANYTHING.data.toString('utf8')
+      - pattern: $REQ.files.$ANYTHING['data'].toString('utf8')
+  - patterns:
+    - pattern-either:
+      - pattern-inside: |
+          ({ $REQ }: Request,$RES: Response, $NEXT: NextFunction) =>
+          {...}
+      - pattern-inside: |
+          ({ $REQ }: Request,$RES: Response) => {...}
+    - focus-metavariable: $REQ
+    - pattern-either:
+      - pattern: params
+      - pattern: query
+      - pattern: cookies
+      - pattern: headers
+      - pattern: body
+      - pattern: files.$ANYTHING.data.toString('utf8')
+      - pattern: files.$ANYTHING['data'].toString('utf8')
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - pattern-inside: |
+          require('xml2json');
+          ...
+      - pattern-inside: |
+          import 'xml2json';
+          ...
+    - pattern: $EXPAT.toJson($SINK,...)
+    - focus-metavariable: $SINK
+- id: javascript.express.security.audit.express-path-join-resolve-traversal.express-path-join-resolve-traversal
+  message: Possible writing outside of the destination, make sure that the target
+    path is nested in the intended destination
+  metadata:
+    owasp:
+    - A05:2017 - Broken Access Control
+    - A01:2021 - Broken Access Control
+    - A01:2025 - Broken Access Control
+    cwe:
+    - 'CWE-22: Improper Limitation of a Pathname to a Restricted Directory (''Path
+      Traversal'')'
+    category: security
+    references:
+    - https://owasp.org/www-community/attacks/Path_Traversal
+    technology:
+    - express
+    - node.js
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: HIGH
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Path Traversal
+    source: https://semgrep.dev/r/javascript.express.security.audit.express-path-join-resolve-traversal.express-path-join-resolve-traversal
+    shortlink: https://sg.run/weRn
+    semgrep.dev:
+      rule:
+        r_id: 9273
+        rv_id: 1263141
+        rule_id: L1Uyb8
+        version_id: ExTExX0
+        url: https://semgrep.dev/playground/r/ExTExX0/javascript.express.security.audit.express-path-join-resolve-traversal.express-path-join-resolve-traversal
+        origin: community
+  languages:
+  - javascript
+  - typescript
+  severity: WARNING
+  mode: taint
+  pattern-sources:
+  - patterns:
+    - pattern-either:
+      - pattern-inside: function ... ($REQ, $RES) {...}
+      - pattern-inside: function ... ($REQ, $RES, $NEXT) {...}
+      - patterns:
+        - pattern-either:
+          - pattern-inside: $APP.$METHOD(..., function $FUNC($REQ, $RES) {...})
+          - pattern-inside: $APP.$METHOD(..., function $FUNC($REQ, $RES, $NEXT) {...})
+        - metavariable-regex:
+            metavariable: $METHOD
+            regex: ^(get|post|put|head|delete|options)$
+    - pattern-either:
+      - pattern: $REQ.query
+      - pattern: $REQ.body
+      - pattern: $REQ.params
+      - pattern: $REQ.cookies
+      - pattern: $REQ.headers
+  - patterns:
+    - pattern-either:
+      - pattern-inside: |
+          ({ $REQ }: Request,$RES: Response, $NEXT: NextFunction) =>
+          {...}
+      - pattern-inside: |
+          ({ $REQ }: Request,$RES: Response) => {...}
+    - focus-metavariable: $REQ
+    - pattern-either:
+      - pattern: params
+      - pattern: query
+      - pattern: cookies
+      - pattern: headers
+      - pattern: body
+  pattern-sinks:
+  - patterns:
+    - focus-metavariable: $SINK
+    - pattern-either:
+      - pattern-inside: |
+          $PATH = require('path');
+          ...
+      - pattern-inside: |
+          import $PATH from 'path';
+          ...
+    - pattern-either:
+      - pattern: $PATH.join(...,$SINK,...)
+      - pattern: $PATH.resolve(...,$SINK,...)
+  - patterns:
+    - focus-metavariable: $SINK
+    - pattern-inside: |
+        import 'path';
+        ...
+    - pattern-either:
+      - pattern: path.join(...,$SINK,...)
+      - pattern: path.resolve(...,$SINK,...)
+  pattern-sanitizers:
+  - pattern: $Y.replace(...)
+  - pattern: $Y.indexOf(...)
+  - pattern: |
+      function ... (...) {
+          ...
+          <... $Y.indexOf(...) ...>
+          ...
+      }
+  - patterns:
+    - pattern: $FUNC(...)
+    - metavariable-regex:
+        metavariable: $FUNC
+        regex: sanitize
+- id: javascript.express.security.injection.raw-html-format.raw-html-format
+  message: User data flows into the host portion of this manually-constructed HTML.
+    This can introduce a Cross-Site-Scripting (XSS) vulnerability if this comes from
+    user-provided input. Consider using a sanitization library such as DOMPurify to
+    sanitize the HTML within.
+  metadata:
+    cwe:
+    - 'CWE-79: Improper Neutralization of Input During Web Page Generation (''Cross-site
+      Scripting'')'
+    owasp:
+    - A07:2017 - Cross-Site Scripting (XSS)
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    references:
+    - https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html
+    category: security
+    technology:
+    - express
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: HIGH
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Cross-Site-Scripting (XSS)
+    source: https://semgrep.dev/r/javascript.express.security.injection.raw-html-format.raw-html-format
+    shortlink: https://sg.run/5DO3
+    semgrep.dev:
+      rule:
+        r_id: 14691
+        rv_id: 1263175
+        rule_id: 5rUL0X
+        version_id: NdTzyQv
+        url: https://semgrep.dev/playground/r/NdTzyQv/javascript.express.security.injection.raw-html-format.raw-html-format
+        origin: community
+  languages:
+  - javascript
+  - typescript
+  severity: WARNING
+  mode: taint
+  pattern-sources:
+  - label: EXPRESS
+    patterns:
+    - pattern-either:
+      - pattern-inside: function ... ($REQ, $RES) {...}
+      - pattern-inside: function ... ($REQ, $RES, $NEXT) {...}
+      - patterns:
+        - pattern-either:
+          - pattern-inside: $APP.$METHOD(..., function $FUNC($REQ, $RES) {...})
+          - pattern-inside: $APP.$METHOD(..., function $FUNC($REQ, $RES, $NEXT) {...})
+        - metavariable-regex:
+            metavariable: $METHOD
+            regex: ^(get|post|put|head|delete|options)$
+    - pattern-either:
+      - pattern: $REQ.query
+      - pattern: $REQ.body
+      - pattern: $REQ.params
+      - pattern: $REQ.cookies
+      - pattern: $REQ.headers
+  - label: EXPRESSTS
+    patterns:
+    - pattern-either:
+      - pattern-inside: |
+          ({ $REQ }: Request,$RES: Response, $NEXT: NextFunction) =>
+          {...}
+      - pattern-inside: |
+          ({ $REQ }: Request,$RES: Response) => {...}
+    - focus-metavariable: $REQ
+    - pattern-either:
+      - pattern: params
+      - pattern: query
+      - pattern: cookies
+      - pattern: headers
+      - pattern: body
+  - label: CLEAN
+    by-side-effect: true
+    patterns:
+    - pattern-either:
+      - pattern: $A($SOURCE)
+      - pattern: $SANITIZE. ... .$A($SOURCE)
+      - pattern: $A. ... .$SANITIZE($SOURCE)
+    - focus-metavariable: $SOURCE
+    - metavariable-regex:
+        metavariable: $A
+        regex: (?i)(.*valid|.*sanitiz)
+  pattern-sinks:
+  - requires: (EXPRESS and not CLEAN) or (EXPRESSTS and not CLEAN)
+    patterns:
+    - pattern-either:
+      - patterns:
+        - pattern-either:
+          - pattern: '"$HTMLSTR" + $EXPR'
+          - pattern: '"$HTMLSTR".concat(...)'
+          - pattern: util.format($HTMLSTR, ...)
+        - metavariable-pattern:
+            metavariable: $HTMLSTR
+            language: generic
+            pattern: <$TAG ...
+      - patterns:
+        - pattern: |
+            `...`
+        - pattern-regex: |
+            .*<\w+.*
+- id: javascript.express.security.audit.express-res-sendfile.express-res-sendfile
+  message: The application processes user-input, this is passed to res.sendFile which
+    can allow an attacker to arbitrarily read files on the system through path traversal.
+    It is recommended to perform input validation in addition to canonicalizing the
+    path. This allows you to validate the path against the intended directory it should
+    be accessing.
+  metadata:
+    references:
+    - https://cheatsheetseries.owasp.org/cheatsheets/Input_Validation_Cheat_Sheet.html
+    technology:
+    - express
+    category: security
+    cwe:
+    - 'CWE-73: External Control of File Name or Path'
+    owasp:
+    - A04:2021 - Insecure Design
+    - A06:2025 - Insecure Design
+    subcategory:
+    - vuln
+    likelihood: HIGH
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Path Traversal
+    source: https://semgrep.dev/r/javascript.express.security.audit.express-res-sendfile.express-res-sendfile
+    shortlink: https://sg.run/7DJk
+    semgrep.dev:
+      rule:
+        r_id: 22082
+        rv_id: 1263142
+        rule_id: j2UzDx
+        version_id: 7ZTE3X9
+        url: https://semgrep.dev/playground/r/7ZTE3X9/javascript.express.security.audit.express-res-sendfile.express-res-sendfile
+        origin: community
+  languages:
+  - javascript
+  - typescript
+  severity: WARNING
+  mode: taint
+  pattern-sources:
+  - patterns:
+    - pattern-either:
+      - pattern-inside: function ... ($REQ, $RES) {...}
+      - pattern-inside: function ... ($REQ, $RES, $NEXT) {...}
+      - patterns:
+        - pattern-either:
+          - pattern-inside: $APP.$METHOD(..., function $FUNC($REQ, $RES) {...})
+          - pattern-inside: $APP.$METHOD(..., function $FUNC($REQ, $RES, $NEXT) {...})
+        - metavariable-regex:
+            metavariable: $METHOD
+            regex: ^(get|post|put|head|delete|options)$
+    - pattern-either:
+      - pattern: $REQ.query
+      - pattern: $REQ.body
+      - pattern: $REQ.params
+      - pattern: $REQ.cookies
+      - pattern: $REQ.headers
+  - patterns:
+    - pattern-either:
+      - pattern-inside: |
+          ({ $REQ }: Request,$RES: Response, $NEXT: NextFunction) =>
+          {...}
+      - pattern-inside: |
+          ({ $REQ }: Request,$RES: Response) => {...}
+    - pattern-either:
+      - pattern: params
+      - pattern: query
+      - pattern: cookies
+      - pattern: headers
+      - pattern: body
+  - patterns:
+    - pattern-either:
+      - patterns:
+        - pattern-either:
+          - pattern-inside: |
+              function ... (...,$REQ: $TYPE, ...) {...}
+        - metavariable-regex:
+            metavariable: $TYPE
+            regex: ^(string|String)
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - pattern: $RES.$METH($QUERY,...)
+    - pattern-not-inside: $RES.$METH($QUERY,$OPTIONS)
+    - metavariable-regex:
+        metavariable: $METH
+        regex: ^(sendfile|sendFile)$
+    - focus-metavariable: $QUERY
+- id: javascript.express.security.audit.express-open-redirect.express-open-redirect
+  message: The application redirects to a URL specified by user-supplied input `$REQ`
+    that is not validated. This could redirect users to malicious locations. Consider
+    using an allow-list approach to validate URLs, or warn users they are being redirected
+    to a third-party website.
+  metadata:
+    technology:
+    - express
+    references:
+    - https://cheatsheetseries.owasp.org/cheatsheets/Unvalidated_Redirects_and_Forwards_Cheat_Sheet.html
+    cwe:
+    - 'CWE-601: URL Redirection to Untrusted Site (''Open Redirect'')'
+    category: security
+    owasp:
+    - A01:2021 - Broken Access Control
+    - A01:2025 - Broken Access Control
+    subcategory:
+    - vuln
+    likelihood: HIGH
+    impact: MEDIUM
+    confidence: HIGH
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Open Redirect
+    source: https://semgrep.dev/r/javascript.express.security.audit.express-open-redirect.express-open-redirect
+    shortlink: https://sg.run/EpoP
+    semgrep.dev:
+      rule:
+        r_id: 22081
+        rv_id: 1263140
+        rule_id: X5ULkq
+        version_id: nWT2L0v
+        url: https://semgrep.dev/playground/r/nWT2L0v/javascript.express.security.audit.express-open-redirect.express-open-redirect
+        origin: community
+  languages:
+  - javascript
+  - typescript
+  severity: WARNING
+  options:
+    taint_unify_mvars: true
+    symbolic_propagation: true
+  mode: taint
+  pattern-sources:
+  - patterns:
+    - pattern-either:
+      - pattern-inside: function ... ($REQ, $RES) {...}
+      - pattern-inside: function ... ($REQ, $RES, $NEXT) {...}
+      - patterns:
+        - pattern-either:
+          - pattern-inside: $APP.$METHOD(..., function $FUNC($REQ, $RES) {...})
+          - pattern-inside: $APP.$METHOD(..., function $FUNC($REQ, $RES, $NEXT) {...})
+        - metavariable-regex:
+            metavariable: $METHOD
+            regex: ^(get|post|put|head|delete|options)$
+    - pattern-either:
+      - pattern: $REQ.query
+      - pattern: $REQ.body
+      - pattern: $REQ.params
+      - pattern: $REQ.cookies
+      - pattern: $REQ.headers
+  - patterns:
+    - pattern-either:
+      - pattern-inside: |
+          ({ $REQ }: Request,$RES: Response, $NEXT: NextFunction) =>
+          {...}
+      - pattern-inside: |
+          ({ $REQ }: Request,$RES: Response) => {...}
+    - focus-metavariable: $REQ
+    - pattern-either:
+      - pattern: params
+      - pattern: query
+      - pattern: cookies
+      - pattern: headers
+      - pattern: body
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - pattern: $RES.redirect("$HTTP"+$REQ. ... .$VALUE)
+      - pattern: $RES.redirect("$HTTP"+$REQ. ... .$VALUE + $...A)
+      - pattern: $RES.redirect(`$HTTP${$REQ. ... .$VALUE}...`)
+      - pattern: $RES.redirect("$HTTP"+$REQ.$VALUE[...])
+      - pattern: $RES.redirect("$HTTP"+$REQ.$VALUE[...] + $...A)
+      - pattern: $RES.redirect(`$HTTP${$REQ.$VALUE[...]}...`)
+    - metavariable-regex:
+        metavariable: $HTTP
+        regex: ^https?:\/\/$
+    - pattern-either:
+      - pattern: $REQ. ... .$VALUE
+  - patterns:
+    - pattern-either:
+      - pattern: $RES.redirect($REQ. ... .$VALUE)
+      - pattern: $RES.redirect($REQ. ... .$VALUE + $...A)
+      - pattern: $RES.redirect(`${$REQ. ... .$VALUE}...`)
+    - pattern: $REQ. ... .$VALUE
+  - patterns:
+    - pattern-either:
+      - pattern: $RES.redirect($REQ.$VALUE['...'])
+      - pattern: $RES.redirect($REQ.$VALUE['...'] + $...A)
+      - pattern: $RES.redirect(`${$REQ.$VALUE['...']}...`)
+    - pattern: $REQ.$VALUE
+  - patterns:
+    - pattern-either:
+      - pattern-inside: |
+          $ASSIGN = $REQ. ... .$VALUE
+          ...
+      - pattern-inside: |
+          $ASSIGN = $REQ.$VALUE['...']
+          ...
+      - pattern-inside: |
+          $ASSIGN = $REQ. ... .$VALUE + $...A
+          ...
+      - pattern-inside: "$ASSIGN = $REQ.$VALUE['...'] + $...A\n...     \n"
+      - pattern-inside: |
+          $ASSIGN = `${$REQ. ... .$VALUE}...`
+          ...
+      - pattern-inside: "$ASSIGN = `${$REQ.$VALUE['...']}...`\n...                    \n"
+    - pattern-either:
+      - pattern: $RES.redirect($ASSIGN)
+      - pattern: $RES.redirect($ASSIGN + $...FOO)
+      - pattern: $RES.redirect(`${$ASSIGN}...`)
+    - focus-metavariable: $ASSIGN
+- id: javascript.express.security.audit.express-third-party-object-deserialization.express-third-party-object-deserialization
+  message: The following function call $SER.$FUNC accepts user controlled data which
+    can result in Remote Code Execution (RCE) through Object Deserialization. It is
+    recommended to use secure data processing alternatives such as JSON.parse() and
+    Buffer.from().
+  options:
+    interfile: true
+  metadata:
+    interfile: true
+    technology:
+    - express
+    category: security
+    cwe:
+    - 'CWE-502: Deserialization of Untrusted Data'
+    references:
+    - https://cheatsheetseries.owasp.org/cheatsheets/Deserialization_Cheat_Sheet.html
+    source_rule_url:
+    - https://github.com/ajinabraham/njsscan/blob/75bfbeb9c8d72999e4d527dfa2548f7f0f3cc48a/njsscan/rules/semantic_grep/eval/eval_deserialize.yaml
+    owasp:
+    - A08:2017 - Insecure Deserialization
+    - A08:2021 - Software and Data Integrity Failures
+    - A08:2025 - Software or Data Integrity Failures
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: HIGH
+    impact: HIGH
+    confidence: HIGH
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - 'Insecure Deserialization '
+    source: https://semgrep.dev/r/javascript.express.security.audit.express-third-party-object-deserialization.express-third-party-object-deserialization
+    shortlink: https://sg.run/8W5j
+    semgrep.dev:
+      rule:
+        r_id: 22084
+        rv_id: 1263145
+        rule_id: 9AUyqj
+        version_id: gETB7nD
+        url: https://semgrep.dev/playground/r/gETB7nD/javascript.express.security.audit.express-third-party-object-deserialization.express-third-party-object-deserialization
+        origin: community
+  languages:
+  - javascript
+  - typescript
+  severity: WARNING
+  mode: taint
+  pattern-sources:
+  - patterns:
+    - pattern-either:
+      - pattern-inside: function ... ($REQ, $RES) {...}
+      - pattern-inside: function ... ($REQ, $RES, $NEXT) {...}
+      - patterns:
+        - pattern-either:
+          - pattern-inside: $APP.$METHOD(..., function $FUNC($REQ, $RES) {...})
+          - pattern-inside: $APP.$METHOD(..., function $FUNC($REQ, $RES, $NEXT) {...})
+        - metavariable-regex:
+            metavariable: $METHOD
+            regex: ^(get|post|put|head|delete|options)$
+    - pattern-either:
+      - pattern: $REQ.query
+      - pattern: $REQ.body
+      - pattern: $REQ.params
+      - pattern: $REQ.cookies
+      - pattern: $REQ.headers
+      - pattern: $REQ.files.$ANYTHING.data.toString('utf8')
+      - pattern: $REQ.files.$ANYTHING['data'].toString('utf8')
+  - patterns:
+    - pattern-either:
+      - pattern-inside: |
+          ({ $REQ }: Request,$RES: Response, $NEXT: NextFunction) =>
+          {...}
+      - pattern-inside: |
+          ({ $REQ }: Request,$RES: Response) => {...}
+    - focus-metavariable: $REQ
+    - pattern-either:
+      - pattern: params
+      - pattern: query
+      - pattern: cookies
+      - pattern: headers
+      - pattern: body
+      - pattern: files.$ANYTHING.data.toString('utf8')
+      - pattern: files.$ANYTHING['data'].toString('utf8')
+  pattern-sinks:
+  - pattern-either:
+    - patterns:
+      - pattern-either:
+        - pattern-inside: |
+            $SER = require('$IMPORT')
+            ...
+        - pattern-inside: |
+            import $SER from '$IMPORT'
+             ...
+        - pattern-inside: |
+            import * as $SER from '$IMPORT'
+            ...
+      - metavariable-regex:
+          metavariable: $IMPORT
+          regex: ^(node-serialize|serialize-to-js)$
+      - pattern: $SER.$FUNC(...)
+      - metavariable-regex:
+          metavariable: $FUNC
+          regex: ^(unserialize|deserialize)$
+- id: javascript.express.security.express-sandbox-injection.express-sandbox-code-injection
+  message: Make sure that unverified user data can not reach `sandbox`.
+  metadata:
+    owasp:
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    references:
+    - https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html
+    cwe:
+    - 'CWE-94: Improper Control of Generation of Code (''Code Injection'')'
+    category: security
+    technology:
+    - express
+    cwe2022-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Code Injection
+    source: https://semgrep.dev/r/javascript.express.security.express-sandbox-injection.express-sandbox-code-injection
+    shortlink: https://sg.run/KlwL
+    semgrep.dev:
+      rule:
+        r_id: 9255
+        rv_id: 1263169
+        rule_id: j2UvXB
+        version_id: jQTn59D
+        url: https://semgrep.dev/playground/r/jQTn59D/javascript.express.security.express-sandbox-injection.express-sandbox-code-injection
+        origin: community
+  languages:
+  - javascript
+  - typescript
+  severity: ERROR
+  mode: taint
+  pattern-sources:
+  - patterns:
+    - pattern-either:
+      - pattern-inside: function ... ($REQ, $RES) {...}
+      - pattern-inside: function ... ($REQ, $RES, $NEXT) {...}
+      - patterns:
+        - pattern-either:
+          - pattern-inside: $APP.$METHOD(..., function $FUNC($REQ, $RES) {...})
+          - pattern-inside: $APP.$METHOD(..., function $FUNC($REQ, $RES, $NEXT) {...})
+        - metavariable-regex:
+            metavariable: $METHOD
+            regex: ^(get|post|put|head|delete|options)$
+    - pattern-either:
+      - pattern: $REQ.query
+      - pattern: $REQ.body
+      - pattern: $REQ.params
+      - pattern: $REQ.cookies
+      - pattern: $REQ.headers
+  - patterns:
+    - pattern-either:
+      - pattern-inside: |
+          ({ $REQ }: Request,$RES: Response, $NEXT: NextFunction) =>
+          {...}
+      - pattern-inside: |
+          ({ $REQ }: Request,$RES: Response) => {...}
+    - focus-metavariable: $REQ
+    - pattern-either:
+      - pattern: params
+      - pattern: query
+      - pattern: cookies
+      - pattern: headers
+      - pattern: body
+  pattern-sinks:
+  - patterns:
+    - pattern-inside: |
+        $SANDBOX = require('sandbox');
+        ...
+    - pattern-either:
+      - patterns:
+        - pattern-inside: |
+            $S = new $SANDBOX(...);
+            ...
+        - pattern: |
+            $S.run(...)
+      - pattern: |
+          new $SANDBOX($OPTS).run(...)
+      - pattern: new $SANDBOX().run(...)
+- id: javascript.express.security.audit.express-cookie-settings.express-cookie-session-no-expires
+  message: 'Default session middleware settings: `expires` not set. Use it to set
+    expiration date for persistent cookies.'
+  severity: WARNING
+  languages:
+  - javascript
+  - typescript
+  metadata:
+    cwe:
+    - 'CWE-522: Insufficiently Protected Credentials'
+    owasp:
+    - A02:2017 - Broken Authentication
+    - A04:2021 - Insecure Design
+    - A06:2025 - Insecure Design
+    source-rule-url: https://expressjs.com/en/advanced/best-practice-security.html
+    category: security
+    technology:
+    - express
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: HIGH
+    impact: LOW
+    confidence: MEDIUM
+    references:
+    - https://owasp.org/Top10/A04_2021-Insecure_Design
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Cryptographic Issues
+    source: https://semgrep.dev/r/javascript.express.security.audit.express-cookie-settings.express-cookie-session-no-expires
+    shortlink: https://sg.run/N4eG
+    semgrep.dev:
+      rule:
+        r_id: 9271
+        rv_id: 1263135
+        rule_id: EwU2DZ
+        version_id: O9TpxRq
+        url: https://semgrep.dev/playground/r/O9TpxRq/javascript.express.security.audit.express-cookie-settings.express-cookie-session-no-expires
+        origin: community
+  patterns:
+  - pattern-either:
+    - pattern-inside: |
+        $SESSION = require('cookie-session');
+        ...
+    - pattern-inside: |
+        $SESSION = require('express-session');
+        ...
+  - pattern: $SESSION(...)
+  - pattern-not-inside: $SESSION(<... {cookie:{expires:...}} ...>,...)
+  - pattern-not-inside: |
+      $OPTS = <... {cookie:{expires:...}} ...>;
+      ...
+      $SESSION($OPTS,...);
+  - pattern-not-inside: |
+      $OPTS = ...;
+      ...
+      $COOKIE = <... {expires:...} ...>;
+      ...
+      $SESSION($OPTS,...);
+  - pattern-not-inside: |
+      $OPTS = ...;
+      ...
+      $OPTS.cookie = <... {expires:...} ...>;
+      ...
+      $SESSION($OPTS,...);
+  - pattern-not-inside: |
+      $OPTS = ...;
+      ...
+      $COOKIE.expires = ...;
+      ...
+      $SESSION($OPTS,...);
+  - pattern-not-inside: |-
+      $OPTS = ...;
+      ...
+      $OPTS.cookie.expires = ...;
+      ...
+      $SESSION($OPTS,...);
+- id: javascript.express.security.cors-misconfiguration.cors-misconfiguration
+  message: By letting user input control CORS parameters, there is a risk that software
+    does not properly verify that the source of data or communication is valid. Use
+    literal values for CORS settings.
+  metadata:
+    owasp:
+    - A07:2021 - Identification and Authentication Failures
+    - A07:2025 - Authentication Failures
+    cwe:
+    - 'CWE-346: Origin Validation Error'
+    category: security
+    references:
+    - https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
+    technology:
+    - express
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Improper Authentication
+    source: https://semgrep.dev/r/javascript.express.security.cors-misconfiguration.cors-misconfiguration
+    shortlink: https://sg.run/nKXO
+    semgrep.dev:
+      rule:
+        r_id: 13580
+        rv_id: 1263162
+        rule_id: 5rULJQ
+        version_id: YDTZe8Y
+        url: https://semgrep.dev/playground/r/YDTZe8Y/javascript.express.security.cors-misconfiguration.cors-misconfiguration
+        origin: community
+  languages:
+  - javascript
+  - typescript
+  severity: WARNING
+  mode: taint
+  pattern-sources:
+  - patterns:
+    - pattern-either:
+      - pattern-inside: function ... ($REQ, $RES) {...}
+      - pattern-inside: function ... ($REQ, $RES, $NEXT) {...}
+      - patterns:
+        - pattern-either:
+          - pattern-inside: $APP.$METHOD(..., function $FUNC($REQ, $RES) {...})
+          - pattern-inside: $APP.$METHOD(..., function $FUNC($REQ, $RES, $NEXT) {...})
+        - metavariable-regex:
+            metavariable: $METHOD
+            regex: ^(get|post|put|head|delete|options)$
+    - pattern-either:
+      - pattern: $REQ.query
+      - pattern: $REQ.body
+      - pattern: $REQ.params
+      - pattern: $REQ.cookies
+      - pattern: $REQ.headers
+  - patterns:
+    - pattern-either:
+      - pattern-inside: |
+          ({ $REQ }: Request,$RES: Response, $NEXT: NextFunction) =>
+          {...}
+      - pattern-inside: |
+          ({ $REQ }: Request,$RES: Response) => {...}
+    - focus-metavariable: $REQ
+    - pattern-either:
+      - pattern: params
+      - pattern: query
+      - pattern: cookies
+      - pattern: headers
+      - pattern: body
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - pattern: $RES.set($HEADER, $X)
+      - pattern: $RES.header($HEADER, $X)
+      - pattern: $RES.setHeader($HEADER, $X)
+      - pattern: |
+          $RES.set({$HEADER: $X}, ...)
+      - pattern: |
+          $RES.writeHead($STATUS, {$HEADER: $X}, ...)
+    - focus-metavariable: $X
+    - metavariable-regex:
+        metavariable: $HEADER
+        regex: .*(Access-Control-Allow-Origin|access-control-allow-origin).*
+- id: javascript.express.security.audit.express-check-directory-listing.express-check-directory-listing
+  message: Directory listing/indexing is enabled, which may lead to disclosure of
+    sensitive directories and files. It is recommended to disable directory listing
+    unless it is a public resource. If you need directory listing, ensure that sensitive
+    files are inaccessible when querying the resource.
+  options:
+    interfile: true
+  metadata:
+    interfile: true
+    cwe:
+    - 'CWE-548: Exposure of Information Through Directory Listing'
+    owasp:
+    - A06:2017 - Security Misconfiguration
+    - A01:2021 - Broken Access Control
+    - A01:2025 - Broken Access Control
+    category: security
+    technology:
+    - express
+    references:
+    - https://www.npmjs.com/package/serve-index
+    - https://www.acunetix.com/blog/articles/directory-listing-information-disclosure/
+    subcategory:
+    - vuln
+    likelihood: HIGH
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/javascript.express.security.audit.express-check-directory-listing.express-check-directory-listing
+    shortlink: https://sg.run/DX2G
+    semgrep.dev:
+      rule:
+        r_id: 22552
+        rv_id: 1263129
+        rule_id: x8UqEb
+        version_id: rxTAKGb
+        url: https://semgrep.dev/playground/r/rxTAKGb/javascript.express.security.audit.express-check-directory-listing.express-check-directory-listing
+        origin: community
+  languages:
+  - javascript
+  - typescript
+  severity: WARNING
+  patterns:
+  - pattern-either:
+    - pattern: |
+        $APP.use(require('serve-index')(...))
+    - patterns:
+      - pattern-either:
+        - pattern-inside: |
+            $SERVEINDEX = require('serve-index')
+            ...
+        - pattern-inside: |
+            import $SERVEINDEX from 'serve-index'
+            ...
+        - pattern-inside: |
+            import * as $SERVEINDEX from 'serve-index'
+            ...
+      - pattern-either:
+        - patterns:
+          - pattern-inside: |
+              $VALUE = $SERVEINDEX(...)
+              ...
+          - pattern: |
+              $VALUE(...)
+        - pattern: |
+            $APP.use(..., $SERVEINDEX(...), ...)
+- id: javascript.sequelize.security.audit.sequelize-injection-express.express-sequelize-injection
+  message: Detected a sequelize statement that is tainted by user-input. This could
+    lead to SQL injection if the variable is user-controlled and is not properly sanitized.
+    In order to prevent SQL injection, it is recommended to use parameterized queries
+    or prepared statements.
+  options:
+    interfile: true
+  metadata:
+    interfile: true
+    references:
+    - https://sequelize.org/docs/v6/core-concepts/raw-queries/#replacements
+    category: security
+    technology:
+    - express
+    cwe:
+    - 'CWE-89: Improper Neutralization of Special Elements used in an SQL Command
+      (''SQL Injection'')'
+    owasp:
+    - A01:2017 - Injection
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: HIGH
+    impact: HIGH
+    confidence: HIGH
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - SQL Injection
+    source: https://semgrep.dev/r/javascript.sequelize.security.audit.sequelize-injection-express.express-sequelize-injection
+    shortlink: https://sg.run/gjoe
+    semgrep.dev:
+      rule:
+        r_id: 22085
+        rv_id: 1263241
+        rule_id: yyU0GX
+        version_id: nWT2Llx
+        url: https://semgrep.dev/playground/r/nWT2Llx/javascript.sequelize.security.audit.sequelize-injection-express.express-sequelize-injection
+        origin: community
+  languages:
+  - javascript
+  - typescript
+  severity: ERROR
+  mode: taint
+  pattern-sources:
+  - patterns:
+    - pattern-either:
+      - pattern-inside: function ... ($REQ, $RES) {...}
+      - pattern-inside: function ... ($REQ, $RES, $NEXT) {...}
+      - patterns:
+        - pattern-either:
+          - pattern-inside: $APP.$METHOD(..., function $FUNC($REQ, $RES) {...})
+          - pattern-inside: $APP.$METHOD(..., function $FUNC($REQ, $RES, $NEXT) {...})
+        - metavariable-regex:
+            metavariable: $METHOD
+            regex: ^(get|post|put|head|delete|options)$
+    - pattern-either:
+      - pattern: $REQ.query
+      - pattern: $REQ.body
+      - pattern: $REQ.params
+      - pattern: $REQ.cookies
+      - pattern: $REQ.headers
+      - pattern: $REQ.files.$ANYTHING.data.toString('utf8')
+      - pattern: $REQ.files.$ANYTHING['data'].toString('utf8')
+  - patterns:
+    - pattern-either:
+      - pattern-inside: |
+          ({ $REQ }: Request,$RES: Response, $NEXT: NextFunction) =>
+          {...}
+      - pattern-inside: |
+          ({ $REQ }: Request,$RES: Response) => {...}
+    - focus-metavariable: $REQ
+    - pattern-either:
+      - pattern: params
+      - pattern: query
+      - pattern: cookies
+      - pattern: headers
+      - pattern: body
+      - pattern: files.$ANYTHING.data.toString('utf8')
+      - pattern: files.$ANYTHING['data'].toString('utf8')
+  pattern-sinks:
+  - pattern-either:
+    - patterns:
+      - pattern-either:
+        - pattern: sequelize.query($QUERY,...)
+        - pattern: $DB.sequelize.query($QUERY,...)
+      - focus-metavariable: $QUERY
+  pattern-sanitizers:
+  - pattern-either:
+    - pattern: parseInt(...)
+    - pattern: $FUNC. ... .hash(...)
+- id: javascript.express.security.express-expat-xxe.express-expat-xxe
+  message: Make sure that unverified user data can not reach the XML Parser, as it
+    can result in XML External or Internal Entity (XXE) Processing vulnerabilities.
+  options:
+    interfile: true
+  metadata:
+    interfile: true
+    owasp:
+    - A04:2017 - XML External Entities (XXE)
+    - A05:2021 - Security Misconfiguration
+    - A02:2025 - Security Misconfiguration
+    cwe:
+    - 'CWE-611: Improper Restriction of XML External Entity Reference'
+    asvs:
+      section: V5 Validation, Sanitization and Encoding
+      control_id: 5.5.2 Insecue XML Deserialization
+      control_url: https://github.com/OWASP/ASVS/blob/master/4.0/en/0x13-V5-Validation-Sanitization-Encoding.md#v55-deserialization-prevention
+      version: '4'
+    references:
+    - https://github.com/astro/node-expat
+    category: security
+    technology:
+    - express
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - XML Injection
+    source: https://semgrep.dev/r/javascript.express.security.express-expat-xxe.express-expat-xxe
+    shortlink: https://sg.run/BkXx
+    semgrep.dev:
+      rule:
+        r_id: 9251
+        rv_id: 1263164
+        rule_id: zdUkJl
+        version_id: o5TbD5l
+        url: https://semgrep.dev/playground/r/o5TbD5l/javascript.express.security.express-expat-xxe.express-expat-xxe
+        origin: community
+  languages:
+  - javascript
+  - typescript
+  severity: ERROR
+  mode: taint
+  pattern-sources:
+  - patterns:
+    - pattern-either:
+      - pattern-inside: function ... ($REQ, $RES) {...}
+      - pattern-inside: function ... ($REQ, $RES, $NEXT) {...}
+      - patterns:
+        - pattern-either:
+          - pattern-inside: $APP.$METHOD(..., function $FUNC($REQ, $RES) {...})
+          - pattern-inside: $APP.$METHOD(..., function $FUNC($REQ, $RES, $NEXT) {...})
+        - metavariable-regex:
+            metavariable: $METHOD
+            regex: ^(get|post|put|head|delete|options)$
+    - pattern-either:
+      - pattern: $REQ.query
+      - pattern: $REQ.body
+      - pattern: $REQ.params
+      - pattern: $REQ.cookies
+      - pattern: $REQ.headers
+  - patterns:
+    - pattern-either:
+      - pattern-inside: |
+          ({ $REQ }: Request,$RES: Response, $NEXT: NextFunction) =>
+          {...}
+      - pattern-inside: |
+          ({ $REQ }: Request,$RES: Response) => {...}
+    - focus-metavariable: $REQ
+    - pattern-either:
+      - pattern: params
+      - pattern: query
+      - pattern: cookies
+      - pattern: headers
+      - pattern: body
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - pattern-inside: |
+          $XML = require('node-expat')
+          ...
+      - pattern-inside: |
+          import $XML from 'node-expat'
+          ...
+      - pattern-inside: |
+          import * as $XML from 'node-expat'
+          ...
+    - pattern-either:
+      - pattern-inside: |
+          $PARSER = new $XML.Parser(...);
+          ...
+    - pattern-either:
+      - pattern: $PARSER.parse($QUERY)
+      - pattern: $PARSER.write($QUERY)
+    - focus-metavariable: $QUERY
+- id: javascript.lang.security.audit.code-string-concat.code-string-concat
+  message: Found data from an Express or Next web request flowing to `eval`. If this
+    data is user-controllable this can lead to execution of arbitrary system commands
+    in the context of your application process. Avoid `eval` whenever possible.
+  options:
+    interfile: true
+  metadata:
+    interfile: true
+    confidence: HIGH
+    owasp:
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    cwe:
+    - 'CWE-95: Improper Neutralization of Directives in Dynamically Evaluated Code
+      (''Eval Injection'')'
+    references:
+    - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval
+    - https://nodejs.org/api/child_process.html#child_processexeccommand-options-callback
+    - https://www.stackhawk.com/blog/nodejs-command-injection-examples-and-prevention/
+    - https://ckarande.gitbooks.io/owasp-nodegoat-tutorial/content/tutorial/a1_-_server_side_js_injection.html
+    category: security
+    technology:
+    - node.js
+    - Express
+    - Next.js
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Code Injection
+    source: https://semgrep.dev/r/javascript.lang.security.audit.code-string-concat.code-string-concat
+    shortlink: https://sg.run/96Yk
+    semgrep.dev:
+      rule:
+        r_id: 13023
+        rv_id: 1263192
+        rule_id: DbUKEz
+        version_id: 44TEjYX
+        url: https://semgrep.dev/playground/r/44TEjYX/javascript.lang.security.audit.code-string-concat.code-string-concat
+        origin: community
+  languages:
+  - javascript
+  - typescript
+  severity: ERROR
+  mode: taint
+  pattern-sources:
+  - pattern-either:
+    - patterns:
+      - pattern-either:
+        - pattern-inside: function ... ($REQ, $RES) {...}
+        - pattern-inside: function ... ($REQ, $RES, $NEXT) {...}
+        - patterns:
+          - pattern-either:
+            - pattern-inside: $APP.$METHOD(..., function $FUNC($REQ, $RES) {...})
+            - pattern-inside: $APP.$METHOD(..., function $FUNC($REQ, $RES, $NEXT)
+                {...})
+          - metavariable-regex:
+              metavariable: $METHOD
+              regex: ^(get|post|put|head|delete|options)$
+      - pattern-either:
+        - pattern: $REQ.query
+        - pattern: $REQ.body
+        - pattern: $REQ.params
+        - pattern: $REQ.cookies
+        - pattern: $REQ.headers
+    - patterns:
+      - pattern-either:
+        - pattern-inside: |
+            import { ...,$IMPORT,... } from 'next/router'
+            ...
+        - pattern-inside: |
+            import $IMPORT from 'next/router';
+            ...
+      - pattern-either:
+        - patterns:
+          - pattern-inside: |
+              $ROUTER = $IMPORT()
+              ...
+          - pattern-either:
+            - pattern-inside: |
+                const { ...,$PROPS,... } = $ROUTER.query
+                ...
+            - pattern-inside: |
+                var { ...,$PROPS,... } = $ROUTER.query
+                ...
+            - pattern-inside: |
+                let { ...,$PROPS,... } = $ROUTER.query
+                ...
+          - focus-metavariable: $PROPS
+        - patterns:
+          - pattern-inside: |
+              $ROUTER = $IMPORT()
+              ...
+          - pattern: "$ROUTER.query.$VALUE \n"
+        - patterns:
+          - pattern: $IMPORT().query.$VALUE
+  pattern-sinks:
+  - patterns:
+    - pattern: |
+        eval(...)
+- id: javascript.express.security.audit.express-jwt-not-revoked.express-jwt-not-revoked
+  message: No token revoking configured for `express-jwt`. A leaked token could still
+    be used and unable to be revoked. Consider using function as the `isRevoked` option.
+  metadata:
+    cwe:
+    - 'CWE-522: Insufficiently Protected Credentials'
+    owasp:
+    - A02:2017 - Broken Authentication
+    - A04:2021 - Insecure Design
+    - A06:2025 - Insecure Design
+    source-rule-url: https://github.com/goldbergyoni/nodebestpractices/blob/master/sections/security/expirejwt.md
+    asvs:
+      section: 'V3: Session Management Verification Requirements'
+      control_id: 3.5.3 Insecure Stateless Session Tokens
+      control_url: https://github.com/OWASP/ASVS/blob/master/4.0/en/0x12-V3-Session-management.md#v35-token-based-session-management
+      version: '4'
+    category: security
+    technology:
+    - express
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    references:
+    - https://owasp.org/Top10/A04_2021-Insecure_Design
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Cryptographic Issues
+    source: https://semgrep.dev/r/javascript.express.security.audit.express-jwt-not-revoked.express-jwt-not-revoked
+    shortlink: https://sg.run/kXNo
+    semgrep.dev:
+      rule:
+        r_id: 9272
+        rv_id: 1263137
+        rule_id: 7KUQ9k
+        version_id: vdT06Bg
+        url: https://semgrep.dev/playground/r/vdT06Bg/javascript.express.security.audit.express-jwt-not-revoked.express-jwt-not-revoked
+        origin: community
+  languages:
+  - javascript
+  - typescript
+  severity: WARNING
+  patterns:
+  - pattern-inside: |
+      $JWT = require('express-jwt');
+      ...
+  - pattern: $JWT(...)
+  - pattern-not-inside: $JWT(<... {isRevoked:...} ...>,...)
+  - pattern-not-inside: |-
+      $OPTS = <... {isRevoked:...} ...>;
+      ...
+      $JWT($OPTS,...);
+- id: javascript.express.security.audit.res-render-injection.res-render-injection
+  message: User controllable data `$REQ` enters `$RES.render(...)` this can lead to
+    the loading of other HTML/templating pages that they may not be authorized to
+    render. An attacker may attempt to use directory traversal techniques e.g. `../folder/index`
+    to access other HTML pages on the file system. Where possible, do not allow users
+    to define what should be  loaded in $RES.render or use an allow list for the existing
+    application.
+  options:
+    interfile: true
+  metadata:
+    interfile: true
+    owasp:
+    - A01:2021 - Broken Access Control
+    - A01:2025 - Broken Access Control
+    cwe:
+    - 'CWE-706: Use of Incorrectly-Resolved Name or Reference'
+    category: security
+    technology:
+    - express
+    references:
+    - http://expressjs.com/en/4x/api.html#res.render
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Improper Authorization
+    source: https://semgrep.dev/r/javascript.express.security.audit.res-render-injection.res-render-injection
+    shortlink: https://sg.run/eLjd
+    semgrep.dev:
+      rule:
+        r_id: 9276
+        rv_id: 1263149
+        rule_id: QrUzrq
+        version_id: PkTR3OY
+        url: https://semgrep.dev/playground/r/PkTR3OY/javascript.express.security.audit.res-render-injection.res-render-injection
+        origin: community
+  languages:
+  - javascript
+  - typescript
+  severity: WARNING
+  mode: taint
+  pattern-sources:
+  - patterns:
+    - pattern-either:
+      - pattern-inside: function ... ($REQ, $RES) {...}
+      - pattern-inside: function ... ($REQ, $RES, $NEXT) {...}
+      - patterns:
+        - pattern-either:
+          - pattern-inside: $APP.$METHOD(..., function $FUNC($REQ, $RES) {...})
+          - pattern-inside: $APP.$METHOD(..., function $FUNC($REQ, $RES, $NEXT) {...})
+        - metavariable-regex:
+            metavariable: $METHOD
+            regex: ^(get|post|put|head|delete|options)$
+    - pattern-either:
+      - pattern: $REQ.query
+      - pattern: $REQ.body
+      - pattern: $REQ.params
+      - pattern: $REQ.cookies
+      - pattern: $REQ.headers
+  - patterns:
+    - pattern-either:
+      - pattern-inside: |
+          ({ $REQ }: Request,$RES: Response, $NEXT: NextFunction) =>
+          {...}
+      - pattern-inside: |
+          ({ $REQ }: Request,$RES: Response) => {...}
+    - focus-metavariable: $REQ
+    - pattern-either:
+      - pattern: params
+      - pattern: query
+      - pattern: cookies
+      - pattern: headers
+      - pattern: body
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - pattern: $RES.render($SINK, ...)
+    - focus-metavariable: $SINK
+- id: javascript.lang.security.audit.sqli.node-knex-sqli.node-knex-sqli
+  message: 'Detected SQL statement that is tainted by `$REQ` object. This could lead
+    to SQL injection if the variable is user-controlled and not properly sanitized.
+    In order to prevent SQL injection, it is recommended to use parameterized queries
+    or prepared statements. An example of parameterized queries like so: `knex.raw(''SELECT
+    $1 from table'', [userinput])` can help prevent SQLi.'
+  metadata:
+    confidence: MEDIUM
+    references:
+    - https://knexjs.org/#Builder-fromRaw
+    - https://knexjs.org/#Builder-whereRaw
+    - https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html
+    category: security
+    owasp:
+    - A01:2017 - Injection
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    cwe:
+    - 'CWE-89: Improper Neutralization of Special Elements used in an SQL Command
+      (''SQL Injection'')'
+    technology:
+    - express
+    - nodejs
+    - knex
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: HIGH
+    impact: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - SQL Injection
+    source: https://semgrep.dev/r/javascript.lang.security.audit.sqli.node-knex-sqli.node-knex-sqli
+    shortlink: https://sg.run/l9eE
+    semgrep.dev:
+      rule:
+        r_id: 18257
+        rv_id: 1263205
+        rule_id: d8UKLD
+        version_id: l4TJRey
+        url: https://semgrep.dev/playground/r/l4TJRey/javascript.lang.security.audit.sqli.node-knex-sqli.node-knex-sqli
+        origin: community
+  languages:
+  - javascript
+  - typescript
+  severity: WARNING
+  mode: taint
+  pattern-sources:
+  - patterns:
+    - pattern-either:
+      - pattern-inside: function ... ($REQ, $RES) {...}
+      - pattern-inside: function ... ($REQ, $RES, $NEXT) {...}
+      - patterns:
+        - pattern-either:
+          - pattern-inside: $APP.$METHOD(..., function $FUNC($REQ, $RES) {...})
+          - pattern-inside: $APP.$METHOD(..., function $FUNC($REQ, $RES, $NEXT) {...})
+        - metavariable-regex:
+            metavariable: $METHOD
+            regex: ^(get|post|put|head|delete|options)
+    - pattern-either:
+      - pattern: $REQ.query
+      - pattern: $REQ.body
+      - pattern: $REQ.params
+      - pattern: $REQ.cookies
+      - pattern: $REQ.headers
+      - pattern: $REQ.files.$ANYTHING.data.toString('utf8')
+      - pattern: $REQ.files.$ANYTHING['data'].toString('utf8')
+  - patterns:
+    - pattern-either:
+      - pattern-inside: |
+          ({ $REQ }: Request,$RES: Response, $NEXT: NextFunction) =>
+          {...}
+      - pattern-inside: |
+          ({ $REQ }: Request,$RES: Response) => {...}
+    - focus-metavariable: $REQ
+    - pattern-either:
+      - pattern: params
+      - pattern: query
+      - pattern: cookies
+      - pattern: headers
+      - pattern: body
+      - pattern: files.$ANYTHING.data.toString('utf8')
+      - pattern: files.$ANYTHING['data'].toString('utf8')
+  pattern-sinks:
+  - patterns:
+    - focus-metavariable: $QUERY
+    - pattern-either:
+      - pattern-inside: $KNEX.fromRaw($QUERY, ...)
+      - pattern-inside: $KNEX.whereRaw($QUERY, ...)
+      - pattern-inside: $KNEX.raw($QUERY, ...)
+    - pattern-either:
+      - pattern-inside: |
+          require('knex')
+          ...
+      - pattern-inside: |
+          import 'knex'
+          ...
+  pattern-sanitizers:
+  - patterns:
+    - pattern: parseInt(...)
+- id: javascript.express.security.express-insecure-template-usage.express-insecure-template-usage
+  message: User data from `$REQ` is being compiled into the template, which can lead
+    to a Server Side Template Injection (SSTI) vulnerability.
+  options:
+    interfile: true
+  metadata:
+    interfile: true
+    category: security
+    cwe:
+    - 'CWE-1336: Improper Neutralization of Special Elements Used in a Template Engine'
+    owasp:
+    - A03:2021 - Injection
+    - A01:2017 - Injection
+    - A05:2025 - Injection
+    references:
+    - https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html
+    technology:
+    - javascript
+    - typescript
+    - express
+    - pug
+    - jade
+    - dot
+    - ejs
+    - nunjucks
+    - lodash
+    - handlbars
+    - mustache
+    - hogan.js
+    - eta
+    - squirrelly
+    source_rule_url:
+    - https://github.com/github/codeql/blob/2ba2642c7ab29b9eedef33bcc2b8cd1d203d0c10/javascript/ql/test/query-tests/Security/CWE-094/CodeInjection/template-sinks.js
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Code Injection
+    source: https://semgrep.dev/r/javascript.express.security.express-insecure-template-usage.express-insecure-template-usage
+    shortlink: https://sg.run/b49v
+    semgrep.dev:
+      rule:
+        r_id: 19226
+        rv_id: 1263165
+        rule_id: EwUr9k
+        version_id: zyTb2eD
+        url: https://semgrep.dev/playground/r/zyTb2eD/javascript.express.security.express-insecure-template-usage.express-insecure-template-usage
+        origin: community
+  languages:
+  - javascript
+  - typescript
+  severity: WARNING
+  mode: taint
+  pattern-propagators:
+  - pattern: $MODEL.$FIND($E).then((...,$S,...)=>{...})
+    from: $E
+    to: $S
+  pattern-sources:
+  - patterns:
+    - pattern-either:
+      - pattern-inside: function ... ($REQ, $RES) {...}
+      - pattern-inside: function ... ($REQ, $RES, $NEXT) {...}
+      - patterns:
+        - pattern-either:
+          - pattern-inside: $APP.$METHOD(..., function $FUNC($REQ, $RES) {...})
+          - pattern-inside: $APP.$METHOD(..., function $FUNC($REQ, $RES, $NEXT) {...})
+        - metavariable-regex:
+            metavariable: $METHOD
+            regex: ^(get|post|put|head|delete|options)$
+    - pattern-either:
+      - pattern: $REQ.query
+      - pattern: $REQ.body
+      - pattern: $REQ.params
+      - pattern: $REQ.cookies
+      - pattern: $REQ.headers
+  - patterns:
+    - pattern-either:
+      - pattern-inside: |
+          ({ $REQ }: Request,$RES: Response, $NEXT: NextFunction) =>
+          {...}
+      - pattern-inside: |
+          ({ $REQ }: Request,$RES: Response) => {...}
+    - focus-metavariable: $REQ
+    - pattern-either:
+      - pattern: params
+      - pattern: query
+      - pattern: cookies
+      - pattern: headers
+      - pattern: body
+  pattern-sinks:
+  - pattern-either:
+    - patterns:
+      - pattern-either:
+        - pattern-inside: |
+            $PUG = require('pug')
+            ...
+        - pattern-inside: |
+            import * as $PUG from 'pug'
+            ...
+        - pattern-inside: |
+            $PUG = require('jade')
+            ...
+        - pattern-inside: |
+            import * as $PUG from 'jade'
+            ...
+      - pattern-either:
+        - pattern: $PUG.compile(...)
+        - pattern: $PUG.compileClient(...)
+        - pattern: $PUG.compileClientWithDependenciesTracked(...)
+        - pattern: $PUG.render(...)
+    - patterns:
+      - pattern-either:
+        - pattern-inside: |
+            $PUG = require('dot')
+            ...
+        - pattern-inside: |
+            import * as $PUG from 'dot'
+            ...
+      - pattern-either:
+        - pattern: $PUG.template(...)
+        - pattern: $PUG.compile(...)
+    - patterns:
+      - pattern-either:
+        - pattern-inside: |
+            $PUG = require('ejs')
+            ...
+        - pattern-inside: |
+            import * as $PUG from 'ejs'
+            ...
+      - pattern-either:
+        - pattern: $PUG.render(...)
+    - patterns:
+      - pattern-either:
+        - pattern-inside: |
+            $PUG = require('nunjucks')
+            ...
+        - pattern-inside: |
+            import * as $PUG from 'nunjucks'
+            ...
+      - pattern-either:
+        - pattern: $PUG.renderString(...)
+    - patterns:
+      - pattern-either:
+        - pattern-inside: |
+            $PUG = require('lodash')
+            ...
+        - pattern-inside: |
+            import * as $PUG from 'lodash'
+            ...
+      - pattern-either:
+        - pattern: $PUG.template(...)
+    - patterns:
+      - pattern-either:
+        - pattern-inside: |
+            $PUG = require('mustache')
+            ...
+        - pattern-inside: |
+            import * as $PUG from 'mustache'
+            ...
+        - pattern-inside: |
+            $PUG = require('eta')
+            ...
+        - pattern-inside: |
+            import * as $PUG from 'eta'
+            ...
+        - pattern-inside: |
+            $PUG = require('squirrelly')
+            ...
+        - pattern-inside: |
+            import * as $PUG from 'squirrelly'
+            ...
+      - pattern-either:
+        - pattern: $PUG.render(...)
+    - patterns:
+      - pattern-either:
+        - pattern-inside: |
+            $PUG = require('hogan.js')
+            ...
+        - pattern-inside: |
+            import * as $PUG from 'hogan.js'
+            ...
+        - pattern-inside: |
+            $PUG = require('handlebars')
+            ...
+        - pattern-inside: |
+            import * as $PUG from 'handlebars'
+            ...
+      - pattern-either:
+        - pattern: $PUG.compile(...)
+- id: javascript.express.security.express-vm2-injection.express-vm2-injection
+  message: Make sure that unverified user data can not reach `vm2`.
+  metadata:
+    owasp:
+    - A03:2021 - Injection
+    - A05:2025 - Injection
+    references:
+    - https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html
+    cwe:
+    - 'CWE-94: Improper Control of Generation of Code (''Code Injection'')'
+    category: security
+    technology:
+    - express
+    cwe2022-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Code Injection
+    source: https://semgrep.dev/r/javascript.express.security.express-vm2-injection.express-vm2-injection
+    shortlink: https://sg.run/1GWv
+    semgrep.dev:
+      rule:
+        r_id: 12822
+        rv_id: 1263171
+        rule_id: WAUPXJ
+        version_id: 9lT4bnX
+        url: https://semgrep.dev/playground/r/9lT4bnX/javascript.express.security.express-vm2-injection.express-vm2-injection
+        origin: community
+  languages:
+  - javascript
+  - typescript
+  severity: WARNING
+  mode: taint
+  pattern-sources:
+  - patterns:
+    - pattern-either:
+      - pattern-inside: function ... ($REQ, $RES) {...}
+      - pattern-inside: function ... ($REQ, $RES, $NEXT) {...}
+      - patterns:
+        - pattern-either:
+          - pattern-inside: $APP.$METHOD(..., function $FUNC($REQ, $RES) {...})
+          - pattern-inside: $APP.$METHOD(..., function $FUNC($REQ, $RES, $NEXT) {...})
+        - metavariable-regex:
+            metavariable: $METHOD
+            regex: ^(get|post|put|head|delete|options)$
+    - pattern-either:
+      - pattern: $REQ.query
+      - pattern: $REQ.body
+      - pattern: $REQ.params
+      - pattern: $REQ.cookies
+      - pattern: $REQ.headers
+  - patterns:
+    - pattern-either:
+      - pattern-inside: |
+          ({ $REQ }: Request,$RES: Response, $NEXT: NextFunction) =>
+          {...}
+      - pattern-inside: |
+          ({ $REQ }: Request,$RES: Response) => {...}
+    - focus-metavariable: $REQ
+    - pattern-either:
+      - pattern: params
+      - pattern: query
+      - pattern: cookies
+      - pattern: headers
+      - pattern: body
+  pattern-sinks:
+  - patterns:
+    - pattern-inside: |
+        require('vm2')
+        ...
+    - pattern-either:
+      - patterns:
+        - pattern-either:
+          - pattern-inside: |
+              $VM = new VM(...)
+              ...
+          - pattern-inside: |
+              $VM = new NodeVM(...)
+              ...
+        - pattern: |
+            $VM.run(...)
+      - pattern: |
+          new VM(...).run(...)
+      - pattern: |
+          new NodeVM(...).run(...)
+      - pattern: |
+          new VMScript(...)
+      - pattern: |
+          new VM(...)
+      - pattern: new NodeVM(...)
+- id: javascript.express.security.audit.express-xml2json-xxe-event.express-xml2json-xxe-event
+  message: Xml Parser is used inside Request Event. Make sure that unverified user
+    data can not reach the XML Parser, as it can result in XML External or Internal
+    Entity (XXE) Processing vulnerabilities
+  metadata:
+    owasp:
+    - A04:2017 - XML External Entities (XXE)
+    - A05:2021 - Security Misconfiguration
+    - A02:2025 - Security Misconfiguration
+    cwe:
+    - 'CWE-611: Improper Restriction of XML External Entity Reference'
+    category: security
+    technology:
+    - express
+    references:
+    - https://www.npmjs.com/package/xml2json
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: HIGH
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - XML Injection
+    source: https://semgrep.dev/r/javascript.express.security.audit.express-xml2json-xxe-event.express-xml2json-xxe-event
+    shortlink: https://sg.run/x1AA
+    semgrep.dev:
+      rule:
+        r_id: 9274
+        rv_id: 1263146
+        rule_id: 8GUjkk
+        version_id: QkTGqgo
+        url: https://semgrep.dev/playground/r/QkTGqgo/javascript.express.security.audit.express-xml2json-xxe-event.express-xml2json-xxe-event
+        origin: community
+  languages:
+  - javascript
+  - typescript
+  severity: WARNING
+  mode: taint
+  pattern-sources:
+  - patterns:
+    - pattern-either:
+      - pattern-inside: function ... ($REQ, $RES) {...}
+      - pattern-inside: function ... ($REQ, $RES, $NEXT) {...}
+      - patterns:
+        - pattern-either:
+          - pattern-inside: $APP.$METHOD(..., function $FUNC($REQ, $RES) {...})
+          - pattern-inside: $APP.$METHOD(..., function $FUNC($REQ, $RES, $NEXT) {...})
+        - metavariable-regex:
+            metavariable: $METHOD
+            regex: ^(get|post|put|head|delete|options)$
+    - pattern-either:
+      - pattern: $REQ.query
+      - pattern: $REQ.body
+      - pattern: $REQ.params
+      - pattern: $REQ.cookies
+      - pattern: $REQ.headers
+  - patterns:
+    - pattern-either:
+      - pattern-inside: |
+          ({ $REQ }: Request,$RES: Response, $NEXT: NextFunction) => {...}
+      - pattern-inside: |
+          ({ $REQ }: Request,$RES: Response) => {...}
+    - focus-metavariable: $REQ
+    - pattern-either:
+      - pattern: params
+      - pattern: query
+      - pattern: cookies
+      - pattern: headers
+      - pattern: body
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - pattern-inside: |
+          require('xml2json');
+          ...
+      - pattern-inside: |
+          import 'xml2json';
+          ...
+    - pattern: $REQ.on('...', function(...) { ... $EXPAT.toJson($INPUT,...); ... })
+    - focus-metavariable: $INPUT
+- id: javascript.express.security.express-jwt-hardcoded-secret.express-jwt-hardcoded-secret
+  message: A hard-coded credential was detected. It is not recommended to store credentials
+    in source-code, as this risks secrets being leaked and used by either an internal
+    or external malicious adversary. It is recommended to use environment variables
+    to securely provide credentials or retrieve credentials from a secure vault or
+    HSM (Hardware Security Module).
+  options:
+    interfile: true
+  metadata:
+    interfile: true
+    cwe:
+    - 'CWE-798: Use of Hard-coded Credentials'
+    references:
+    - https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html
+    owasp:
+    - A07:2021 - Identification and Authentication Failures
+    - A07:2025 - Authentication Failures
+    category: security
+    technology:
+    - express
+    - secrets
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - audit
+    likelihood: HIGH
+    impact: MEDIUM
+    confidence: HIGH
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Hard-coded Secrets
+    source: https://semgrep.dev/r/javascript.express.security.express-jwt-hardcoded-secret.express-jwt-hardcoded-secret
+    shortlink: https://sg.run/Do1d
+    semgrep.dev:
+      rule:
+        r_id: 9252
+        rv_id: 1263166
+        rule_id: pKUOjy
+        version_id: pZT03Q0
+        url: https://semgrep.dev/playground/r/pZT03Q0/javascript.express.security.express-jwt-hardcoded-secret.express-jwt-hardcoded-secret
+        origin: community
+  languages:
+  - javascript
+  - typescript
+  severity: WARNING
+  patterns:
+  - pattern-either:
+    - pattern-inside: |
+        $JWT = require('express-jwt');
+        ...
+    - pattern-inside: |
+        import $JWT from 'express-jwt';
+        ...
+    - pattern-inside: |
+        import * as $JWT from 'express-jwt';
+        ...
+    - pattern-inside: |
+        import { ..., $JWT, ... } from 'express-jwt';
+        ...
+  - pattern-either:
+    - pattern: |
+        $JWT({...,secret: "$Y",...},...)
+    - pattern: |
+        $OPTS = "$Y";
+        ...
+        $JWT({...,secret: $OPTS},...);
+  - focus-metavariable: $Y
+- id: javascript.express.security.x-frame-options-misconfiguration.x-frame-options-misconfiguration
+  message: By letting user input control `X-Frame-Options` header, there is a risk
+    that software does not properly verify whether or not a browser should be allowed
+    to render a page in an `iframe`.
+  metadata:
+    references:
+    - https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options
+    owasp:
+    - A04:2021 - Insecure Design
+    - A06:2025 - Insecure Design
+    cwe:
+    - 'CWE-451: User Interface (UI) Misrepresentation of Critical Information'
+    category: security
+    technology:
+    - express
+    subcategory:
+    - vuln
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Other
+    source: https://semgrep.dev/r/javascript.express.security.x-frame-options-misconfiguration.x-frame-options-misconfiguration
+    shortlink: https://sg.run/EvjA
+    semgrep.dev:
+      rule:
+        r_id: 13581
+        rv_id: 1263178
+        rule_id: GdUrLy
+        version_id: xyTjz3D
+        url: https://semgrep.dev/playground/r/xyTjz3D/javascript.express.security.x-frame-options-misconfiguration.x-frame-options-misconfiguration
+        origin: community
+  languages:
+  - javascript
+  - typescript
+  severity: WARNING
+  mode: taint
+  pattern-sources:
+  - patterns:
+    - pattern-either:
+      - pattern-inside: function ... ($REQ, $RES) {...}
+      - pattern-inside: function ... ($REQ, $RES, $NEXT) {...}
+      - patterns:
+        - pattern-either:
+          - pattern-inside: $APP.$METHOD(..., function $FUNC($REQ, $RES) {...})
+          - pattern-inside: $APP.$METHOD(..., function $FUNC($REQ, $RES, $NEXT) {...})
+        - metavariable-regex:
+            metavariable: $METHOD
+            regex: ^(get|post|put|head|delete|options)$
+    - pattern-either:
+      - pattern: $REQ.query
+      - pattern: $REQ.body
+      - pattern: $REQ.params
+      - pattern: $REQ.cookies
+      - pattern: $REQ.headers
+  - patterns:
+    - pattern-either:
+      - pattern-inside: |
+          ({ $REQ }: Request,$RES: Response, $NEXT: NextFunction) =>
+          {...}
+      - pattern-inside: |
+          ({ $REQ }: Request,$RES: Response) => {...}
+    - focus-metavariable: $REQ
+    - pattern-either:
+      - pattern: params
+      - pattern: query
+      - pattern: cookies
+      - pattern: headers
+      - pattern: body
+  pattern-sinks:
+  - patterns:
+    - pattern-either:
+      - pattern: $RES.set($HEADER, ...)
+      - pattern: $RES.header($HEADER, ...)
+      - pattern: $RES.setHeader($HEADER, ...)
+      - pattern: |
+          $RES.set({$HEADER: ...}, ...)
+      - pattern: |
+          $RES.writeHead($STATUS, {$HEADER: ...}, ...)
+    - metavariable-regex:
+        metavariable: $HEADER
+        regex: .*(X-Frame-Options|x-frame-options).*
+- id: javascript.express.security.audit.express-cookie-settings.express-cookie-session-default-name
+  message: "Don\u2019t use the default session cookie name Using the default session
+    cookie name can open your app to attacks. The security issue posed is similar
+    to X-Powered-By: a potential attacker can use it to fingerprint the server and
+    target attacks accordingly."
+  severity: WARNING
+  languages:
+  - javascript
+  - typescript
+  metadata:
+    cwe:
+    - 'CWE-522: Insufficiently Protected Credentials'
+    owasp:
+    - A02:2017 - Broken Authentication
+    - A04:2021 - Insecure Design
+    - A06:2025 - Insecure Design
+    source-rule-url: https://expressjs.com/en/advanced/best-practice-security.html
+    category: security
+    technology:
+    - express
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: HIGH
+    impact: LOW
+    confidence: MEDIUM
+    references:
+    - https://owasp.org/Top10/A04_2021-Insecure_Design
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Cryptographic Issues
+    source: https://semgrep.dev/r/javascript.express.security.audit.express-cookie-settings.express-cookie-session-default-name
+    shortlink: https://sg.run/1Z5x
+    semgrep.dev:
+      rule:
+        r_id: 9266
+        rv_id: 1263130
+        rule_id: eqU8k2
+        version_id: bZT536J
+        url: https://semgrep.dev/playground/r/bZT536J/javascript.express.security.audit.express-cookie-settings.express-cookie-session-default-name
+        origin: community
+  patterns:
+  - pattern-either:
+    - pattern-inside: |
+        $SESSION = require('cookie-session');
+        ...
+    - pattern-inside: |
+        $SESSION = require('express-session');
+        ...
+  - pattern: $SESSION(...)
+  - pattern-not-inside: $SESSION(<... {name:...} ...>,...)
+  - pattern-not-inside: |
+      $OPTS = <... {name:...} ...>;
+      ...
+      $SESSION($OPTS,...);
+  - pattern-not-inside: |
+      $OPTS = ...;
+      ...
+      $OPTS.name = ...;
+      ...
+      $SESSION($OPTS,...);
+- id: javascript.express.security.audit.express-cookie-settings.express-cookie-session-no-domain
+  message: 'Default session middleware settings: `domain` not set. It indicates the
+    domain of the cookie; use it to compare against the domain of the server in which
+    the URL is being requested. If they match, then check the path attribute next.'
+  severity: WARNING
+  languages:
+  - javascript
+  - typescript
+  metadata:
+    cwe:
+    - 'CWE-522: Insufficiently Protected Credentials'
+    owasp:
+    - A02:2017 - Broken Authentication
+    - A04:2021 - Insecure Design
+    - A06:2025 - Insecure Design
+    source-rule-url: https://expressjs.com/en/advanced/best-practice-security.html
+    category: security
+    technology:
+    - express
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: HIGH
+    impact: LOW
+    confidence: MEDIUM
+    references:
+    - https://owasp.org/Top10/A04_2021-Insecure_Design
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Cryptographic Issues
+    source: https://semgrep.dev/r/javascript.express.security.audit.express-cookie-settings.express-cookie-session-no-domain
+    shortlink: https://sg.run/rd41
+    semgrep.dev:
+      rule:
+        r_id: 9269
+        rv_id: 1263133
+        rule_id: ZqU5Pn
+        version_id: w8TRoyd
+        url: https://semgrep.dev/playground/r/w8TRoyd/javascript.express.security.audit.express-cookie-settings.express-cookie-session-no-domain
+        origin: community
+  patterns:
+  - pattern-either:
+    - pattern-inside: |
+        $SESSION = require('cookie-session');
+        ...
+    - pattern-inside: |
+        $SESSION = require('express-session');
+        ...
+  - pattern: $SESSION(...)
+  - pattern-not-inside: $SESSION(<... {cookie:{domain:...}} ...>,...)
+  - pattern-not-inside: |
+      $OPTS = <... {cookie:{domain:...}} ...>;
+      ...
+      $SESSION($OPTS,...);
+  - pattern-not-inside: |
+      $OPTS = ...;
+      ...
+      $COOKIE = <... {domain:...} ...>;
+      ...
+      $SESSION($OPTS,...);
+  - pattern-not-inside: |
+      $OPTS = ...;
+      ...
+      $OPTS.cookie = <... {domain:...} ...>;
+      ...
+      $SESSION($OPTS,...);
+  - pattern-not-inside: |
+      $OPTS = ...;
+      ...
+      $COOKIE.domain = ...;
+      ...
+      $SESSION($OPTS,...);
+  - pattern-not-inside: |
+      $OPTS = ...;
+      ...
+      $OPTS.cookie.domain = ...;
+      ...
+      $SESSION($OPTS,...);
+- id: javascript.express.security.audit.express-cookie-settings.express-cookie-session-no-httponly
+  message: 'Default session middleware settings: `httpOnly` not set. It ensures the
+    cookie is sent only over HTTP(S), not client JavaScript, helping to protect against
+    cross-site scripting attacks.'
+  severity: WARNING
+  languages:
+  - javascript
+  - typescript
+  metadata:
+    cwe:
+    - 'CWE-522: Insufficiently Protected Credentials'
+    owasp:
+    - A02:2017 - Broken Authentication
+    - A04:2021 - Insecure Design
+    - A06:2025 - Insecure Design
+    source-rule-url: https://expressjs.com/en/advanced/best-practice-security.html
+    category: security
+    technology:
+    - express
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: HIGH
+    impact: LOW
+    confidence: MEDIUM
+    references:
+    - https://owasp.org/Top10/A04_2021-Insecure_Design
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Cryptographic Issues
+    source: https://semgrep.dev/r/javascript.express.security.audit.express-cookie-settings.express-cookie-session-no-httponly
+    shortlink: https://sg.run/ydBO
+    semgrep.dev:
+      rule:
+        r_id: 9268
+        rv_id: 1263132
+        rule_id: d8UjGo
+        version_id: kbTzGev
+        url: https://semgrep.dev/playground/r/kbTzGev/javascript.express.security.audit.express-cookie-settings.express-cookie-session-no-httponly
+        origin: community
+  patterns:
+  - pattern-either:
+    - pattern-inside: |
+        $SESSION = require('cookie-session');
+        ...
+    - pattern-inside: |
+        $SESSION = require('express-session');
+        ...
+  - pattern: $SESSION(...)
+  - pattern-not-inside: $SESSION(<... {cookie:{httpOnly:true}} ...>,...)
+  - pattern-not-inside: |
+      $OPTS = <... {cookie:{httpOnly:true}} ...>;
+      ...
+      $SESSION($OPTS,...);
+  - pattern-not-inside: |
+      $OPTS = ...;
+      ...
+      $COOKIE = <... {httpOnly:true} ...>;
+      ...
+      $SESSION($OPTS,...);
+  - pattern-not-inside: |
+      $OPTS = ...;
+      ...
+      $OPTS.cookie = <... {httpOnly:true} ...>;
+      ...
+      $SESSION($OPTS,...);
+  - pattern-not-inside: |
+      $OPTS = ...;
+      ...
+      $COOKIE.httpOnly = true;
+      ...
+      $SESSION($OPTS,...);
+  - pattern-not-inside: |
+      $OPTS = ...;
+      ...
+      $OPTS.cookie.httpOnly = true;
+      ...
+      $SESSION($OPTS,...);
+- id: javascript.express.security.audit.express-cookie-settings.express-cookie-session-no-path
+  message: 'Default session middleware settings: `path` not set. It indicates the
+    path of the cookie; use it to compare against the request path. If this and domain
+    match, then send the cookie in the request.'
+  severity: WARNING
+  languages:
+  - javascript
+  - typescript
+  metadata:
+    cwe:
+    - 'CWE-522: Insufficiently Protected Credentials'
+    owasp:
+    - A02:2017 - Broken Authentication
+    - A04:2021 - Insecure Design
+    - A06:2025 - Insecure Design
+    source-rule-url: https://expressjs.com/en/advanced/best-practice-security.html
+    category: security
+    technology:
+    - express
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: HIGH
+    impact: LOW
+    confidence: MEDIUM
+    references:
+    - https://owasp.org/Top10/A04_2021-Insecure_Design
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Cryptographic Issues
+    source: https://semgrep.dev/r/javascript.express.security.audit.express-cookie-settings.express-cookie-session-no-path
+    shortlink: https://sg.run/b7pd
+    semgrep.dev:
+      rule:
+        r_id: 9270
+        rv_id: 1263134
+        rule_id: nJUz4X
+        version_id: xyTjzQD
+        url: https://semgrep.dev/playground/r/xyTjzQD/javascript.express.security.audit.express-cookie-settings.express-cookie-session-no-path
+        origin: community
+  patterns:
+  - pattern-either:
+    - pattern-inside: |
+        $SESSION = require('cookie-session');
+        ...
+    - pattern-inside: |
+        $SESSION = require('express-session');
+        ...
+  - pattern: $SESSION(...)
+  - pattern-not-inside: $SESSION(<... {cookie:{path:...}} ...>,...)
+  - pattern-not-inside: |
+      $OPTS = <... {cookie:{path:...}} ...>;
+      ...
+      $SESSION($OPTS,...);
+  - pattern-not-inside: |
+      $OPTS = ...;
+      ...
+      $COOKIE = <... {path:...} ...>;
+      ...
+      $SESSION($OPTS,...);
+  - pattern-not-inside: |
+      $OPTS = ...;
+      ...
+      $OPTS.cookie = <... {path:...} ...>;
+      ...
+      $SESSION($OPTS,...);
+  - pattern-not-inside: |
+      $OPTS = ...;
+      ...
+      $COOKIE.path = ...;
+      ...
+      $SESSION($OPTS,...);
+  - pattern-not-inside: |
+      $OPTS = ...;
+      ...
+      $OPTS.cookie.path = ...;
+      ...
+      $SESSION($OPTS,...);
+- id: javascript.express.security.audit.express-cookie-settings.express-cookie-session-no-secure
+  message: 'Default session middleware settings: `secure` not set. It ensures the
+    browser only sends the cookie over HTTPS.'
+  severity: WARNING
+  languages:
+  - javascript
+  - typescript
+  metadata:
+    cwe:
+    - 'CWE-522: Insufficiently Protected Credentials'
+    owasp:
+    - A02:2017 - Broken Authentication
+    - A04:2021 - Insecure Design
+    - A06:2025 - Insecure Design
+    source-rule-url: https://expressjs.com/en/advanced/best-practice-security.html
+    category: security
+    technology:
+    - express
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: HIGH
+    impact: LOW
+    confidence: MEDIUM
+    references:
+    - https://owasp.org/Top10/A04_2021-Insecure_Design
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Cryptographic Issues
+    source: https://semgrep.dev/r/javascript.express.security.audit.express-cookie-settings.express-cookie-session-no-secure
+    shortlink: https://sg.run/9oKz
+    semgrep.dev:
+      rule:
+        r_id: 9267
+        rv_id: 1263131
+        rule_id: v8Unzw
+        version_id: NdTzyrv
+        url: https://semgrep.dev/playground/r/NdTzyrv/javascript.express.security.audit.express-cookie-settings.express-cookie-session-no-secure
+        origin: community
+  patterns:
+  - pattern-either:
+    - pattern-inside: |
+        $SESSION = require('cookie-session');
+        ...
+    - pattern-inside: |
+        $SESSION = require('express-session');
+        ...
+  - pattern: $SESSION(...)
+  - pattern-not-inside: $SESSION(<... {cookie:{secure:true}} ...>,...)
+  - pattern-not-inside: |
+      $OPTS = <... {cookie:{secure:true}} ...>;
+      ...
+      $SESSION($OPTS,...);
+  - pattern-not-inside: |
+      $OPTS = ...;
+      ...
+      $COOKIE = <... {secure:true} ...>;
+      ...
+      $SESSION($OPTS,...);
+  - pattern-not-inside: |
+      $OPTS = ...;
+      ...
+      $OPTS.cookie = <... {secure:true} ...>;
+      ...
+      $SESSION($OPTS,...);
+  - pattern-not-inside: |
+      $OPTS = ...;
+      ...
+      $COOKIE.secure = true;
+      ...
+      $SESSION($OPTS,...);
+  - pattern-not-inside: |
+      $OPTS = ...;
+      ...
+      $OPTS.cookie.secure = true;
+      ...
+      $SESSION($OPTS,...);
+- id: javascript.express.security.audit.express-session-hardcoded-secret.express-session-hardcoded-secret
+  message: A hard-coded credential was detected. It is not recommended to store credentials
+    in source-code, as this risks secrets being leaked and used by either an internal
+    or external malicious adversary. It is recommended to use environment variables
+    to securely provide credentials or retrieve credentials from a secure vault or
+    HSM (Hardware Security Module).
+  options:
+    interfile: true
+  metadata:
+    interfile: true
+    cwe:
+    - 'CWE-798: Use of Hard-coded Credentials'
+    references:
+    - https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html
+    owasp:
+    - A07:2021 - Identification and Authentication Failures
+    - A07:2025 - Authentication Failures
+    category: security
+    technology:
+    - express
+    - secrets
+    cwe2022-top25: true
+    cwe2021-top25: true
+    subcategory:
+    - vuln
+    likelihood: HIGH
+    impact: HIGH
+    confidence: HIGH
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Hard-coded Secrets
+    source: https://semgrep.dev/r/javascript.express.security.audit.express-session-hardcoded-secret.express-session-hardcoded-secret
+    shortlink: https://sg.run/LYvG
+    semgrep.dev:
+      rule:
+        r_id: 22083
+        rv_id: 1263143
+        rule_id: 10Uo39
+        version_id: LjTkgle
+        url: https://semgrep.dev/playground/r/LjTkgle/javascript.express.security.audit.express-session-hardcoded-secret.express-session-hardcoded-secret
+        origin: community
+  languages:
+  - javascript
+  - typescript
+  severity: WARNING
+  patterns:
+  - pattern-either:
+    - pattern-inside: |
+        $SESSION = require('express-session');
+        ...
+    - pattern-inside: |
+        import $SESSION from 'express-session'
+        ...
+    - pattern-inside: |
+        import {..., $SESSION, ...} from 'express-session'
+        ...
+    - pattern-inside: |
+        import * as $SESSION from 'express-session'
+        ...
+  - patterns:
+    - pattern-either:
+      - pattern-inside: $APP.use($SESSION({...}))
+      - pattern: |
+          $SECRET = $VALUE
+          ...
+          $APP.use($SESSION($SECRET))
+    - pattern: |
+        secret: '$Y'
+- id: problem-based-packs.insecure-transport.js-node.bypass-tls-verification.bypass-tls-verification
+  message: Checks for setting the environment variable NODE_TLS_REJECT_UNAUTHORIZED
+    to 0, which disables TLS verification. This should only be used for debugging
+    purposes. Setting the option rejectUnauthorized to false bypasses verification
+    against the list of trusted CAs, which also leads to insecure transport. These
+    options lead to vulnerability to MTM attacks, and should not be used.
+  severity: WARNING
+  metadata:
+    likelihood: MEDIUM
+    impact: MEDIUM
+    confidence: MEDIUM
+    category: security
+    cwe: 'CWE-319: Cleartext Transmission of Sensitive Information'
+    owasp: A03:2017 - Sensitive Data Exposure
+    references:
+    - https://nodejs.org/api/https.html#https_https_request_options_callback
+    - https://stackoverflow.com/questions/20433287/node-js-request-cert-has-expired#answer-29397100
+    subcategory:
+    - vuln
+    technology:
+    - node.js
+    vulnerability: Insecure Transport
+    license: Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license
+    vulnerability_class:
+    - Mishandled Sensitive Information
+    source: https://semgrep.dev/r/problem-based-packs.insecure-transport.js-node.bypass-tls-verification.bypass-tls-verification
+    shortlink: https://sg.run/9oxr
+    semgrep.dev:
+      rule:
+        r_id: 9423
+        rv_id: 946067
+        rule_id: OrU3Y6
+        version_id: JdTDybO
+        url: https://semgrep.dev/playground/r/JdTDybO/problem-based-packs.insecure-transport.js-node.bypass-tls-verification.bypass-tls-verification
+        origin: community
+  languages:
+  - javascript
+  - typescript
+  pattern-either:
+  - pattern: |
+      process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
+  - pattern: |
+      {rejectUnauthorized:false}

@@ -1,0 +1,696 @@
+{
+  "schema": 1,
+  "rules": [
+    {
+      "id": "dede.py.auth.jwt-none-algorithm",
+      "message": "JWT decoded with algorithm='none'; signature verification is completely bypassed.",
+      "severity": "CRITICAL",
+      "category": "security",
+      "languages": [
+        "python"
+      ],
+      "when": [
+        {
+          "regex": "(?i)(jwt\\.decode|jwt\\.decode_complete)\\s*\\(",
+          "same_line": true
+        },
+        {
+          "regex": "(?i)algorithm[s]?\\s*=\\s*['\"]none['\"]|algorithm[s]?\\s*=\\s*\\[['\"]none['\"]\\]",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-347"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "asvs": [
+        "v5.0.0-3.5.1"
+      ],
+      "recommendation": "Always specify an explicit signing algorithm (e.g. HS256, RS256) and never accept 'none'.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/347.html",
+        "https://auth0.com/blog/critical-vulnerabilities-in-json-web-token-libraries/"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.py.auth.jwt-no-verify",
+      "message": "JWT decoded with verify=False or options disabling signature/expiration check.",
+      "severity": "CRITICAL",
+      "category": "security",
+      "languages": [
+        "python"
+      ],
+      "when": [
+        {
+          "regex": "(?i)jwt\\.decode\\s*\\(",
+          "same_line": true
+        }
+      ],
+      "if": [
+        {
+          "contains_any": [
+            "verify=false",
+            "\"verify_signature\": false",
+            "'verify_signature': false",
+            "verify_exp\": false",
+            "verify_exp': false"
+          ]
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-347"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "asvs": [
+        "v5.0.0-3.5.1"
+      ],
+      "recommendation": "Never disable JWT signature or expiration verification in production code.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/347.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.py.auth.hardcoded-jwt-secret",
+      "message": "JWT signed with a short or hardcoded secret literal; tokens are forgeable.",
+      "severity": "CRITICAL",
+      "category": "secret",
+      "languages": [
+        "python"
+      ],
+      "when": [
+        {
+          "regex": "(?i)jwt\\.encode\\s*\\(",
+          "same_line": true,
+          "not_regex": "(?i)(?:os\\.environ|getenv|settings\\.|config\\.|secrets\\.token)"
+        }
+      ],
+      "if": [
+        {
+          "contains_any": [
+            "\"secret\"",
+            "'secret'",
+            "\"password\"",
+            "'password'",
+            "\"changeme\"",
+            "'changeme'"
+          ]
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-321"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "asvs": [
+        "v5.0.0-3.5.2"
+      ],
+      "recommendation": "Load JWT secrets from environment variables or a secret manager; use at least 256-bit random values.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/321.html"
+      ]
+    },
+    {
+      "id": "dede.py.crypto.rsa-small-key",
+      "message": "RSA key generated with fewer than 2048 bits; key is too small for security.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "python"
+      ],
+      "when": [
+        {
+          "regex": "(?i)(rsa\\.generate_private_key|RSA\\.generate|generate_private_key)\\s*\\(",
+          "same_line": true
+        },
+        {
+          "regex": "\\b(512|768|1024)\\b",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-326"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "asvs": [
+        "v5.0.0-6.2.4"
+      ],
+      "recommendation": "Use RSA keys of at least 2048 bits; prefer 4096-bit for long-lived keys or use ECDSA P-256/P-384.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/326.html",
+        "https://csrc.nist.gov/publications/detail/sp/800-57-part-1/rev-5/final"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.py.crypto.ecb-mode",
+      "message": "AES-ECB mode usage; identical plaintext blocks produce identical ciphertext, leaking patterns.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "python"
+      ],
+      "when": [
+        {
+          "regex": "(?i)modes\\.ECB\\(|Cipher\\.MODE_ECB|mode=modes\\.ECB|AES\\.MODE_ECB",
+          "same_line": true
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-327"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "asvs": [
+        "v5.0.0-6.2.1"
+      ],
+      "recommendation": "Use AES-GCM or AES-CBC with a random IV; never ECB.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/327.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.py.crypto.sha1-signature",
+      "message": "SHA-1 used for digital signatures; collision-prone and deprecated for this use.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "python"
+      ],
+      "when": [
+        {
+          "regex": "(?i)(hashes\\.SHA1|hashlib\\.sha1)\\s*\\(",
+          "same_line": true,
+          "not_regex": "(?i)(?:usedforsecurity=false|\\#\\ dede:\\ non\\-crypto|checksum)"
+        }
+      ],
+      "if": [
+        {
+          "contains_any": [
+            "sign",
+            "verify",
+            "signature",
+            "hmac",
+            "digest"
+          ]
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-327"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "asvs": [
+        "v5.0.0-6.2.1"
+      ],
+      "recommendation": "Use SHA-256 or SHA-3 for signature operations.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/327.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.py.web.open-redirect",
+      "message": "HTTP redirect destination built from user-supplied input; open redirect risk.",
+      "severity": "MEDIUM",
+      "category": "security",
+      "languages": [
+        "python"
+      ],
+      "when": [
+        {
+          "regex": "(?i)(redirect|make_response|HttpResponseRedirect|abort)\\s*\\(",
+          "same_line": true
+        },
+        {
+          "regex": "(?i)(request\\.(args|form|values|get_json|json|data|params|query_params|POST|GET))",
+          "same_line": true,
+          "not_regex": "(?i)(?:urlparse|url_for|allowed_hosts|safe_url|is_safe_url|\\#\\ dede:\\ validated)"
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-601"
+      ],
+      "owasp": [
+        "A01:2025"
+      ],
+      "asvs": [
+        "v5.0.0-5.1.5"
+      ],
+      "recommendation": "Validate redirect targets against an allowlist of known-safe URLs or use only url_for().",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/601.html",
+        "https://cheatsheetseries.owasp.org/cheatsheets/Unvalidated_Redirects_and_Forwards_Cheat_Sheet.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.py.web.ssti-render-string",
+      "message": "Jinja2/Mako template rendered with user-supplied string; server-side template injection risk.",
+      "severity": "CRITICAL",
+      "category": "security",
+      "languages": [
+        "python"
+      ],
+      "when": [
+        {
+          "regex": "(?i)(Environment\\(|jinja2\\.Template|from_string|render_template_string)\\s*\\(",
+          "same_line": true
+        },
+        {
+          "regex": "(?i)(request\\.(args|form|values|data|json|GET|POST)|input\\()",
+          "same_line": true,
+          "not_regex": "(?i)(?:autoescape=true|Markup\\(|escape\\(|\\#\\ dede:\\ safe)"
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-94"
+      ],
+      "owasp": [
+        "A03:2025"
+      ],
+      "asvs": [
+        "v5.0.0-5.3.3"
+      ],
+      "recommendation": "Never pass user-controlled data as a template string; use render_template() with a fixed template file.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/94.html",
+        "https://portswigger.net/research/server-side-template-injection"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.py.web.xmlrpc-multicall-ssrf",
+      "message": "xmlrpc.client used with user-controlled URL; SSRF and unsafe XML parsing risk.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "python"
+      ],
+      "when": [
+        {
+          "regex": "(?i)xmlrpc\\.client\\.ServerProxy\\s*\\(",
+          "same_line": true
+        },
+        {
+          "regex": "(?i)(request\\.(args|form|params|json)|input\\()",
+          "same_line": true
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-918"
+      ],
+      "owasp": [
+        "A10:2025"
+      ],
+      "asvs": [
+        "v5.0.0-12.6.1"
+      ],
+      "recommendation": "Validate and allowlist xmlrpc server URLs; never derive them from user input.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/918.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.py.injection.ldap-unescaped",
+      "message": "LDAP search filter built with string concatenation; LDAP injection risk.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "python"
+      ],
+      "when": [
+        {
+          "regex": "(?i)(ldap|ldap3|simpleldap).*search.*filter.*(%|format\\(|\\.join|\\+)",
+          "same_line": true,
+          "not_regex": "(?i)(?:escape_filter_chars|escape_dn_chars|\\#\\ dede:\\ safe)"
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-90"
+      ],
+      "owasp": [
+        "A03:2025"
+      ],
+      "asvs": [
+        "v5.0.0-5.3.5"
+      ],
+      "recommendation": "Use ldap3.utils.conv.escape_filter_chars() to escape all user-supplied values in LDAP filters.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/90.html",
+        "https://cheatsheetseries.owasp.org/cheatsheets/LDAP_Injection_Prevention_Cheat_Sheet.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.py.injection.xpath-concat",
+      "message": "XPath expression built with string concatenation; XPath injection risk.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "python"
+      ],
+      "when": [
+        {
+          "regex": "(?i)(xpath|lxml.*xpath|etree.*xpath).*(%s|format\\(|f\"|\\+)",
+          "same_line": true,
+          "not_regex": "(?i)(?:xpath_variable|literal\\(|\\#\\ dede:\\ safe)"
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-643"
+      ],
+      "owasp": [
+        "A03:2025"
+      ],
+      "asvs": [
+        "v5.0.0-5.3.7"
+      ],
+      "recommendation": "Use parameterized XPath queries with lxml's smart_strings=False and XPath variables.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/643.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.py.deserialize.marshal-load",
+      "message": "marshal.loads on untrusted data; can execute arbitrary code.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "python"
+      ],
+      "when": [
+        {
+          "regex": "marshal\\.loads?\\s*\\(",
+          "same_line": true
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-502"
+      ],
+      "owasp": [
+        "A08:2025"
+      ],
+      "asvs": [
+        "v5.0.0-13.3.1"
+      ],
+      "recommendation": "Avoid marshal for untrusted data; use JSON or a safe serialization format.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/502.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.py.cmd.os-system-concat",
+      "message": "os.system called with concatenated or formatted string; command injection risk.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "python"
+      ],
+      "when": [
+        {
+          "regex": "(?i)os\\.system\\s*\\(\\s*(['\"].*['\"]\\s*\\+|f['\"]|.*\\.format\\()",
+          "same_line": true
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-78"
+      ],
+      "owasp": [
+        "A03:2025"
+      ],
+      "asvs": [
+        "v5.0.0-5.3.4"
+      ],
+      "recommendation": "Use subprocess.run with shell=False and pass arguments as a list.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/78.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.py.ssrf.requests-user-url",
+      "message": "HTTP request to a URL derived from user input; Server-Side Request Forgery (SSRF) risk.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "python"
+      ],
+      "when": [
+        {
+          "regex": "(?i)(requests\\.(get|post|put|delete|patch|head|request)|httpx\\.(get|post|put|delete|patch|request)|urllib\\.request\\.urlopen)\\s*\\(",
+          "same_line": true
+        },
+        {
+          "regex": "(?i)(request\\.(args|form|values|json|data|GET|POST)|input\\()",
+          "same_line": true,
+          "not_regex": "(?i)(?:allowlist|allowed_hosts|validate_url|is_safe_url|urlparse|\\#\\ dede:\\ safe)"
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-918"
+      ],
+      "owasp": [
+        "A10:2025"
+      ],
+      "asvs": [
+        "v5.0.0-12.6.1"
+      ],
+      "recommendation": "Validate request URLs against a strict allowlist of permitted hostnames; block internal/loopback addresses.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/918.html",
+        "https://cheatsheetseries.owasp.org/cheatsheets/Server_Side_Request_Forgery_Prevention_Cheat_Sheet.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.py.timing.str-compare-password",
+      "message": "Password or token compared with == operator; vulnerable to timing attacks.",
+      "severity": "MEDIUM",
+      "category": "security",
+      "languages": [
+        "python"
+      ],
+      "when": [
+        {
+          "regex": "(?i)(password|token|secret|api_key|hmac|signature)\\s*==\\s*",
+          "same_line": true,
+          "not_regex": "(?i)(?:hmac\\.compare_digest|secrets\\.compare_digest|constant_time_compare|\\#\\ dede:\\ safe)"
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-208"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "asvs": [
+        "v5.0.0-2.7.5"
+      ],
+      "recommendation": "Use hmac.compare_digest() or secrets.compare_digest() for constant-time comparisons.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/208.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.py.web.cors-wildcard",
+      "message": "CORS configured to allow all origins (*); all cross-origin requests are permitted.",
+      "severity": "MEDIUM",
+      "category": "security",
+      "languages": [
+        "python"
+      ],
+      "when": [
+        {
+          "regex": "(?i)(CORS|cors\\(|cors_origin|Access-Control-Allow-Origin).*[\"']\\*[\"']",
+          "same_line": true,
+          "not_regex": "(?i)(?:\\#\\ dede:\\ public\\-api|allow_all_origins=false)"
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-942"
+      ],
+      "owasp": [
+        "A05:2025"
+      ],
+      "asvs": [
+        "v5.0.0-14.4.7"
+      ],
+      "recommendation": "Restrict CORS to specific trusted origins instead of using a wildcard.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/942.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.py.web.session-no-secret",
+      "message": "Flask/Django session with weak or missing SECRET_KEY; sessions are forgeable.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "python"
+      ],
+      "when": [
+        {
+          "regex": "(?i)(SECRET_KEY|secret_key)\\s*=\\s*['\"][^'\"]{1,16}['\"]",
+          "same_line": true,
+          "not_regex": "(?i)(?:os\\.environ|getenv|os\\.urandom|secrets\\.token|\\#\\ dede:\\ safe)"
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-321"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "asvs": [
+        "v5.0.0-3.6.1"
+      ],
+      "recommendation": "Generate SECRET_KEY with at least 32 bytes of randomness (os.urandom(32)) and load it from the environment.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/321.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.py.web.sql-raw-execute",
+      "message": "Raw SQL string passed to execute/query with user input; SQL injection risk.",
+      "severity": "CRITICAL",
+      "category": "security",
+      "languages": [
+        "python"
+      ],
+      "when": [
+        {
+          "regex": "(?i)\\.(execute|raw|query)\\s*\\(\\s*(f['\"]|['\"][^'\"]*['\"]\\s*%|.*\\.format\\()",
+          "same_line": true,
+          "not_regex": "(?i)(?:\\#\\ dede:\\ safe|parameterized|%s|\\?)"
+        }
+      ],
+      "confidence": "HIGH",
+      "cwe": [
+        "CWE-89"
+      ],
+      "owasp": [
+        "A03:2025"
+      ],
+      "asvs": [
+        "v5.0.0-5.3.4"
+      ],
+      "recommendation": "Use parameterized queries and never build SQL by string formatting.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/89.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.py.path.traversal-join",
+      "message": "File path constructed from user input with os.path.join; path traversal risk.",
+      "severity": "HIGH",
+      "category": "security",
+      "languages": [
+        "python"
+      ],
+      "when": [
+        {
+          "regex": "(?i)os\\.path\\.join\\s*\\(",
+          "same_line": true
+        },
+        {
+          "regex": "(?i)(request\\.(args|form|values|json|params)|input\\()",
+          "same_line": true,
+          "not_regex": "(?i)(?:os\\.path\\.abspath|Path\\.resolve|\\.startswith\\(base|realpath|\\#\\ dede:\\ safe)"
+        }
+      ],
+      "confidence": "MEDIUM",
+      "cwe": [
+        "CWE-22"
+      ],
+      "owasp": [
+        "A01:2025"
+      ],
+      "asvs": [
+        "v5.0.0-12.3.1"
+      ],
+      "recommendation": "Resolve the full path with os.path.realpath and verify it starts with the intended base directory.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/22.html"
+      ],
+      "exclude_comments": true
+    },
+    {
+      "id": "dede.py.crypto.predictable-uuid",
+      "message": "UUID1 or UUID3 used for security tokens; UUID4 (random) should be used instead.",
+      "severity": "LOW",
+      "category": "security",
+      "languages": [
+        "python"
+      ],
+      "when": [
+        {
+          "regex": "(?i)uuid\\.(uuid1|uuid3)\\s*\\(",
+          "same_line": true
+        }
+      ],
+      "if": [
+        {
+          "contains_any": [
+            "token",
+            "session",
+            "secret",
+            "key",
+            "nonce",
+            "csrf"
+          ]
+        }
+      ],
+      "confidence": "LOW",
+      "cwe": [
+        "CWE-338"
+      ],
+      "owasp": [
+        "A02:2025"
+      ],
+      "asvs": [
+        "v5.0.0-6.2.2"
+      ],
+      "recommendation": "Use uuid.uuid4() for random, unpredictable identifiers in security contexts.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/338.html"
+      ],
+      "exclude_comments": true
+    }
+  ]
+}
